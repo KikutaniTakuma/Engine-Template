@@ -47,14 +47,14 @@ public:
 	/// </summary>
 	/// <returns>デルタタイム</returns>
 	inline float GetDelta() const {
-		return deltaTime_;
+		return static_cast<float>(deltaTime_);
 	}
 
 	/// <summary>
 	/// fps取得
 	/// </summary>
 	/// <returns>fps</returns>
-	inline float GetFps() const {
+	inline double GetFps() const {
 		return fps_;
 	}
 
@@ -71,8 +71,10 @@ public:
 /// </summary>
 private:
 	std::chrono::steady_clock::time_point frameStartTime_;
-	float deltaTime_;
-	float fps_;
+	double deltaTime_;
+	double fps_;
+	double maxFps_;
+	double minFps_;
 	size_t frameCount_;
 
 	std::chrono::steady_clock::time_point gameStartTime_;
