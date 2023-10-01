@@ -195,10 +195,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Utils\Action\Frame\Frame.cpp" />
     <ClCompile Include="Utils\Camera\Camera.cpp" />
     <ClCompile Include="Utils\CsvLoad\CsvLoad.cpp" />
-    <ClCompile Include="Utils\Math\Angle.cpp" />
     <ClCompile Include="Utils\Math\Mat4x4.cpp" />
-    <ClCompile Include="Utils\Math\Random.cpp" />
-    <ClCompile Include="Utils\Math\ValueRange.cpp" />
     <ClCompile Include="Utils\Math\Vector2.cpp" />
     <ClCompile Include="Utils\Math\Vector3.cpp" />
     <ClCompile Include="Utils\Math\Vector4.cpp" />
@@ -251,9 +248,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Utils\Action\Frame\Frame.h" />
     <ClInclude Include="Utils\Camera\Camera.h" />
     <ClInclude Include="Utils\CsvLoad\CsvLoad.h" />
-    <ClInclude Include="Utils\Math\Angle.h" />
-    <ClInclude Include="Utils\Math\Random.h" />
-    <ClInclude Include="Utils\Math\ValueRange.h" />
     <ClInclude Include="Utils\Math\Mat4x4.h" />
     <ClInclude Include="Utils\Math\Vector2.h" />
     <ClInclude Include="Utils\Math\Vector3.h" />
