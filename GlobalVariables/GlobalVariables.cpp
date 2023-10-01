@@ -6,25 +6,37 @@
 #include <fstream>
 #include <Windows.h> 
 
-GlobalVariables::GlobalVariables(const std::string &fileNmae) :
+GlobalVariables::GlobalVariables(const std::string& fileNmae) :
 	datas(),
 	isCreate(false),
 	groupNameAdd(),
-	dataFileName(fileNmae)
+	dataFileNmae(fileNmae)
 {}
 
-void GlobalVariables::CreateGroup(const std::string &groupName) {
+void GlobalVariables::CreateGroup(const std::string& groupName) {
 	datas[groupName];
 }
 
-const GlobalVariables::Group &GlobalVariables::GetGroup(const std::string &groupName) const {
-	// グループ内を検索
-	const auto &itGroup = datas.find(groupName);
-	assert(itGroup != datas.end());
-
-	return itGroup->second;
+void GlobalVariables::SetValue(const std::string& groupName, const std::string& key, int32_t value) {
+	auto& gruop = datas[groupName];
+	Item item = value;
+	gruop[key] = value;
 }
-
+void GlobalVariables::SetValue(const std::string& groupName, const std::string& key, float value) {
+	auto& gruop = datas[groupName];
+	Item item = value;
+	gruop[key] = value;
+}
+void GlobalVariables::SetValue(const std::string& groupName, const std::string& key, const Vector3& value) {
+	auto& gruop = datas[groupName];
+	Item item = value;
+	gruop[key] = value;
+}
+void GlobalVariables::SetValue(const std::string& groupName, const std::string& key, const std::string& value) {
+	auto& gruop = datas[groupName];
+	Item item = value;
+	gruop[key] = value;
+}
 
 void GlobalVariables::Update() {
 	if (!ImGui::Begin(" Global Variables", nullptr, ImGuiWindowFlags_MenuBar)) {
@@ -37,31 +49,27 @@ void GlobalVariables::Update() {
 
 
 	for (auto itrGroup = datas.begin(); itrGroup != datas.end(); itrGroup++) {
-		const std::string &groupName = itrGroup->first;
-		auto &group = itrGroup->second;
+		const std::string& groupName = itrGroup->first;
+		auto& group = itrGroup->second;
 
 		if (!ImGui::BeginMenu(groupName.c_str())) {
 			continue;
 		}
-		for (auto &itemitr : group) {
-			const std::string &itemName = itemitr.first;
+		for (auto& itemitr : group) {
+			const std::string& itemName = itemitr.first;
 
-			auto &item = itemitr.second;
+			auto& item = itemitr.second;
 
 			if (std::holds_alternative<int32_t>(item)) {
-				int32_t *ptr = std::get_if<int32_t>(&item);
+				int32_t* ptr = std::get_if<int32_t>(&item);
 				ImGui::SliderInt(itemName.c_str(), ptr, 0, 100);
 			}
 			else if (std::holds_alternative<float>(item)) {
-				float *ptr = std::get_if<float>(&item);
+				float* ptr = std::get_if<float>(&item);
 				ImGui::SliderFloat(itemName.c_str(), ptr, -10.0f, 10.0f);
 			}
-			else if (std::holds_alternative<Vector2>(item)) {
-				Vector2 *ptr = std::get_if<Vector2>(&item);
-				ImGui::SliderFloat2(itemName.c_str(), &ptr->x, -10.0f, 10.0f);
-			}
 			else if (std::holds_alternative<Vector3>(item)) {
-				Vector3 *ptr = std::get_if<Vector3>(&item);
+				Vector3* ptr = std::get_if<Vector3>(&item);
 				ImGui::SliderFloat3(itemName.c_str(), &ptr->x, -10.0f, 10.0f);
 			}
 		}
@@ -81,7 +89,7 @@ void GlobalVariables::Update() {
 	ImGui::End();
 }
 
-void GlobalVariables::SaveFile(const std::string &groupName) {
+void GlobalVariables::SaveFile(const std::string& groupName) {
 	auto itrGroup = datas.find(groupName);
 	assert(itrGroup != datas.end());
 
@@ -92,19 +100,15 @@ void GlobalVariables::SaveFile(const std::string &groupName) {
 	root[groupName] = nlohmann::json::object();
 
 	for (auto itemItr = itrGroup->second.begin(); itemItr != itrGroup->second.end(); itemItr++) {
-		const std::string &itemName = itemItr->first;
+		const std::string& itemName = itemItr->first;
 
-		auto &item = itemItr->second;
+		auto& item = itemItr->second;
 
 		if (std::holds_alternative<int32_t>(item)) {
 			root[groupName][itemName] = std::get<int32_t>(item);
 		}
 		else if (std::holds_alternative<float>(item)) {
 			root[groupName][itemName] = std::get<float>(item);
-		}
-		else if (std::holds_alternative<Vector2>(item)) {
-			auto tmp = std::get<Vector2>(item);
-			root[groupName][itemName] = nlohmann::json::array({ tmp.x, tmp.y });
 		}
 		else if (std::holds_alternative<Vector3>(item)) {
 			auto tmp = std::get<Vector3>(item);
@@ -115,14 +119,14 @@ void GlobalVariables::SaveFile(const std::string &groupName) {
 		}
 	}
 
-	const std::filesystem::path kDirectoryPath = "./Datas/" + dataFileName;
+	const std::filesystem::path kDirectoryPath = "./Datas/" + dataFileNmae;
 
 	if (!std::filesystem::exists(kDirectoryPath)) {
 		std::filesystem::create_directory(kDirectoryPath);
 	}
 
 	std::string groupNameTmp;
-	for (auto &i : groupName) {
+	for (auto& i : groupName) {
 		if (i == '\0') {
 			break;
 		}
@@ -143,15 +147,15 @@ void GlobalVariables::SaveFile(const std::string &groupName) {
 }
 
 void GlobalVariables::LoadFile() {
-	const std::filesystem::path kDirectoryPath = "./Datas/" + dataFileName;
+	const std::filesystem::path kDirectoryPath = "./Datas/" + dataFileNmae;
 
 	if (!std::filesystem::exists(kDirectoryPath)) {
 		return;
 	}
 
 	std::filesystem::directory_iterator dirItr(kDirectoryPath);
-	for (const auto &entry : dirItr) {
-		const auto &filePath = entry.path();
+	for (const auto& entry : dirItr) {
+		const auto& filePath = entry.path();
 
 		auto extention = filePath.extension().string();
 		if (extention.compare(".json") != 0) {
@@ -163,8 +167,8 @@ void GlobalVariables::LoadFile() {
 
 }
 
-void GlobalVariables::LoadFile(const std::string &groupName) {
-	const std::filesystem::path kDirectoryPath = "./Datas/" + dataFileName;
+void GlobalVariables::LoadFile(const std::string& groupName) {
+	const std::filesystem::path kDirectoryPath = "./Datas/" + dataFileNmae;
 	std::string filePath = kDirectoryPath.string() + groupName + std::string(".json");
 
 	std::ifstream file(filePath);
@@ -184,7 +188,7 @@ void GlobalVariables::LoadFile(const std::string &groupName) {
 	assert(groupItr != root.end());
 
 	for (auto itemItr = groupItr->begin(); itemItr != groupItr->end(); itemItr++) {
-		const std::string &itemName = itemItr.key();
+		const std::string& itemName = itemItr.key();
 
 		if (itemItr->is_number_integer()) {
 			int32_t value = itemItr->get<int32_t>();
@@ -192,10 +196,6 @@ void GlobalVariables::LoadFile(const std::string &groupName) {
 		}
 		else if (itemItr->is_number_float()) {
 			float value = itemItr->get<float>();
-			SetValue(groupName, itemName, value);
-		}
-		else if (itemItr->is_array() && itemItr->size() == 2) {
-			Vector2 value = { itemItr->at(0),itemItr->at(1) };
 			SetValue(groupName, itemName, value);
 		}
 		else if (itemItr->is_array() && itemItr->size() == 3) {
@@ -210,25 +210,49 @@ void GlobalVariables::LoadFile(const std::string &groupName) {
 	}
 }
 
-const GlobalVariables::Item &GlobalVariables::Get(const std::string &groupName, const std::string &key) const {
-
-	// グループの検索
-	const auto &group = GetGroup(groupName);
-
-	// キーがあるか
-	const auto &itItem = group.find(key);
-	assert(itItem != group.end());
-
-	return itItem->second;
+void GlobalVariables::AddItem(const std::string& groupName, const std::string& key, int32_t value) {
+	auto& gruop = datas[groupName];
+	auto itemItr = gruop.find(key);
+	if (itemItr == gruop.end()) {
+		Item item = value;
+		gruop[key] = value;
+	}
+}
+void GlobalVariables::AddItem(const std::string& groupName, const std::string& key, float value) {
+	auto& gruop = datas[groupName];
+	auto itemItr = gruop.find(key);
+	gruop[key] = value;
+	if (itemItr == gruop.end()) {
+		Item item = value;
+		gruop[key] = value;
+	}
+}
+void GlobalVariables::AddItem(const std::string& groupName, const std::string& key, const Vector3& value) {
+	auto& gruop = datas[groupName];
+	auto itemItr = gruop.find(key);
+	gruop[key] = value;
+	if (itemItr == gruop.end()) {
+		Item item = value;
+		gruop[key] = value;
+	}
+}
+void GlobalVariables::AddItem(const std::string& groupName, const std::string& key, const std::string& value) {
+	auto& gruop = datas[groupName];
+	auto itemItr = gruop.find(key);
+	gruop[key] = value;
+	if (itemItr == gruop.end()) {
+		Item item = value;
+		gruop[key] = value;
+	}
 }
 
-int32_t GlobalVariables::GetIntValue(const std::string &groupName, const std::string &key) const {
+int32_t GlobalVariables::GetIntValue(const std::string& groupName, const std::string& key) const {
 	auto dataItr = datas.find(groupName);
 	assert(dataItr != datas.end());
-	const Group &group = dataItr->second;
+	const Group& group = dataItr->second;
 	auto itemItr = group.find(key);
 	assert(itemItr != group.end());
-	const Item &item = itemItr->second;
+	const Item& item = itemItr->second;
 	if (std::holds_alternative<int32_t>(item)) {
 		return std::get<int32_t>(item);
 	}
@@ -237,13 +261,13 @@ int32_t GlobalVariables::GetIntValue(const std::string &groupName, const std::st
 		return 0;
 	}
 }
-float GlobalVariables::GetFloatValue(const std::string &groupName, const std::string &key)const {
+float GlobalVariables::GetFloatValue(const std::string& groupName, const std::string& key)const {
 	auto dataItr = datas.find(groupName);
 	assert(dataItr != datas.end());
-	const Group &group = dataItr->second;
+	const Group& group = dataItr->second;
 	auto itemItr = group.find(key);
 	assert(itemItr != group.end());
-	const Item &item = itemItr->second;
+	const Item& item = itemItr->second;
 	if (std::holds_alternative<float>(item)) {
 		return std::get<float>(item);
 	}
@@ -252,13 +276,13 @@ float GlobalVariables::GetFloatValue(const std::string &groupName, const std::st
 		return 0.0f;
 	}
 }
-Vector3 GlobalVariables::GetVector3Value(const std::string &groupName, const std::string &key) const {
+Vector3 GlobalVariables::GetVector3Value(const std::string& groupName, const std::string& key) const {
 	auto dataItr = datas.find(groupName);
 	assert(dataItr != datas.end());
-	const Group &group = dataItr->second;
+	const Group& group = dataItr->second;
 	auto itemItr = group.find(key);
 	assert(itemItr != group.end());
-	const Item &item = itemItr->second;
+	const Item& item = itemItr->second;
 	if (std::holds_alternative<Vector3>(item)) {
 		return std::get<Vector3>(item);
 	}
@@ -268,13 +292,13 @@ Vector3 GlobalVariables::GetVector3Value(const std::string &groupName, const std
 		return Vector3();
 	}
 }
-std::string GlobalVariables::GetStringValue(const std::string &groupName, const std::string &key) const {
+std::string GlobalVariables::GetStringValue(const std::string& groupName, const std::string& key) const {
 	auto dataItr = datas.find(groupName);
 	assert(dataItr != datas.end());
-	const Group &group = dataItr->second;
+	const Group& group = dataItr->second;
 	auto itemItr = group.find(key);
 	assert(itemItr != group.end());
-	const Item &item = itemItr->second;
+	const Item& item = itemItr->second;
 	if (std::holds_alternative<std::string>(item)) {
 		return std::get<std::string>(item);
 	}
