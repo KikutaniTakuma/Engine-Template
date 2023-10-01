@@ -15,49 +15,9 @@ ErrorCheck* ErrorCheck::GetInstance() {
 ErrorCheck::ErrorCheck() :
 	isError(false)
 {
-	std::filesystem::path directoryPath = "./ErrorLog/";
-	if (!std::filesystem::exists(directoryPath)) {
-		std::filesystem::create_directory(directoryPath);
-	}
-	std::ofstream file(directoryPath.string() + "ErrorLog.txt", std::ios::app);
-	assert(file);
-
-	auto now = std::chrono::system_clock::now();
-	auto nowSec = std::chrono::floor<std::chrono::seconds>(now);
-	std::chrono::zoned_time zt{"Asia/Tokyo", nowSec};
-
-	file << std::endl << std::format("{:%Y/%m/%d %H:%M:%S %Z} : {}", zt, "ErrorCheck Start") << std::endl;
 }
 
 ErrorCheck::~ErrorCheck() {
-	if (isError) {
-		std::filesystem::path directoryPath = "./ErrorLog/";
-		if (!std::filesystem::exists(directoryPath)) {
-			std::filesystem::create_directory(directoryPath);
-		}
-		std::ofstream file(directoryPath.string() + "ErrorLog.txt", std::ios::app);
-		assert(file);
-
-		auto now = std::chrono::system_clock::now();
-		auto nowSec = std::chrono::floor<std::chrono::seconds>(now);
-		std::chrono::zoned_time zt{"Asia/Tokyo", nowSec};
-
-		file << std::format("{:%Y/%m/%d %H:%M:%S %Z} : {}", zt, "There was Error!!!!") << std::endl;
-	}
-	else {
-		std::filesystem::path directoryPath = "./ErrorLog/";
-		if (!std::filesystem::exists(directoryPath)) {
-			std::filesystem::create_directory(directoryPath);
-		}
-		std::ofstream file(directoryPath.string() + "ErrorLog.txt", std::ios::app);
-		assert(file);
-
-		auto now = std::chrono::system_clock::now();
-		auto nowSec = std::chrono::floor<std::chrono::seconds>(now);
-		std::chrono::zoned_time zt{"Asia/Tokyo", nowSec};
-
-		file << std::format("{:%Y/%m/%d %H:%M:%S %Z} : {}", zt, "ErrorCheck End") << std::endl;
-	}
 }
 
 void ErrorCheck::ErrorTextBox(const std::string& text, const std::string& boxName) {
@@ -81,7 +41,7 @@ void ErrorCheck::ErrorTextBox(const std::string& text, const std::string& boxNam
 }
 
 void ErrorCheck::ErrorLog(const std::string& text, const std::string& boxName) {
-	std::filesystem::path directoryPath = "./ErrorLog/";
+	std::filesystem::path directoryPath = "./Log/";
 	if (!std::filesystem::exists(directoryPath)) {
 		std::filesystem::create_directory(directoryPath);
 	}
