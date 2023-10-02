@@ -29,9 +29,6 @@
     <ClCompile Include="Engine\WinApp\WinApp.cpp">
       <Filter>Engine\WinApp</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\ConvertString\ConvertString.cpp">
-      <Filter>Engine\ConvertString</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\ShaderManager\ShaderManager.cpp">
       <Filter>Engine\ShaderManager</Filter>
     </ClCompile>
@@ -131,6 +128,9 @@
     <ClCompile Include="Utils\Log\Log.cpp">
       <Filter>Utils\Log</Filter>
     </ClCompile>
+    <ClCompile Include="Utils\ConvertString\ConvertString.cpp">
+      <Filter>Utils\ConvertString</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -141,9 +141,6 @@
     </Filter>
     <Filter Include="Engine\WinApp">
       <UniqueIdentifier>{b53c25de-314b-4648-8852-e97c158f0275}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\ConvertString">
-      <UniqueIdentifier>{5a7a3057-cf34-4af9-a2fc-9484d57e4dd8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\ShaderManager">
       <UniqueIdentifier>{e9f17783-c021-4323-ae3b-d9f04d63298d}</UniqueIdentifier>
@@ -247,6 +244,9 @@
     <Filter Include="Utils\Log">
       <UniqueIdentifier>{50f0f596-926c-4b48-959c-d79c4f823f0f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils\ConvertString">
+      <UniqueIdentifier>{5a7a3057-cf34-4af9-a2fc-9484d57e4dd8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Engine.h">
@@ -278,9 +278,6 @@
     </ClInclude>
     <ClInclude Include="Engine\WinApp\WinApp.h">
       <Filter>Engine\WinApp</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\ConvertString\ConvertString.h">
-      <Filter>Engine\ConvertString</Filter>
     </ClInclude>
     <ClInclude Include="Engine\ShaderManager\ShaderManager.h">
       <Filter>Engine\ShaderManager</Filter>
@@ -386,6 +383,9 @@
     </ClInclude>
     <ClInclude Include="Utils\Log\Log.h">
       <Filter>Utils\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\ConvertString\ConvertString.h">
+      <Filter>Utils\ConvertString</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

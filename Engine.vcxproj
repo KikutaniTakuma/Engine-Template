@@ -156,7 +156,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Drawers\PeraRender\PeraRender.cpp" />
     <ClCompile Include="Drawers\StringOut\StringOut.cpp" />
     <ClCompile Include="Drawers\Texture2D\Texture2D.cpp" />
-    <ClCompile Include="Engine\ConvertString\ConvertString.cpp" />
     <ClCompile Include="Engine\Engine.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
     </ClCompile>
@@ -194,6 +193,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="TextureManager\Texture\Texture.cpp" />
     <ClCompile Include="Utils\Action\Frame\Frame.cpp" />
     <ClCompile Include="Utils\Camera\Camera.cpp" />
+    <ClCompile Include="Utils\ConvertString\ConvertString.cpp" />
     <ClCompile Include="Utils\CsvLoad\CsvLoad.cpp" />
     <ClCompile Include="Utils\Log\Log.cpp" />
     <ClCompile Include="Utils\Math\Mat4x4.cpp" />
@@ -211,7 +211,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Drawers\StringOut\StringOut.h" />
     <ClInclude Include="Drawers\Texture2D\Texture2D.h" />
     <ClInclude Include="Engine\ConstBuffer\ConstBuffer.h" />
-    <ClInclude Include="Engine\ConvertString\ConvertString.h" />
     <ClInclude Include="Engine\Engine.h" />
     <ClInclude Include="Engine\ErrorCheck\ErrorCheck.h" />
     <ClInclude Include="Engine\FrameInfo\FrameInfo.h" />
@@ -248,6 +247,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="TextureManager\Texture\Texture.h" />
     <ClInclude Include="Utils\Action\Frame\Frame.h" />
     <ClInclude Include="Utils\Camera\Camera.h" />
+    <ClInclude Include="Utils\ConvertString\ConvertString.h" />
     <ClInclude Include="Utils\CsvLoad\CsvLoad.h" />
     <ClInclude Include="Utils\Log\Log.h" />
     <ClInclude Include="Utils\Math\Mat4x4.h" />
