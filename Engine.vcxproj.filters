@@ -122,9 +122,6 @@
     <ClCompile Include="Engine\FrameInfo\FrameInfo.cpp">
       <Filter>Engine\FrameInfo</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Log\Log.cpp">
-      <Filter>Engine\Log</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\CsvLoad\CsvLoad.cpp">
       <Filter>Utils\CsvLoad</Filter>
     </ClCompile>
@@ -237,9 +234,6 @@
     </Filter>
     <Filter Include="Engine\FrameInfo">
       <UniqueIdentifier>{0b450b74-986a-4b3d-9a34-b57d457b62d0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Log">
-      <UniqueIdentifier>{14abbff2-7fc6-4360-992e-2b862477492f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Utils\CsvLoad">
       <UniqueIdentifier>{0801bfcf-a0f8-4f86-b79a-283b0de7cdd3}</UniqueIdentifier>
@@ -374,9 +368,6 @@
     </ClInclude>
     <ClInclude Include="Engine\FrameInfo\FrameInfo.h">
       <Filter>Engine\FrameInfo</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Log\Log.h">
-      <Filter>Engine\Log</Filter>
     </ClInclude>
     <ClInclude Include="Utils\CsvLoad\CsvLoad.h">
       <Filter>Utils\CsvLoad</Filter>

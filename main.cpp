@@ -32,7 +32,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// フォントロード
 	Engine::LoadFont("./Resources/Font/fonttest.spritefont");
 
-	bool fullscreen = false;
+	static const auto* const frameInfo = FrameInfo::GetInstance();
 
 	/// 
 	/// メインループ
@@ -43,9 +43,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		// fps
 		ImGui::Begin("fps");
-		ImGui::Text("Frame rate: %3.0f fps", FrameInfo::GetInstance()->GetFps());
-		ImGui::Text("Delta Time: %.4f", FrameInfo::GetInstance()->GetDelta());
-		ImGui::Text("Frame Count: %llu", FrameInfo::GetInstance()->GetFrameCount());
+		ImGui::Text("Frame rate: %3.0lf fps", frameInfo->GetFps());
+		ImGui::Text("Delta Time: %.4lf", frameInfo->GetDelta());
+		ImGui::Text("Frame Count: %llu", frameInfo->GetFrameCount());
 		ImGui::End();
 
 		// 入力処理
@@ -57,12 +57,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 更新処理
 		/// 
 
-		// フルスクリーン(ImGuiはフルスクリーン時バグる)
-		if (KeyInput::Releaed(DIK_F11) ||
-			((KeyInput::LongPush(DIK_LALT) || KeyInput::LongPush(DIK_RALT)) && KeyInput::Releaed(DIK_RETURN))) {
-			fullscreen = !fullscreen;
-			WinApp::GetInstance()->SetFullscreen(fullscreen);
-		}
+
 
 		///
 		/// 更新処理ここまで
@@ -71,6 +66,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// 描画処理
 		/// 
+
 
 
 		///

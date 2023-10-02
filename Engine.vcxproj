@@ -162,7 +162,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ClCompile>
     <ClCompile Include="Engine\ErrorCheck\ErrorCheck.cpp" />
     <ClCompile Include="Engine\FrameInfo\FrameInfo.cpp" />
-    <ClCompile Include="Engine\Log\Log.cpp" />
     <ClCompile Include="Engine\PipelineManager\PipelineManager.cpp" />
     <ClCompile Include="Engine\PipelineManager\Pipeline\Pipeline.cpp" />
     <ClCompile Include="Engine\RenderTarget\RenderTarget.cpp" />
@@ -214,7 +213,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Engine.h" />
     <ClInclude Include="Engine\ErrorCheck\ErrorCheck.h" />
     <ClInclude Include="Engine\FrameInfo\FrameInfo.h" />
-    <ClInclude Include="Engine\Log\Log.h" />
     <ClInclude Include="Engine\PipelineManager\PipelineManager.h" />
     <ClInclude Include="Engine\PipelineManager\Pipeline\Pipeline.h" />
     <ClInclude Include="Engine\RenderTarget\RenderTarget.h" />

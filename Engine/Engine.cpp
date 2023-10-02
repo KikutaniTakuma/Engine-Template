@@ -12,7 +12,6 @@
 #include "PipelineManager/PipelineManager.h"
 #include "ErrorCheck/ErrorCheck.h"
 #include "FrameInfo/FrameInfo.h"
-#include "Log/Log.h"
 
 #include "Utils/Math/Vector3.h"
 #include "Utils/Math/Mat4x4.h"
@@ -199,7 +198,7 @@ bool Engine::InitializeDirect3D() {
 		}
 
 		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
-			Log::AddLog(ConvertString(std::format(L"Use Adapter:{}\n", adapterDesc.Description)));
+			//Log::AddLog(ConvertString(std::format(L"Use Adapter:{}\n", adapterDesc.Description)));
 			break;
 		}
 		useAdapter.Reset();
@@ -225,7 +224,7 @@ bool Engine::InitializeDirect3D() {
 		hr = D3D12CreateDevice(useAdapter.Get(), featureLevels[i], IID_PPV_ARGS(device.GetAddressOf()));
 
 		if (SUCCEEDED(hr)) {
-			Log::AddLog(std::format("FeatureLevel:{}\n", featureLevelString[i]));
+			/*Log::AddLog(std::format("FeatureLevel:{}\n", featureLevelString[i]));*/
 			break;
 		}
 	}
@@ -233,7 +232,7 @@ bool Engine::InitializeDirect3D() {
 	if (device == nullptr) {
 		return false;
 	}
-	Log::AddLog("Complete create D3D12Device!!!\n");
+	//Log::AddLog("Complete create D3D12Device!!!\n");
 
 #ifdef _DEBUG
 	ID3D12InfoQueue* infoQueue = nullptr;
