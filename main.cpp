@@ -12,9 +12,7 @@
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Engine/FrameInfo/FrameInfo.h"
 
-#include "Input/Gamepad/Gamepad.h"
-#include "Input/KeyInput/KeyInput.h"
-#include "Input/Mouse/Mouse.h"
+#include "Input/Input.h"
 
 #include "GlobalVariables/GlobalVariables.h"
 
@@ -32,7 +30,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// フォントロード
 	Engine::LoadFont("./Resources/Font/fonttest.spritefont");
 
-	bool fullscreen = false;
+	static const auto* const frameInfo = FrameInfo::GetInstance();
+
+	auto input = Input::GetInstance();
 
 	/// 
 	/// メインループ
@@ -43,26 +43,19 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		// fps
 		ImGui::Begin("fps");
-		ImGui::Text("Frame rate: %3.0f fps", FrameInfo::GetInstance()->GetFps());
-		ImGui::Text("Delta Time: %.4f", FrameInfo::GetInstance()->GetDelta());
-		ImGui::Text("Frame Count: %llu", FrameInfo::GetInstance()->GetFrameCount());
+		ImGui::Text("Frame rate: %3.0lf fps", frameInfo->GetFps());
+		ImGui::Text("Delta Time: %.4lf", frameInfo->GetDelta());
+		ImGui::Text("Frame Count: %llu", frameInfo->GetFrameCount());
 		ImGui::End();
 
 		// 入力処理
-		Gamepad::Input();
-		KeyInput::Input();
-		Mouse::Input();
+		input->InputStart();
 
 		/// 
 		/// 更新処理
 		/// 
 
-		// フルスクリーン(ImGuiはフルスクリーン時バグる)
-		if (KeyInput::Releaed(DIK_F11) ||
-			((KeyInput::LongPush(DIK_LALT) || KeyInput::LongPush(DIK_RALT)) && KeyInput::Releaed(DIK_RETURN))) {
-			fullscreen = !fullscreen;
-			WinApp::GetInstance()->SetFullscreen(fullscreen);
-		}
+		
 
 		///
 		/// 更新処理ここまで
@@ -71,6 +64,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// 描画処理
 		/// 
+
 
 
 		///
@@ -82,7 +76,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		Engine::FrameEnd();
 
 		// Escapeが押されたら終了
-		if (KeyInput::Pushed(DIK_ESCAPE) || Gamepad::Pushed(Gamepad::Button::BACK)) {
+		if (input->GetKey()->Pushed(DIK_ESCAPE) || input->GetGamepad()->Pushed(Gamepad::Button::BACK)) {
 			break;
 		}
 	}

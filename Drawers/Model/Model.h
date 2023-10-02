@@ -80,9 +80,9 @@ private:
 	void LoadMtl(const std::string fileName);
 
 public:
-	void LoadShader(const std::string& vertex = "Shaders/ModelShader/Model.VS.hlsl",
-		const std::string& pixel = "Shaders/ModelShader/Model.PS.hlsl",
-		const std::string& geometory = "Shaders/ModelShader/ModelNone.GS.hlsl",
+	void LoadShader(const std::string& vertex = "./Resources/Shaders/ModelShader/Model.VS.hlsl",
+		const std::string& pixel = "./Resources/Shaders/ModelShader/Model.PS.hlsl",
+		const std::string& geometory = "./Resources/Shaders/ModelShader/ModelNone.GS.hlsl",
 		const std::string& hull = {},
 		const std::string& domain = {}
 	);

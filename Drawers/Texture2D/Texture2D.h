@@ -35,8 +35,8 @@ public:
 
 public:
 	void Initialize(
-		const std::string& vsFileName = "Shaders/Texture2DShader/Texture2D.VS.hlsl",
-		const std::string& psFileName = "Shaders/Texture2DShader/Texture2DNone.PS.hlsl"
+		const std::string& vsFileName = "./Resources/Shaders/Texture2DShader/Texture2D.VS.hlsl",
+		const std::string& psFileName = "./Resources/Shaders/Texture2DShader/Texture2DNone.PS.hlsl"
 	);
 
 private:

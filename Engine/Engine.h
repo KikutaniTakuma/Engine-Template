@@ -117,10 +117,6 @@ public:
 		return engine->rtvHandles[backBufferIndex];
 	}
 
-	static inline IDirectInput8* GetDirectInput() {
-		return engine->directInput.Get();
-	}
-
 	static inline DirectX::SpriteFont* GetFont(const std::string& fontName) {
 		return engine->spriteFonts[fontName].get();
 	}
@@ -228,20 +224,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence;
 	uint64_t fenceVal = 0;
 	HANDLE fenceEvent = nullptr;
-
-
-
-
-
-/// <summary>
-/// 入力関係
-/// </summary>
-private:
-	bool InitializeInput();
-
-private:
-	Microsoft::WRL::ComPtr<IDirectInput8> directInput;
-
 	
 
 

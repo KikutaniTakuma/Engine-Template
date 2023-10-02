@@ -4,7 +4,7 @@
 #include <cassert>
 #include <format>
 #include "Engine/ErrorCheck/ErrorCheck.h"
-#include "Engine/Log/Log.h"
+//#include "Engine/Log/Log.h"
 
 ShaderManager* ShaderManager::instance = nullptr;
 
@@ -62,7 +62,7 @@ IDxcBlob* ShaderManager::CompilerShader(
 {
 	// 1. hlslファイルを読む
 	// これからシェーダーをコンパイルする旨をログに出す
-	Log::AddLog(ConvertString(std::format(L"Begin CompilerShader, path:{}, profile:{}\n", filePath, profile)));
+	//Log::AddLog(ConvertString(std::format(L"Begin CompilerShader, path:{}, profile:{}\n", filePath, profile)));
 	// hlslファイルを読む
 	Microsoft::WRL::ComPtr<IDxcBlobEncoding> shaderSource;
 	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, shaderSource.GetAddressOf());
@@ -107,7 +107,7 @@ IDxcBlob* ShaderManager::CompilerShader(
 	Microsoft::WRL::ComPtr<IDxcBlobUtf8> shaderError;
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(shaderError.GetAddressOf()), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
-		Log::AddLog(shaderError->GetStringPointer());
+		//Log::AddLog(shaderError->GetStringPointer());
 		ErrorCheck::GetInstance()->ErrorTextBox(shaderError->GetStringPointer(), "ShaderManager");
 		// 警告・エラーダメゼッタイ
 		assert(false);
@@ -118,7 +118,7 @@ IDxcBlob* ShaderManager::CompilerShader(
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 	assert(SUCCEEDED(hr));
 	// 成功したログを出す
-	Log::AddLog(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
+	//Log::AddLog(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
 
 	// 実行用バイナリをリターン
 	return shaderBlob;

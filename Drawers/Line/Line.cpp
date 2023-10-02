@@ -23,8 +23,8 @@ Line::Line() :
 
 	heap.CreateConstBufferView(wvpMat);
 
-	shader.vertex = ShaderManager::LoadVertexShader("./Shaders/LineShader/Line.VS.hlsl");
-	shader.pixel = ShaderManager::LoadPixelShader("./Shaders/LineShader/Line.PS.hlsl");
+	shader.vertex = ShaderManager::LoadVertexShader("./Resources/Shaders/LineShader/Line.VS.hlsl");
+	shader.pixel = ShaderManager::LoadPixelShader("./Resources/Shaders/LineShader/Line.PS.hlsl");
 
 	auto paramaterTmp = heap.GetParameter();
 	PipelineManager::CreateRootSgnature(&paramaterTmp, 1, false);

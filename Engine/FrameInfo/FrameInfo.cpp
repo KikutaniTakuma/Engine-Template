@@ -1,5 +1,5 @@
 #include "FrameInfo.h"
-#include "Engine/Log/Log.h"
+//#include "Engine/Log/Log.h"
 
 #include <cmath>
 #include <thread>
@@ -45,16 +45,16 @@ FrameInfo::~FrameInfo() {
 	auto playtime =
 		std::chrono::duration_cast<std::chrono::milliseconds>(end - gameStartTime_);
 
-	double theoreticalFrameCount = (static_cast<double>(playtime.count()) / 1000.0) * static_cast<double>(mode.dmDisplayFrequency);
+	//double theoreticalFrameCount = (static_cast<double>(playtime.count()) / 1000.0) * static_cast<double>(mode.dmDisplayFrequency);
 
 	maxFps_ = std::clamp(maxFps_, 0.0, static_cast<double>(mode.dmDisplayFrequency));
 	minFps_ = std::clamp(minFps_, 0.0, static_cast<double>(mode.dmDisplayFrequency));
 
-	Log::AddLog(std::format("Average Fps : {:.2f}\n", static_cast<double>(mode.dmDisplayFrequency) * (static_cast<double>(frameCount_) / theoreticalFrameCount)));
-	if (std::chrono::duration_cast<std::chrono::seconds>(end - gameStartTime_) > std::chrono::seconds(1)) {
+	//Log::AddLog(std::format("Average Fps : {:.2f}\n", static_cast<double>(mode.dmDisplayFrequency) * (static_cast<double>(frameCount_) / theoreticalFrameCount)));
+	/*if (std::chrono::duration_cast<std::chrono::seconds>(end - gameStartTime_) > std::chrono::seconds(1)) {
 		Log::AddLog(std::format("Max Fps : {:.2f}\n", maxFps_));
 		Log::AddLog(std::format("Min Fps : {:.2f}\n", minFps_));
-	}
+	}*/
 }
 
 FrameInfo* const FrameInfo::GetInstance() {

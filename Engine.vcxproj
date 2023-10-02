@@ -162,7 +162,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ClCompile>
     <ClCompile Include="Engine\ErrorCheck\ErrorCheck.cpp" />
     <ClCompile Include="Engine\FrameInfo\FrameInfo.cpp" />
-    <ClCompile Include="Engine\Log\Log.cpp" />
     <ClCompile Include="Engine\PipelineManager\PipelineManager.cpp" />
     <ClCompile Include="Engine\PipelineManager\Pipeline\Pipeline.cpp" />
     <ClCompile Include="Engine\RenderTarget\RenderTarget.cpp" />
@@ -179,6 +178,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="GlobalVariables\GlobalVariables.cpp" />
     <ClCompile Include="Input\Gamepad\Gamepad.cpp" />
+    <ClCompile Include="Input\Input.cpp" />
     <ClCompile Include="Input\KeyInput\KeyInput.cpp" />
     <ClCompile Include="Input\Mouse\Mouse.cpp" />
     <ClCompile Include="main.cpp" />
@@ -214,7 +214,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Engine.h" />
     <ClInclude Include="Engine\ErrorCheck\ErrorCheck.h" />
     <ClInclude Include="Engine\FrameInfo\FrameInfo.h" />
-    <ClInclude Include="Engine\Log\Log.h" />
     <ClInclude Include="Engine\PipelineManager\PipelineManager.h" />
     <ClInclude Include="Engine\PipelineManager\Pipeline\Pipeline.h" />
     <ClInclude Include="Engine\RenderTarget\RenderTarget.h" />
@@ -233,6 +232,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="GlobalVariables\GlobalVariables.h" />
     <ClInclude Include="GlobalVariables\VariantItem.h" />
     <ClInclude Include="Input\Gamepad\Gamepad.h" />
+    <ClInclude Include="Input\Input.h" />
     <ClInclude Include="Input\KeyInput\KeyInput.h" />
     <ClInclude Include="Input\Mouse\Mouse.h" />
     <ClInclude Include="MeshManager\MeshManager.h">

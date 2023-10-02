@@ -56,17 +56,17 @@ private:
 private:
 	WORD preButton;
 	XINPUT_STATE state;
-	XINPUT_VIBRATION vibration;
+	XINPUT_VIBRATION vibration_;
 
-private:
-	static Gamepad* GetInstans();
+public:
+	static Gamepad*const GetInstance();
 
 
 public:
 	/// <summary>
 	/// 入力処理
 	/// </summary>
-	static void Input();
+	void Input();
 
 public:
 	/// <summary>
@@ -74,63 +74,63 @@ public:
 	/// </summary>
 	/// <param name="type">ボタンタイプ</param>
 	/// <returns>1:押された 0:押されてない</returns>
-	static bool GetButton(Button type);
+	bool GetButton(Button type);
 
 	/// <summary>
 	/// 前フレームのボタンの状態取得
 	/// </summary>
 	/// <param name="type">ボタンタイプ</param>
 	/// <returns>1:押された 0:押されてない</returns>
-	static bool GetPreButton(Button type);
+	bool GetPreButton(Button type);
 
 	/// <summary>
 	/// 押した瞬間かを取得
 	/// </summary>
 	/// <param name="type">ボタンタイプ</param>
 	/// <returns>1:押された 0:押されてない</returns>
-	static bool Pushed(Button type);
+	bool Pushed(Button type);
 
 	/// <summary>
 	/// 押し続けているかを取得
 	/// </summary>
 	/// <param name="type">ボタンタイプ</param>
 	/// <returns>1:押された 0:押されてない</returns>
-	static bool LongPushed(Button type);
+	bool LongPushed(Button type);
 
 	/// <summary>
 	/// ボタンを離した瞬間かを取得
 	/// </summary>
 	/// <param name="type">ボタンタイプ</param>
 	/// <returns>1:押された 0:押されてない</returns>
-	static bool Released(Button type);
+	bool Released(Button type);
 
 	/// <summary>
 	/// 何かしらのキーやトリガーが押された
 	/// </summary>
 	/// <returns>押されたらtrue</returns>
-	static bool PushAnyKey();
+	bool PushAnyKey();
 
 	/// <summary>
 	/// トリガーを取得
 	/// </summary>
 	/// <param name="type">トリガーのタイプ</param>
 	/// <returns>0.0f ～ 1.0f の値</returns>
-	static float GetTriger(Triger type);
+	float GetTriger(Triger type);
 
 	/// <summary>
 	/// Stick
 	/// </summary>
 	/// <param name="type">スティックのタイプ</param>
 	/// <returns>-1.0f ～ 1.0f の値</returns>
-	static float GetStick(Stick type);
+	float GetStick(Stick type);
 
 	/// <summary>
 	/// バイブレーション
 	/// </summary>
 	/// <param name="leftVibIntensity">左側のバイブレーション 0.0f ～ 1.0f で強さを指定</param>
 	/// <param name="rightVibIntensity">右側のバイブレーション 0.0f ～ 1.0f で強さを指定</param>
-	static void Vibration(float leftVibIntensity, float rightVibIntensity);
+	void Vibration(float leftVibIntensity, float rightVibIntensity);
 
 	// デバッグ用
-	static void Debug();
+	void Debug();
 };

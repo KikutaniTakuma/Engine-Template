@@ -7,25 +7,25 @@
 Gamepad::Gamepad() :
 	preButton(0),
 	state({0}),
-	vibration({0})
+	vibration_({0})
 {}
 
-Gamepad* Gamepad::GetInstans() {
-	static Gamepad pInstans;
-	return &pInstans;
+Gamepad* const Gamepad::GetInstance() {
+	static Gamepad pInstance;
+	return &pInstance;
 }
 
 void Gamepad::Input() {
-	Gamepad::GetInstans()->preButton = Gamepad::GetInstans()->state.Gamepad.wButtons;
-    XInputGetState(0, &Gamepad::GetInstans()->state);
+	preButton = state.Gamepad.wButtons;
+    XInputGetState(0, &state);
 }
 
 bool Gamepad::GetButton(Button type) {
-    return (Gamepad::GetInstans()->state.Gamepad.wButtons >> static_cast<short>(type)) % 2 == 1;
+    return (state.Gamepad.wButtons >> static_cast<short>(type)) % 2 == 1;
 }
 
 bool Gamepad::GetPreButton(Button type) {
-	return (Gamepad::GetInstans()->preButton >> static_cast<short>(type)) % 2 == 1;
+	return (preButton >> static_cast<short>(type)) % 2 == 1;
 }
 
 bool Gamepad::Pushed(Button type) {
@@ -41,7 +41,7 @@ bool Gamepad::Released(Button type) {
 }
 
 bool Gamepad::PushAnyKey() {
-	Gamepad* instance = Gamepad::GetInstans();
+	Gamepad* instance = Gamepad::GetInstance();
 	float leftStickX = GetStick(Stick::LEFT_X);
 	float leftStickY = GetStick(Stick::LEFT_Y);
 	float rightStickX = GetStick(Stick::RIGHT_X);
@@ -66,11 +66,11 @@ float Gamepad::GetTriger(Triger type) {
 	switch (type)
 	{
 	case Gamepad::Triger::LEFT:
-		return static_cast<float>(Gamepad::GetInstans()->state.Gamepad.bLeftTrigger) * kNormal;
+		return static_cast<float>(state.Gamepad.bLeftTrigger) * kNormal;
 		break;
 
 	case Gamepad::Triger::RIGHT:
-		return static_cast<float>(Gamepad::GetInstans()->state.Gamepad.bRightTrigger) * kNormal;
+		return static_cast<float>(state.Gamepad.bRightTrigger) * kNormal;
 		break;
 
 	default:
@@ -85,16 +85,16 @@ float Gamepad::GetStick(Stick type) {
 	switch (type)
 	{
 	case Gamepad::Stick::LEFT_X:
-		return static_cast<float>(Gamepad::GetInstans()->state.Gamepad.sThumbLX) * kNormal;
+		return static_cast<float>(state.Gamepad.sThumbLX) * kNormal;
 		break;
 	case Gamepad::Stick::LEFT_Y:
-		return static_cast<float>(Gamepad::GetInstans()->state.Gamepad.sThumbLY) * kNormal;
+		return static_cast<float>(state.Gamepad.sThumbLY) * kNormal;
 		break;
 	case Gamepad::Stick::RIGHT_X:
-		return static_cast<float>(Gamepad::GetInstans()->state.Gamepad.sThumbRX) * kNormal;
+		return static_cast<float>(state.Gamepad.sThumbRX) * kNormal;
 		break;
 	case Gamepad::Stick::RIGHT_Y:
-		return static_cast<float>(Gamepad::GetInstans()->state.Gamepad.sThumbRY) * kNormal;
+		return static_cast<float>(state.Gamepad.sThumbRY) * kNormal;
 		break;
 	default:
 		return 0.0f;
@@ -106,9 +106,9 @@ void Gamepad::Vibration(float leftVibIntensity, float rightVibIntensity) {
 	leftVibIntensity = std::clamp(leftVibIntensity, 0.0f, 1.0f);
 	rightVibIntensity = std::clamp(rightVibIntensity, 0.0f, 1.0f);
 
-	Gamepad::GetInstans()->vibration.wLeftMotorSpeed = static_cast<WORD>(static_cast<float>(USHRT_MAX) * leftVibIntensity);
-	Gamepad::GetInstans()->vibration.wRightMotorSpeed = static_cast<WORD>(static_cast<float>(USHRT_MAX) * rightVibIntensity);
-	XInputSetState(0, &Gamepad::GetInstans()->vibration);
+	vibration_.wLeftMotorSpeed = static_cast<WORD>(static_cast<float>(USHRT_MAX) * leftVibIntensity);
+	vibration_.wRightMotorSpeed = static_cast<WORD>(static_cast<float>(USHRT_MAX) * rightVibIntensity);
+	XInputSetState(0, &vibration_);
 }
 
 void Gamepad::Debug() {

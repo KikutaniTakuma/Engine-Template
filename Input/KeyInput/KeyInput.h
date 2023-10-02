@@ -8,38 +8,47 @@
 
 class KeyInput {
 private:
-	KeyInput();
+	KeyInput() = delete;
+	KeyInput(const KeyInput&) = delete;
+	KeyInput(KeyInput&&) = delete;
+	KeyInput(IDirectInput8* input);
 	~KeyInput();
 	KeyInput& operator=(const KeyInput&) = delete;
+	KeyInput& operator=(KeyInput&&) = delete;
 	
 
 public:
-	static void Input();
+	void Input();
 
-	static bool GetKey(uint8_t keyType) {
+	bool GetKey(uint8_t keyType) {
 		return (instance->key[keyType] & 0x80);
 	}
 
-	static bool GetPreKey(uint8_t keyType) {
+	bool GetPreKey(uint8_t keyType) {
 		return (instance->preKey[keyType] & 0x80);
 	}
 
-	static bool Pushed(uint8_t keyType);
-	static bool LongPush(uint8_t keyType);
-	static bool Releaed(uint8_t keyType);
+	bool Pushed(uint8_t keyType);
+	bool LongPush(uint8_t keyType);
+	bool Releaed(uint8_t keyType);
 
 	/// <summary>
 	/// 何かしらのキーが押された
 	/// </summary>
 	/// <returns>押されたらtrue</returns>
-	static bool PushAnyKey();
+	bool PushAnyKey();
 
 public:
-	static void Initialize();
+	static void Initialize(IDirectInput8* input);
 	static void Finalize();
 
 private:
 	static KeyInput* instance;
+
+public:
+	static KeyInput* const GetInstance() {
+		return instance;
+	}
 
 
 private:

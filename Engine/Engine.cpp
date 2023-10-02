@@ -6,13 +6,11 @@
 #include "ShaderManager/ShaderManager.h"
 #include "ConvertString/ConvertString.h"
 #include "TextureManager/TextureManager.h"
-#include "Input/KeyInput/KeyInput.h"
-#include "Input/Mouse/Mouse.h"
+#include "Input/Input.h"
 #include "AudioManager/AudioManager.h"
 #include "PipelineManager/PipelineManager.h"
 #include "ErrorCheck/ErrorCheck.h"
 #include "FrameInfo/FrameInfo.h"
-#include "Log/Log.h"
 
 #include "Utils/Math/Vector3.h"
 #include "Utils/Math/Mat4x4.h"
@@ -123,12 +121,6 @@ bool Engine::Initialize(const std::string& windowName, Resolution resolution) {
 		return false;
 	}
 
-	// InputDevice生成
-	if (!engine->InitializeInput()) {
-		ErrorCheck::GetInstance()->ErrorTextBox("Initialize() : InitializeInput() Failed", "Engine");
-		return false;
-	}
-
 	if (!engine->InitializeDraw()) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Initialize() : InitializeDraw() Failed", "Engine");
 		return false;
@@ -139,8 +131,7 @@ bool Engine::Initialize(const std::string& windowName, Resolution resolution) {
 		return false;
 	}
 
-	KeyInput::Initialize();
-	Mouse::Initialize();
+	Input::Initialize();
 	ShaderManager::Initialize();
 	TextureManager::Initialize();
 	AudioManager::Inititalize();
@@ -154,8 +145,7 @@ void Engine::Finalize() {
 	AudioManager::Finalize();
 	TextureManager::Finalize();
 	ShaderManager::Finalize();
-	Mouse::Finalize();
-	KeyInput::Finalize();
+	Input::Finalize();
 
 	delete engine;
 	engine = nullptr;
@@ -199,7 +189,7 @@ bool Engine::InitializeDirect3D() {
 		}
 
 		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
-			Log::AddLog(ConvertString(std::format(L"Use Adapter:{}\n", adapterDesc.Description)));
+			//Log::AddLog(ConvertString(std::format(L"Use Adapter:{}\n", adapterDesc.Description)));
 			break;
 		}
 		useAdapter.Reset();
@@ -225,7 +215,7 @@ bool Engine::InitializeDirect3D() {
 		hr = D3D12CreateDevice(useAdapter.Get(), featureLevels[i], IID_PPV_ARGS(device.GetAddressOf()));
 
 		if (SUCCEEDED(hr)) {
-			Log::AddLog(std::format("FeatureLevel:{}\n", featureLevelString[i]));
+			/*Log::AddLog(std::format("FeatureLevel:{}\n", featureLevelString[i]));*/
 			break;
 		}
 	}
@@ -233,7 +223,7 @@ bool Engine::InitializeDirect3D() {
 	if (device == nullptr) {
 		return false;
 	}
-	Log::AddLog("Complete create D3D12Device!!!\n");
+	//Log::AddLog("Complete create D3D12Device!!!\n");
 
 #ifdef _DEBUG
 	ID3D12InfoQueue* infoQueue = nullptr;
@@ -413,22 +403,6 @@ bool Engine::InitializeDirect12() {
 	assert(fenceEvent != nullptr);
 	if (!(fenceEvent != nullptr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect12() : CreateEvent() Failed", "Engine");
-		return false;
-	}
-	return true;
-}
-
-
-///
-/// 入力関係
-/// 
-
-bool Engine::InitializeInput() {
-	HRESULT hr = DirectInput8Create(WinApp::GetInstance()->getWNDCLASSEX().hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8,
-		reinterpret_cast<void**>(directInput.GetAddressOf()), nullptr);
-	assert(SUCCEEDED(hr));
-	if (hr != S_OK) {
-		ErrorCheck::GetInstance()->ErrorTextBox("InitializeInput() : DirectInput8Create() Failed", "Engine");
 		return false;
 	}
 	return true;

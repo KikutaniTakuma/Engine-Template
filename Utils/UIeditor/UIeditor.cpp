@@ -5,6 +5,7 @@
 #include "externals/nlohmann/json.hpp"
 #include <fstream>
 #include <filesystem>
+#include "Input/Input.h"
 
 UIeditor* UIeditor::GetInstance() {
 	static UIeditor instance;
@@ -122,23 +123,25 @@ void UIeditor::Update() {
 }
 
 void UIeditor::Update(const Mat4x4& vpvpMat) {
+	static auto mouse = Input::GetInstance()->GetMouse();
+
 	Update();
 
 	for (auto& tex : textures) {
 		tex.second.Update();
 	}
 
-	Vector3 mousePos{ Mouse::GetPos() };
+	Vector3 mousePos{ mouse->GetPos() };
 
 	mousePos = MakeMatrixInverse(vpvpMat) * mousePos;
 	
 	for (auto tex = textures.begin(); tex != textures.end(); tex++) {
 		if (tex->second.Colision({ mousePos.x, mousePos.y })) {
-			if (Mouse::Pushed(Mouse::Button::Left)) {
+			if (mouse->Pushed(Mouse::Button::Left)) {
 				texItr = tex;
 				texItr->second.scale *= 1.2f;
 			}
-			else if(Mouse::Releaed(Mouse::Button::Left)){
+			else if(mouse->Releaed(Mouse::Button::Left)){
 				if (texItr == textures.end()) {
 					continue;
 				}
