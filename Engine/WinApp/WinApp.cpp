@@ -90,6 +90,7 @@ void WinApp::SetFullscreen(bool fullscreen) {
 				~(WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_THICKFRAME)
 			);
 
+			// 画面の大きさ取得
 			RECT fullscreenRect{ 0 };
 			HMONITOR monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
 			MONITORINFO info;
@@ -98,6 +99,7 @@ void WinApp::SetFullscreen(bool fullscreen) {
 			fullscreenRect.right = info.rcMonitor.right - info.rcMonitor.left;
 			fullscreenRect.bottom = info.rcMonitor.bottom - info.rcMonitor.top;
 
+			// windowの大きさ変更
 			SetWindowPos(
 				hwnd, HWND_TOPMOST, fullscreenRect.left, fullscreenRect.top, fullscreenRect.right,
 				fullscreenRect.bottom, SWP_FRAMECHANGED | SWP_NOACTIVATE
@@ -109,6 +111,7 @@ void WinApp::SetFullscreen(bool fullscreen) {
 			// 通常ウィンドウに戻す
 			SetWindowLong(hwnd, GWL_STYLE, windowStyle);
 
+			// windowの大きさ変更
 			SetWindowPos(
 				hwnd, HWND_NOTOPMOST, windowRect.left, windowRect.top,
 				windowRect.right - windowRect.left, windowRect.bottom - windowRect.top,
