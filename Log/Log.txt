@@ -1,6 +1,6 @@
 Use Adapter:NVIDIA GeForce RTX 4070 Ti
 FeatureLevel:12.2
 Complete create D3D12Device!!!
-Average Fps : 152.59
+Average Fps : 147.02
 Max Fps : 165.00
-Min Fps : 160.08
+Min Fps : 54.23

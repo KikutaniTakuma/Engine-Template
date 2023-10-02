@@ -17,7 +17,10 @@ FrameInfo::FrameInfo() :
 	fps_(0.0),
 	maxFps_(0.0),
 	minFps_(0.0),
-	frameCount_(0)
+	frameCount_(0),
+	fpsLimit_(0.0),
+	minTime(),
+	minCheckTime()
 {
 	//画面情報構造体
 	DEVMODE mode{};
@@ -31,6 +34,11 @@ FrameInfo::FrameInfo() :
 	deltaTime_ = 1.0f / fps_;
 
 	gameStartTime_ = std::chrono::steady_clock::now();
+	reference_ = std::chrono::steady_clock::now();
+
+	maxFpsLimit_ = fps_;
+
+	SetFpsLimit(fps_);
 }
 
 FrameInfo::~FrameInfo() {
@@ -73,9 +81,19 @@ void FrameInfo::End() {
 
 	// 10^-6
 	static constexpr double unitAdjustment = 0.000001;
-
-	auto frameTime = std::chrono::duration_cast<std::chrono::microseconds>(end - frameStartTime_);
 	
+	auto elapsed =
+		std::chrono::duration_cast<std::chrono::microseconds>(end - reference_);
+
+	if (elapsed < minTime) {
+		while (std::chrono::steady_clock::now() - reference_ < minTime) {
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
+		}
+	}
+
+	end = std::chrono::steady_clock::now();
+	auto frameTime = std::chrono::duration_cast<std::chrono::microseconds>(end - frameStartTime_);
+
 	deltaTime_ = static_cast<double>(frameTime.count()) * unitAdjustment;
 	fps_ = 1.0f / deltaTime_;
 
@@ -85,4 +103,12 @@ void FrameInfo::End() {
 	}
 
 	frameCount_++;
+	reference_ = std::chrono::steady_clock::now();
+}
+
+void FrameInfo::SetFpsLimit(double fpsLimit) {
+	fpsLimit_ = std::clamp(fpsLimit, 10.0, maxFpsLimit_);
+
+	minTime = std::chrono::microseconds(uint64_t(1000000.0 / fpsLimit_));
+	minCheckTime = std::chrono::microseconds(uint64_t(1000000.0 / fpsLimit_) - 1282LLU);
 }

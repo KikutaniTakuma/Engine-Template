@@ -66,6 +66,9 @@ public:
 		return frameCount_;
 	}
 
+	void SetFpsLimit(double fpsLimit);
+
+
 /// <summary>
 /// メンバ変数
 /// </summary>
@@ -78,4 +81,11 @@ private:
 	size_t frameCount_;
 
 	std::chrono::steady_clock::time_point gameStartTime_;
+
+	std::chrono::steady_clock::time_point reference_;
+	double fpsLimit_;
+	double maxFpsLimit_;
+
+	std::chrono::microseconds minTime;
+	std::chrono::microseconds minCheckTime;
 };

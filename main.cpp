@@ -30,9 +30,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// フォントロード
 	Engine::LoadFont("./Resources/Font/fonttest.spritefont");
 
-	static const auto* const frameInfo = FrameInfo::GetInstance();
+	static auto* const frameInfo = FrameInfo::GetInstance();
 
 	auto input = Input::GetInstance();
+
+	float fpsLimit = 165.0f;
 
 	/// 
 	/// メインループ
@@ -46,7 +48,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::Text("Frame rate: %3.0lf fps", frameInfo->GetFps());
 		ImGui::Text("Delta Time: %.4lf", frameInfo->GetDelta());
 		ImGui::Text("Frame Count: %llu", frameInfo->GetFrameCount());
+		ImGui::DragFloat("fps limit", &fpsLimit, 1.0f, 30.0f, 165.0f);
 		ImGui::End();
+
+		frameInfo->SetFpsLimit(static_cast<double>(fpsLimit));
 
 		// 入力処理
 		input->InputStart();

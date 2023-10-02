@@ -1,4 +1,5 @@
 #include "WinApp.h"
+#pragma comment(lib, "winmm.lib")
 #include <cassert>
 #include "externals/imgui/imgui_impl_win32.h"
 #include "Utils/Math/Vector2.h"
@@ -12,7 +13,9 @@ WinApp::WinApp():
 	windowStyle(0u),
 	windowRect{},
 	windowName()
-{}
+{
+	timeBeginPeriod(1);
+}
 
 WinApp::~WinApp() {
 	UnregisterClass(w.lpszClassName, w.hInstance);
