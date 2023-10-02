@@ -37,12 +37,6 @@ public:
 		return windowName;
 	}
 
-	void SetFullscreen(bool isFullscreen_);
-
-	inline bool GetIsFullscreen() const {
-		return isFullscreen;
-	}
-
 	Vector2 GetWindowSize() const;
 
 
@@ -50,7 +44,6 @@ private:
 	HWND hwnd = nullptr;
 	WNDCLASSEX w{};
 	UINT windowStyle;
-	bool isFullscreen = false;
 	RECT windowRect;
 	std::wstring windowName;
 };

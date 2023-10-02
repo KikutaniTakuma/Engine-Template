@@ -10,7 +10,6 @@ WinApp::WinApp():
 	hwnd{},
 	w{},
 	windowStyle(0u),
-	isFullscreen(false),
 	windowRect{},
 	windowName()
 {}
@@ -66,7 +65,6 @@ void WinApp::Create(const std::wstring& windowTitle, int32_t width, int32_t heig
 		w.hInstance,
 		nullptr
 	);
-	SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
 	windowStyle &= ~WS_THICKFRAME;
 
@@ -76,54 +74,6 @@ void WinApp::Create(const std::wstring& windowTitle, int32_t width, int32_t heig
 	ShowWindow(hwnd, SW_NORMAL);
 }
 
-void WinApp::SetFullscreen(bool fullscreen) {
-
-	if (isFullscreen != fullscreen) {
-		if (fullscreen) {
-			// 元の状態のサイズを保存
-			GetWindowRect(hwnd, &windowRect);
-
-			// 仮想フルスクリーン化(通常ウィンドウに戻す)
-			SetWindowLong(
-				hwnd, GWL_STYLE,
-				windowStyle &
-				~(WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_THICKFRAME)
-			);
-
-			// 画面の大きさ取得
-			RECT fullscreenRect{ 0 };
-			HMONITOR monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
-			MONITORINFO info;
-			info.cbSize = sizeof(info);
-			GetMonitorInfo(monitor, &info);
-			fullscreenRect.right = info.rcMonitor.right - info.rcMonitor.left;
-			fullscreenRect.bottom = info.rcMonitor.bottom - info.rcMonitor.top;
-
-			// windowの大きさ変更
-			SetWindowPos(
-				hwnd, HWND_TOPMOST, fullscreenRect.left, fullscreenRect.top, fullscreenRect.right,
-				fullscreenRect.bottom, SWP_FRAMECHANGED | SWP_NOACTIVATE
-			);
-			ShowWindow(hwnd, SW_MAXIMIZE);
-
-		}
-		else {
-			// 通常ウィンドウに戻す
-			SetWindowLong(hwnd, GWL_STYLE, windowStyle);
-
-			// windowの大きさ変更
-			SetWindowPos(
-				hwnd, HWND_NOTOPMOST, windowRect.left, windowRect.top,
-				windowRect.right - windowRect.left, windowRect.bottom - windowRect.top,
-				SWP_FRAMECHANGED | SWP_NOACTIVATE
-			);
-
-			ShowWindow(hwnd, SW_NORMAL);
-		}
-	}
-
-	isFullscreen = fullscreen;
-}
 
 Vector2 WinApp::GetWindowSize() const {
 	return Vector2(float(windowRect.right), float(windowRect.bottom));
