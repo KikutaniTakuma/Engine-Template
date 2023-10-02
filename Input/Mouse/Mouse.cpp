@@ -1,5 +1,4 @@
 #include "Mouse.h"
-#include "Engine/Engine.h"
 #include "Engine/WinApp/WinApp.h"
 #include "externals/imgui/imgui.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
@@ -7,8 +6,8 @@
 
 Mouse* Mouse::instance = nullptr;
 
-void Mouse::Initialize() {
-	instance = new Mouse();
+void Mouse::Initialize(IDirectInput8* input) {
+	instance = new Mouse(input);
 	assert(instance);
 	if (!instance) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Initialize() : instance failed", "Mouse");
@@ -22,14 +21,15 @@ void Mouse::Finalize() {
 	instance = nullptr;
 }
 
-Mouse::Mouse() :
+Mouse::Mouse(IDirectInput8* input) :
 	mouse(),
 	mosueState(),
 	preMosueState(),
 	wheel(0),
 	initalizeSucceeded(false)
 {
-	HRESULT hr = Engine::GetDirectInput()->CreateDevice(GUID_SysMouse, mouse.GetAddressOf(), NULL);
+	assert(input);
+	HRESULT hr = input->CreateDevice(GUID_SysMouse, mouse.GetAddressOf(), NULL);
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CreateDevice failed", "Mouse");
@@ -62,27 +62,27 @@ Mouse::~Mouse() {
 
 
 void Mouse::Input() {
-	if (!instance->initalizeSucceeded) {
+	if (!initalizeSucceeded) {
 		return;
 	}
 
-	instance->preMosueState = instance->mosueState;
+	preMosueState = mosueState;
 
-	instance->mouse->Acquire();
+	mouse->Acquire();
 
-	instance->mosueState = {};
-	instance->mouse->GetDeviceState(sizeof(DIMOUSESTATE2), &instance->mosueState);
+	mosueState = {};
+	mouse->GetDeviceState(sizeof(DIMOUSESTATE2), &mosueState);
 
-	instance->wheel += static_cast<size_t>(instance->mosueState.lZ);
+	wheel += static_cast<size_t>(mosueState.lZ);
 }
 
 bool Mouse::Pushed(Mouse::Button button) {
-	if (!instance->initalizeSucceeded) {
+	if (!initalizeSucceeded) {
 		return false;
 	}
 
-	if ((instance->mosueState.rgbButtons[uint8_t(button)] & 0x80) &&
-		!(instance->preMosueState.rgbButtons[uint8_t(button)] & 0x80))
+	if ((mosueState.rgbButtons[uint8_t(button)] & 0x80) &&
+		!(preMosueState.rgbButtons[uint8_t(button)] & 0x80))
 	{
 		return true;
 	}
@@ -91,12 +91,12 @@ bool Mouse::Pushed(Mouse::Button button) {
 }
 
 bool Mouse::LongPush(Mouse::Button button) {
-	if (!instance->initalizeSucceeded) {
+	if (!initalizeSucceeded) {
 		return false;
 	}
 
-	if ((instance->mosueState.rgbButtons[uint8_t(button)] & 0x80) &&
-		(instance->preMosueState.rgbButtons[uint8_t(button)] & 0x80))
+	if ((mosueState.rgbButtons[uint8_t(button)] & 0x80) &&
+		(preMosueState.rgbButtons[uint8_t(button)] & 0x80))
 	{
 		return true;
 	}
@@ -105,12 +105,12 @@ bool Mouse::LongPush(Mouse::Button button) {
 }
 
 bool Mouse::Releaed(Mouse::Button button) {
-	if (!instance->initalizeSucceeded) {
+	if (!initalizeSucceeded) {
 		return false;
 	}
 
-	if (!(instance->mosueState.rgbButtons[uint8_t(button)] & 0x80) &&
-		(instance->preMosueState.rgbButtons[uint8_t(button)] & 0x80))
+	if (!(mosueState.rgbButtons[uint8_t(button)] & 0x80) &&
+		(preMosueState.rgbButtons[uint8_t(button)] & 0x80))
 	{
 		return true;
 	}
@@ -120,15 +120,15 @@ bool Mouse::Releaed(Mouse::Button button) {
 
 bool Mouse::PushAnyKey() {
 	for (size_t i = 0; i < 8; i++) {
-		if (instance->mosueState.rgbButtons[i] != instance->preMosueState.rgbButtons[i]) {
+		if (mosueState.rgbButtons[i] != preMosueState.rgbButtons[i]) {
 			return true;
 		}
 	}
 
 	if (
-		instance->mosueState.lX != instance->preMosueState.lX
-		|| instance->mosueState.lY != instance->preMosueState.lY
-		|| instance->mosueState.lZ != instance->preMosueState.lZ
+		mosueState.lX != preMosueState.lX
+		|| mosueState.lY != preMosueState.lY
+		|| mosueState.lZ != preMosueState.lZ
 		) {
 		return true;
 	}
@@ -137,28 +137,28 @@ bool Mouse::PushAnyKey() {
 }
 
 Vector2 Mouse::GetVelocity() {
-	if (!instance->initalizeSucceeded) {
+	if (!initalizeSucceeded) {
 		return Vector2();
 	}
-	return { static_cast<float>(instance->mosueState.lX), -static_cast<float>(instance->mosueState.lY) };
+	return { static_cast<float>(mosueState.lX), -static_cast<float>(mosueState.lY) };
 }
 
 float Mouse::GetWheel() {
-	if (!instance->initalizeSucceeded) {
+	if (!initalizeSucceeded) {
 		return 0.0f;
 	}
-	return static_cast<float>(instance->wheel);
+	return static_cast<float>(wheel);
 }
 
 float Mouse::GetWheelVelocity() {
-	if (!instance->initalizeSucceeded) {
+	if (!initalizeSucceeded) {
 		return 0.0f;
 	}
-	return static_cast<float>(instance->mosueState.lZ);
+	return static_cast<float>(mosueState.lZ);
 }
 
 Vector2 Mouse::GetPos() {
-	if (!instance->initalizeSucceeded) {
+	if (!initalizeSucceeded) {
 		return Vector2();
 	}
 

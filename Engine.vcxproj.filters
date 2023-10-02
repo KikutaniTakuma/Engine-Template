@@ -125,6 +125,9 @@
     <ClCompile Include="Utils\CsvLoad\CsvLoad.cpp">
       <Filter>Utils\CsvLoad</Filter>
     </ClCompile>
+    <ClCompile Include="Input\Input.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -371,6 +374,9 @@
     </ClInclude>
     <ClInclude Include="Utils\CsvLoad\CsvLoad.h">
       <Filter>Utils\CsvLoad</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\Input.h">
+      <Filter>Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

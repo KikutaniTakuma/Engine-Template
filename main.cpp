@@ -12,9 +12,7 @@
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Engine/FrameInfo/FrameInfo.h"
 
-#include "Input/Gamepad/Gamepad.h"
-#include "Input/KeyInput/KeyInput.h"
-#include "Input/Mouse/Mouse.h"
+#include "Input/Input.h"
 
 #include "GlobalVariables/GlobalVariables.h"
 
@@ -34,6 +32,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	static const auto* const frameInfo = FrameInfo::GetInstance();
 
+	auto input = Input::GetInstance();
+
 	/// 
 	/// メインループ
 	/// 
@@ -49,15 +49,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::End();
 
 		// 入力処理
-		Gamepad::Input();
-		KeyInput::Input();
-		Mouse::Input();
+		input->InputStart();
 
 		/// 
 		/// 更新処理
 		/// 
 
-
+		
 
 		///
 		/// 更新処理ここまで
@@ -78,7 +76,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		Engine::FrameEnd();
 
 		// Escapeが押されたら終了
-		if (KeyInput::Pushed(DIK_ESCAPE) || Gamepad::Pushed(Gamepad::Button::BACK)) {
+		if (input->GetKey()->Pushed(DIK_ESCAPE) || input->GetGamepad()->Pushed(Gamepad::Button::BACK)) {
 			break;
 		}
 	}

@@ -22,39 +22,50 @@ public:
 
 
 private:
-	Mouse();
+	Mouse() = delete;
+	Mouse(IDirectInput8* input);
+	Mouse(const Mouse&) = delete;
+	Mouse(Mouse&&) = delete;
 	~Mouse();
 
-public:
-	static void Input();
+	Mouse& operator=(const Mouse&) = delete;
+	Mouse& operator=(Mouse&&) = delete;
 
-	static bool Pushed(Mouse::Button button);
-	static bool LongPush(Mouse::Button button);
-	static bool Releaed(Mouse::Button button);
+public:
+	 void Input();
+
+	 bool Pushed(Mouse::Button button);
+	 bool LongPush(Mouse::Button button);
+	 bool Releaed(Mouse::Button button);
 
 	/// <summary>
 	/// 何かしらのキーが押された、またはマウスが動いた、ホイールを動かした
 	/// </summary>
 	/// <returns>押されたらtrue</returns>
-	static bool PushAnyKey();
+	 bool PushAnyKey();
 
-	static Vector2 GetVelocity();
+	 Vector2 GetVelocity();
 
-	static float GetWheel();
-	static float GetWheelVelocity();
+	 float GetWheel();
+	 float GetWheelVelocity();
 
-	static Vector2 GetPos();
+	 Vector2 GetPos();
 
-	static void Show(bool flg);
+	 void Show(bool flg);
 
 public:
-	static void Initialize();
+	static void Initialize(IDirectInput8* input);
 	static void Finalize();
 
-	static void Debug();
+	void Debug();
 
 private:
 	static Mouse* instance;
+
+public:
+	static Mouse* const GetInstance() {
+		return instance;
+	}
 
 private:
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> mouse;
