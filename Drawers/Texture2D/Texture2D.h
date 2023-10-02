@@ -116,7 +116,7 @@ public:
 	uint32_t color;
 
 private:
-	ShaderResourceHeap SRVHeap;
+	//ShaderResourceHeap SRVHeap;
 
 	uint32_t SRVHandle;
 

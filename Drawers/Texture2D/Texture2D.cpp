@@ -10,7 +10,7 @@ Texture2D::Texture2D() :
 	pos({ 0.0f,0.0f,0.01f }),
 	uvPibot(),
 	uvSize(Vector2::identity),
-	SRVHeap(16),
+	//SRVHeap(16),
 	SRVHandle{},
 	vertexView(),
 	vertexResource(nullptr),
@@ -61,7 +61,7 @@ Texture2D& Texture2D::operator=(const Texture2D& right) {
 
 	worldPos = right.worldPos;
 
-	SRVHeap.Reset();
+	//SRVHeap.Reset();
 
 	tex = right.tex;
 
@@ -143,12 +143,29 @@ void Texture2D::LoadShader(const std::string& vsFileName, const std::string& psF
 }
 
 void Texture2D::CreateGraphicsPipeline() {
-	static auto paramaterTmp = SRVHeap.GetParameter();
-	PipelineManager::CreateRootSgnature(&paramaterTmp, 1, true);
+	D3D12_DESCRIPTOR_RANGE range = {};
+	range.NumDescriptors = 1;
+	range.BaseShaderRegister = 0;
+	range.OffsetInDescriptorsFromTableStart = D3D12_APPEND_ALIGNED_ELEMENT;
+	range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+
+	std::array<D3D12_ROOT_PARAMETER, 3> rootPrams{};
+	rootPrams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootPrams[0].Descriptor.ShaderRegister = 0;
+	rootPrams[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootPrams[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootPrams[1].Descriptor.ShaderRegister = 1;
+	rootPrams[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootPrams[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootPrams[2].DescriptorTable.NumDescriptorRanges = 1;
+	rootPrams[2].DescriptorTable.pDescriptorRanges = &range;
+	rootPrams[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+	PipelineManager::CreateRootSgnature(rootPrams.data(), rootPrams.size(), true);
 	PipelineManager::SetShader(shader);
 	PipelineManager::SetVertexInput("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT);
 	PipelineManager::SetVertexInput("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT);
-	PipelineManager::IsDepth(false);
+	//PipelineManager::IsDepth(false);
 
 	for (int32_t i = Pipeline::Blend::None; i < Pipeline::Blend::BlendTypeNum; i++) {
 		PipelineManager::SetState(Pipeline::Blend(i), Pipeline::SolidState::Solid);
@@ -163,15 +180,11 @@ void Texture2D::LoadTexture(const std::string& fileName) {
 
 	if (tex && !isLoad) {
 		if (isFirstLoad) {
-			SRVHeap.Reset();
-			SRVHandle = SRVHeap.CreateTxtureView(tex);
-			SRVHeap.CreateConstBufferView(wvpMat);
-			SRVHeap.CreateConstBufferView(colorBuf);
 			CreateGraphicsPipeline();
 			isFirstLoad = false;
 		}
 		else {
-			SRVHeap.CreateTxtureView(tex, SRVHandle);
+			//SRVHeap.CreateTxtureView(tex, SRVHandle);
 		}
 		isLoad = true;
 	}
@@ -186,15 +199,8 @@ void Texture2D::ThreadLoadTexture(const std::string& fileName) {
 void Texture2D::Update() {
 	if (tex && tex->CanUse() && !isLoad) {
 		if (isFirstLoad) {
-			SRVHeap.Reset();
-			SRVHandle = SRVHeap.CreateTxtureView(tex);
-			SRVHeap.CreateConstBufferView(wvpMat);
-			SRVHeap.CreateConstBufferView(colorBuf);
 			CreateGraphicsPipeline();
 			isFirstLoad = false;
-		}
-		else {
-			SRVHeap.CreateTxtureView(tex, SRVHandle);
 		}
 		isLoad = true;
 	}
@@ -248,14 +254,16 @@ void Texture2D::Draw(
 
 		for (auto& i : graphicsPipelineState) {
 			if (!i) {
-				ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Model");
+				ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Texture2D");
 				return;
 			}
 		}
 
 		// 各種描画コマンドを積む
 		graphicsPipelineState[blend]->Use();
-		SRVHeap.Use();
+		tex->Use(2);
+		commandlist->SetGraphicsRootConstantBufferView(0, wvpMat.GetGPUVtlAdrs());
+		commandlist->SetGraphicsRootConstantBufferView(1, colorBuf.GetGPUVtlAdrs());
 		commandlist->IASetVertexBuffers(0, 1, &vertexView);
 		commandlist->IASetIndexBuffer(&indexView);
 		commandlist->DrawIndexedInstanced(6, 1, 0, 0, 0);

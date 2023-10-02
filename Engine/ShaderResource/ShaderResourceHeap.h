@@ -86,6 +86,10 @@ public:
 		return heapSize;
 	}
 
+	inline ID3D12DescriptorHeap* Get() const {
+		return SRVHeap.Get();
+	}
+
 	void Reset();
 
 private:

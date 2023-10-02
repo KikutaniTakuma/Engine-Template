@@ -28,7 +28,8 @@ TextureManager::TextureManager() :
 	isThreadFinish(false),
 	fence(),
 	fenceVal(0),
-	fenceEvent(nullptr)
+	fenceEvent(nullptr),
+	srvHeap(2048)
 {
 	// コマンドキューを作成
 	commandQueue = nullptr;
@@ -126,6 +127,8 @@ Texture* TextureManager::LoadTexture(const std::string& fileName) {
 		if (!tex->isLoad) {
 			return nullptr;
 		}
+
+		tex->heapPos = srvHeap.CreateTxtureView(tex.get());
 		
 		textures.insert(std::make_pair(fileName, std::move(tex)));
 
@@ -172,6 +175,8 @@ Texture* TextureManager::LoadTexture(const std::string& fileName) {
 				return nullptr;
 			}
 
+			tex->heapPos = srvHeap.CreateTxtureView(tex.get());
+
 			textures.insert(std::make_pair(fileName, std::move(tex)));
 
 			thisFrameLoadFlg = true;
@@ -189,6 +194,8 @@ Texture* TextureManager::LoadTexture(const std::string& fileName, ID3D12Graphics
 			return nullptr;
 		}
 
+		tex->heapPos = srvHeap.CreateTxtureView(tex.get());
+
 		textures.insert(std::make_pair(fileName, std::move(tex)));
 
 		thisFrameLoadFlg = true;
@@ -201,6 +208,8 @@ Texture* TextureManager::LoadTexture(const std::string& fileName, ID3D12Graphics
 			if (!tex->isLoad) {
 				return nullptr;
 			}
+
+			tex->heapPos = srvHeap.CreateTxtureView(tex.get());
 
 			textures.insert(std::make_pair(fileName, std::move(tex)));
 
@@ -285,4 +294,13 @@ void TextureManager::ResetCommandList() {
 
 		isThreadFinish = false;
 	}
+}
+
+void TextureManager::Use(int32_t texIndex, UINT rootParam) {
+	auto* const mainComlist = Engine::GetCommandList();
+	ID3D12DescriptorHeap* ppHeaps[] = { srvHeap.Get() };
+	mainComlist->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+
+	mainComlist->SetGraphicsRootDescriptorTable(
+		rootParam, srvHeap.GetSrvGpuHeapHandle(texIndex));
 }

@@ -66,9 +66,12 @@ public:
 		return static_cast<bool>(textureResouce) && !static_cast<bool>(intermediateResource) && isLoad;
 	}
 
+public:
+	void Use(UINT rootParamator);
+
 
 /// <summary>
-/// メンバ関数
+/// メンバ変数
 /// </summary>
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResouce;
@@ -78,6 +81,9 @@ private:
 
 	bool isLoad;
 	bool threadLoadFlg;
+
+	int32_t heapPos;
+
 
 	Vector2 size;
 public:

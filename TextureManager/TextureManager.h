@@ -1,5 +1,6 @@
 #pragma once
 #include "Texture/Texture.h"
+#include "Engine/ShaderResource/ShaderResourceHeap.h"
 
 #include <unordered_map>
 #include <string>
@@ -58,8 +59,12 @@ public:
 
 	void ResetCommandList();
 
+	void Use(int32_t texIndex, UINT rootParam);
+
 
 private:
+	ShaderResourceHeap srvHeap;
+
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;

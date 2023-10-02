@@ -1,0 +1,7 @@
+2023/10/02 21:33:57 : Pipeline / Create() : CreateGraphicsPipelineState
+2023/10/02 21:34:01 : Pipeline / Create() : CreateGraphicsPipelineState
+2023/10/02 21:34:01 : Pipeline / Create() : CreateGraphicsPipelineState
+2023/10/02 21:34:02 : Pipeline / Create() : CreateGraphicsPipelineState
+2023/10/02 21:34:02 : Pipeline / Create() : CreateGraphicsPipelineState
+2023/10/02 22:05:31 : Model / pipeline is nullptr
+2023/10/02 22:06:28 : Model / pipeline is nullptr

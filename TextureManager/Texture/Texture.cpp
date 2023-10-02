@@ -1,10 +1,10 @@
-#include "Texture.h"
 #include "Utils/ConvertString/ConvertString.h"
 #include "Engine/Engine.h"
 #include <cassert>
 #include <iostream>
 #include <filesystem>
 #include "Engine/ErrorCheck/ErrorCheck.h"
+#include "TextureManager/TextureManager.h"
 
 Texture::Texture():
 	textureResouce(nullptr),
@@ -13,7 +13,8 @@ Texture::Texture():
 	isLoad(false),
 	threadLoadFlg(false),
 	size(),
-	fileName()
+	fileName(),
+	heapPos(0)
 {}
 
 Texture::~Texture() {
@@ -228,4 +229,8 @@ void Texture::ReleaseIntermediateResource() {
 		intermediateResource->Release();
 		intermediateResource.Reset();
 	}
+}
+
+void Texture::Use(UINT rootParamator) {
+	TextureManager::GetInstance()->Use(heapPos, rootParamator);
 }

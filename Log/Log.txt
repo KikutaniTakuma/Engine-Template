@@ -1,6 +1,10 @@
 Use Adapter:NVIDIA GeForce RTX 4070 Ti
 FeatureLevel:12.2
 Complete create D3D12Device!!!
-Average Fps : 147.02
+Begin CompilerShader, path:./Resources/Shaders/Texture2DShader/Texture2D.VS.hlsl, profile:vs_6_0
+Compile Succeeded, path:./Resources/Shaders/Texture2DShader/Texture2D.VS.hlsl, profile:vs_6_0
+Begin CompilerShader, path:./Resources/Shaders/Texture2DShader/Texture2DNone.PS.hlsl, profile:ps_6_0
+Compile Succeeded, path:./Resources/Shaders/Texture2DShader/Texture2DNone.PS.hlsl, profile:ps_6_0
+Average Fps : 136.66
 Max Fps : 165.00
-Min Fps : 54.23
+Min Fps : 111.23
