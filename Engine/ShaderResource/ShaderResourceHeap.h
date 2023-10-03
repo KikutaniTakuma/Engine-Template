@@ -3,6 +3,7 @@
 #include <d3d12.h>
 #pragma comment(lib, "d3d12.lib")
 #include "Engine/ConstBuffer/ConstBuffer.h"
+#include "Engine/StructuredBuffer/StructuredBuffer.h"
 #include "TextureManager/Texture/Texture.h"
 #include <memory>
 #include <vector>
@@ -48,6 +49,21 @@ public:
 		return currentHadleIndex - 1u;
 	}
 
+	template<class T>
+	uint32_t CreateStructuredBufferView(StructuredBuffer<T>& strcBuf) {
+		assert(currentHadleIndex < heapSize);
+		if (currentHadleIndex >= heapSize) {
+			ErrorCheck::GetInstance()->ErrorTextBox("CreateStructuredBufferView failed\nOver HeapSize", "ShaderResourceHeap");
+		}
+
+		strcBuf.CrerateView(heapHadles[currentHadleIndex].first);
+		currentHadleIndex++;
+
+		heapOrder.push_back(HeapType::SRV);
+
+		return currentHadleIndex - 1u;
+	}
+
 	inline uint32_t CreateTxtureView(Texture* tex) {
 		assert(tex != nullptr);
 		if (tex == nullptr || !*tex) {
@@ -55,7 +71,7 @@ public:
 		}
 		assert(currentHadleIndex < heapSize);
 		if (currentHadleIndex >= heapSize) {
-			ErrorCheck::GetInstance()->ErrorTextBox("CreateConstBufferView failed\nOver HeapSize", "ShaderResourceHeap");
+			ErrorCheck::GetInstance()->ErrorTextBox("CreateTxtureBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 		tex->CreateSRVView(heapHadles[currentHadleIndex].first);
 		currentHadleIndex++;
@@ -68,7 +84,7 @@ public:
 		assert(tex != nullptr);
 		assert(heapIndex < heapSize);
 		if (currentHadleIndex >= heapSize) {
-			ErrorCheck::GetInstance()->ErrorTextBox("CreateConstBufferView failed\nOver HeapSize", "ShaderResourceHeap");
+			ErrorCheck::GetInstance()->ErrorTextBox("CreatTxtureBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 		tex->CreateSRVView(heapHadles[heapIndex].first);
 	}

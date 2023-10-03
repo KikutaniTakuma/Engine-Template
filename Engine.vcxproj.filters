@@ -131,6 +131,9 @@
     <ClCompile Include="Utils\ConvertString\ConvertString.cpp">
       <Filter>Utils\ConvertString</Filter>
     </ClCompile>
+    <ClCompile Include="Drawers\Particle\Particle.cpp">
+      <Filter>Drawers\Particle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -246,6 +249,12 @@
     </Filter>
     <Filter Include="Utils\ConvertString">
       <UniqueIdentifier>{5a7a3057-cf34-4af9-a2fc-9484d57e4dd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Drawers\Particle">
+      <UniqueIdentifier>{74ff570f-55aa-4e31-bc0a-31a651c20427}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\StructuredBuffer">
+      <UniqueIdentifier>{67f2e570-6474-4122-b2bf-ce326d65d075}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -386,6 +395,12 @@
     </ClInclude>
     <ClInclude Include="Utils\ConvertString\ConvertString.h">
       <Filter>Utils\ConvertString</Filter>
+    </ClInclude>
+    <ClInclude Include="Drawers\Particle\Particle.h">
+      <Filter>Drawers\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\StructuredBuffer\StructuredBuffer.h">
+      <Filter>Engine\StructuredBuffer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

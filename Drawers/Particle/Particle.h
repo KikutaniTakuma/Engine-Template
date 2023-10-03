@@ -3,6 +3,8 @@
 #include "Engine/Engine.h"
 #include "Engine/ConstBuffer/ConstBuffer.h"
 #include "Engine/PipelineManager/PipelineManager.h"
+#include "Engine/StructuredBuffer/StructuredBuffer.h"
+#include "Engine/ShaderResource/ShaderResourceHeap.h"
 
 #include "Utils/Math/Vector3.h"
 #include "Utils/Math/Mat4x4.h"
@@ -11,7 +13,7 @@
 
 #include <array>
 
-class Texture2D {
+class Particle {
 public:
 	struct MatrixData {
 		Mat4x4 wvpMat;
@@ -22,22 +24,30 @@ public:
 		Vector2 uv;
 	};
 
+private:
+	struct WorldTransForm {
+		Vector2 scale;
+		Vector3 rotate;
+		Vector3 pos;
+	};
+
 public:
-	Texture2D();
-	Texture2D(const Texture2D&);
-	Texture2D(Texture2D&&) noexcept;
-	~Texture2D();
+	Particle() = delete;
+	Particle(uint32_t indexNum);
+	Particle(const Particle&);
+	Particle(Particle&&) noexcept;
+	~Particle();
 
-	Texture2D& operator=(const Texture2D& right);
-	Texture2D& operator=(Texture2D&& right) noexcept;
+	Particle& operator=(const Particle& right);
+	Particle& operator=(Particle&& right) noexcept;
 
-/// <summary>
-/// 静的メンバ関数
-/// </summary>
+	/// <summary>
+	/// 静的メンバ関数
+	/// </summary>
 public:
 	static void Initialize(
-		const std::string& vsFileName = "./Resources/Shaders/Texture2DShader/Texture2D.VS.hlsl",
-		const std::string& psFileName = "./Resources/Shaders/Texture2DShader/Texture2DNone.PS.hlsl"
+		const std::string& vsFileName = "./Resources/Shaders/ParticleShader/Particle.VS.hlsl",
+		const std::string& psFileName = "./Resources/Shaders/ParticleShader/ParticleNone.PS.hlsl"
 	);
 
 	static void Finalize();
@@ -47,9 +57,9 @@ private:
 
 	static void CreateGraphicsPipeline();
 
-/// <summary>
-/// 静的メンバ変数
-/// </summary>
+	/// <summary>
+	/// 静的メンバ変数
+	/// </summary>
 private:
 	static std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum)> graphicsPipelineState;
 	static Shader shader;
@@ -73,7 +83,7 @@ public:
 	void Debug(const std::string& guiName);
 
 	bool Colision(const Vector2& pos2D) const;
-	bool Colision(const Texture2D& tex2D) const;
+	bool Colision(const Particle& tex2D) const;
 
 	Vector2 GetTexSize() const {
 		if (tex) {
@@ -118,22 +128,21 @@ public:
 	}
 
 public:
-	Vector2 scale;
-	Vector3 rotate;
-	Vector3 pos;
+	std::vector<WorldTransForm> wtfs;
 
 	Vector2 uvPibot;
 	Vector2 uvSize;
 
-	std::array<Vector3, 4> worldPos;
-
 	uint32_t color;
 
 private:
+	ShaderResourceHeap srvHeap;
+
+
 	D3D12_VERTEX_BUFFER_VIEW vertexView;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
 
-	ConstBuffer<Mat4x4> wvpMat;
+	StructuredBuffer<Mat4x4> wvpMat;
 	ConstBuffer<Vector4> colorBuf;
 
 	Texture* tex;
