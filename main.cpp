@@ -33,11 +33,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	Camera camera{ Camera::Type::Othographic };
 
-	Texture2D tex;
-	tex.Initialize();
-	tex.ThreadLoadTexture("./Resources/watame.png");
-	tex.scale *= 512.0f;
-
 	/// 
 	/// メインループ
 	/// 
@@ -69,8 +64,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			tex.ThreadLoadTexture("./Resources/uvChecker.png");
 		}
 
-		tex.Update();
-		
 		///
 		/// 更新処理ここまで
 		/// 
@@ -79,8 +72,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 描画処理
 		/// 
 		camera.Update();
-
-		tex.Draw(camera.GetViewOthographics());
 
 		///
 		/// 描画処理ここまで

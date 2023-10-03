@@ -4,20 +4,22 @@
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include <numeric>
 
+/// <summary>
+/// 静的変数のインスタンス化
+/// </summary>
+
+std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum)> Texture2D::graphicsPipelineState = {};
+Shader Texture2D::shader = {};
+
+D3D12_INDEX_BUFFER_VIEW Texture2D::indexView = {};
+Microsoft::WRL::ComPtr<ID3D12Resource> Texture2D::indexResource = nullptr;
+
 Texture2D::Texture2D() :
 	scale(Vector2::identity),
 	rotate(),
 	pos({ 0.0f,0.0f,0.01f }),
 	uvPibot(),
 	uvSize(Vector2::identity),
-	//SRVHeap(16),
-	SRVHandle{},
-	vertexView(),
-	vertexResource(nullptr),
-	indexView(),
-	indexResource(nullptr),
-	shader(),
-	graphicsPipelineState(),
 	tex(nullptr),
 	isFirstLoad(true),
 	isLoad(false),
@@ -31,6 +33,14 @@ Texture2D::Texture2D() :
 {
 	*wvpMat = MakeMatrixIndentity();
 	*colorBuf = Vector4::identity;
+
+	if (vertexResource) { vertexResource->Release(); }
+
+	vertexResource = Engine::CreateBufferResuorce(sizeof(VertexData) * 4);
+
+	vertexView.BufferLocation = vertexResource->GetGPUVirtualAddress();
+	vertexView.SizeInBytes = sizeof(VertexData) * 4;
+	vertexView.StrideInBytes = sizeof(VertexData);
 }
 
 Texture2D::Texture2D(const Texture2D& right) :
@@ -42,11 +52,6 @@ Texture2D::Texture2D(Texture2D&& right) noexcept :
 	Texture2D()
 {
 	*this = std::move(right);
-}
-
-Texture2D::~Texture2D() {
-	if (indexResource)indexResource->Release();
-	if (vertexResource)vertexResource->Release();
 }
 
 Texture2D& Texture2D::operator=(const Texture2D& right) {
@@ -61,13 +66,10 @@ Texture2D& Texture2D::operator=(const Texture2D& right) {
 
 	worldPos = right.worldPos;
 
-	//SRVHeap.Reset();
-
 	tex = right.tex;
+	isFirstLoad = right.isFirstLoad;
+	isLoad = right.isLoad;
 
-	shader = right.shader;
-
-	Initialize();
 
 	*wvpMat = *right.wvpMat;
 	*colorBuf = *right.colorBuf;
@@ -107,18 +109,17 @@ Texture2D& Texture2D::operator=(Texture2D&& right) noexcept {
 	return *this;
 }
 
+Texture2D::~Texture2D() {
+	if (vertexResource) {
+		vertexResource->Release();
+		indexResource.Reset();
+	}
+}
+
 void Texture2D::Initialize(const std::string& vsFileName, const std::string& psFileName) {
-	if (indexResource)indexResource->Release();
-	if (vertexResource)vertexResource->Release();
+	if (indexResource) { indexResource->Release(); }
 	
 	LoadShader(vsFileName, psFileName);
-
-	vertexResource = Engine::CreateBufferResuorce(sizeof(VertexData) * 4);
-
-	vertexView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexView.SizeInBytes = sizeof(VertexData) * 4;
-	vertexView.StrideInBytes = sizeof(VertexData);
-
 
 	uint16_t indices[] = {
 			0,1,3, 1,2,3
@@ -133,6 +134,15 @@ void Texture2D::Initialize(const std::string& vsFileName, const std::string& psF
 		indexMap[i] = indices[i];
 	}
 	indexResource->Unmap(0, nullptr);
+
+	CreateGraphicsPipeline();
+}
+
+void Texture2D::Finalize() {
+	if (indexResource) { 
+		indexResource->Release(); 
+		indexResource.Reset();
+	}
 }
 
 void Texture2D::LoadShader(const std::string& vsFileName, const std::string& psFileName) {
@@ -180,7 +190,6 @@ void Texture2D::LoadTexture(const std::string& fileName) {
 
 	if (tex && !isLoad) {
 		if (isFirstLoad) {
-			CreateGraphicsPipeline();
 			isFirstLoad = false;
 		}
 		else {
@@ -199,7 +208,6 @@ void Texture2D::ThreadLoadTexture(const std::string& fileName) {
 void Texture2D::Update() {
 	if (tex && tex->CanUse() && !isLoad) {
 		if (isFirstLoad) {
-			CreateGraphicsPipeline();
 			isFirstLoad = false;
 		}
 		isLoad = true;
@@ -261,9 +269,9 @@ void Texture2D::Draw(
 
 		// 各種描画コマンドを積む
 		graphicsPipelineState[blend]->Use();
-		tex->Use(2);
 		commandlist->SetGraphicsRootConstantBufferView(0, wvpMat.GetGPUVtlAdrs());
 		commandlist->SetGraphicsRootConstantBufferView(1, colorBuf.GetGPUVtlAdrs());
+		tex->Use(2);
 		commandlist->IASetVertexBuffers(0, 1, &vertexView);
 		commandlist->IASetIndexBuffer(&indexView);
 		commandlist->DrawIndexedInstanced(6, 1, 0, 0, 0);

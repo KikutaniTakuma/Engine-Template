@@ -32,17 +32,32 @@ public:
 	Texture2D& operator=(const Texture2D& right);
 	Texture2D& operator=(Texture2D&& right) noexcept;
 
-
+/// <summary>
+/// 静的メンバ関数
+/// </summary>
 public:
-	void Initialize(
+	static void Initialize(
 		const std::string& vsFileName = "./Resources/Shaders/Texture2DShader/Texture2D.VS.hlsl",
 		const std::string& psFileName = "./Resources/Shaders/Texture2DShader/Texture2DNone.PS.hlsl"
 	);
 
-private:
-	void LoadShader(const std::string& vsFileName, const std::string& psFileName);
+	static void Finalize();
 
-	void CreateGraphicsPipeline();
+private:
+	static void LoadShader(const std::string& vsFileName, const std::string& psFileName);
+
+	static void CreateGraphicsPipeline();
+
+/// <summary>
+/// 静的メンバ変数
+/// </summary>
+private:
+	static std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum)> graphicsPipelineState;
+	static Shader shader;
+
+	static D3D12_INDEX_BUFFER_VIEW indexView;
+	static Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
+
 
 public:
 	void LoadTexture(const std::string& fileName);
@@ -116,19 +131,8 @@ public:
 	uint32_t color;
 
 private:
-	//ShaderResourceHeap SRVHeap;
-
-	uint32_t SRVHandle;
-
 	D3D12_VERTEX_BUFFER_VIEW vertexView;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
-
-	D3D12_INDEX_BUFFER_VIEW indexView;
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
-
-	Shader shader;
-
-	std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum)> graphicsPipelineState;
 
 	ConstBuffer<Mat4x4> wvpMat;
 	ConstBuffer<Vector4> colorBuf;
