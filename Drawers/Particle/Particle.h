@@ -29,6 +29,9 @@ private:
 		Vector2 scale;
 		Vector3 rotate;
 		Vector3 pos;
+		bool isActive;
+		
+		Vector3 movePos;
 	};
 
 public:
@@ -47,7 +50,7 @@ public:
 public:
 	static void Initialize(
 		const std::string& vsFileName = "./Resources/Shaders/ParticleShader/Particle.VS.hlsl",
-		const std::string& psFileName = "./Resources/Shaders/ParticleShader/ParticleNone.PS.hlsl"
+		const std::string& psFileName = "./Resources/Shaders/ParticleShader/Particle.PS.hlsl"
 	);
 
 	static void Finalize();
@@ -81,9 +84,6 @@ public:
 	);
 
 	void Debug(const std::string& guiName);
-
-	bool Colision(const Vector2& pos2D) const;
-	bool Colision(const Particle& tex2D) const;
 
 	Vector2 GetTexSize() const {
 		if (tex) {

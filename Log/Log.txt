@@ -1,10 +1,14 @@
-Use Adapter:NVIDIA GeForce RTX 3060 Laptop GPU
+Use Adapter:NVIDIA GeForce RTX 4070 Ti
 FeatureLevel:12.2
 Complete create D3D12Device!!!
 Begin CompilerShader, path:./Resources/Shaders/Texture2DShader/Texture2D.VS.hlsl, profile:vs_6_0
 Compile Succeeded, path:./Resources/Shaders/Texture2DShader/Texture2D.VS.hlsl, profile:vs_6_0
 Begin CompilerShader, path:./Resources/Shaders/Texture2DShader/Texture2DNone.PS.hlsl, profile:ps_6_0
 Compile Succeeded, path:./Resources/Shaders/Texture2DShader/Texture2DNone.PS.hlsl, profile:ps_6_0
-Average Fps : 46.05
-Max Fps : 60.00
-Min Fps : 53.30
+Begin CompilerShader, path:./Resources/Shaders/ParticleShader/Particle.VS.hlsl, profile:vs_6_0
+Compile Succeeded, path:./Resources/Shaders/ParticleShader/Particle.VS.hlsl, profile:vs_6_0
+Begin CompilerShader, path:./Resources/Shaders/ParticleShader/Particle.PS.hlsl, profile:ps_6_0
+Compile Succeeded, path:./Resources/Shaders/ParticleShader/Particle.PS.hlsl, profile:ps_6_0
+Average Fps : 118.31
+Max Fps : 165.00
+Min Fps : 133.07

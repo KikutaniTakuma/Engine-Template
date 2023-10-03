@@ -1,6 +1,6 @@
 Texture2D<float4> tex : register(t0);
 SamplerState smp : register(s0);
-cbuffer Color : register(b1){
+cbuffer Color : register(b0){
     float4 color;
 }
 

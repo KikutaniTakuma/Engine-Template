@@ -11,7 +11,7 @@ class StructuredBuffer {
 	static_assert(!std::is_pointer<T>::value, "Do not use pointer types");
 
 public:
-	inline StructuredBuffer() = delete;
+	StructuredBuffer() = delete;
 
 	inline StructuredBuffer(uint32_t instanceNum) noexcept :
 		bufferResource(),
@@ -21,16 +21,17 @@ public:
 		isCreateView(false),
 		range(),
 		roootParamater(),
-		kInstanseNum(instanceNum)
+		instanceNum(instanceNum)
 	{
 		// バイトサイズは256アライメントする(vramを効率的に使うための仕組み)
-		bufferResource = Engine::CreateBufferResuorce(sizeof(T) * kInstanseNum);
+		bufferResource = Engine::CreateBufferResuorce(sizeof(T) * instanceNum);
+		srvDesc = {};
 		srvDesc.Format = DXGI_FORMAT_UNKNOWN;
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 		srvDesc.Buffer.FirstElement = 0;
 		srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-		srvDesc.Buffer.NumElements = UINT(kInstanseNum);
+		srvDesc.Buffer.NumElements = UINT(instanceNum);
 		srvDesc.Buffer.StructureByteStride = sizeof(T);
 
 		if (isWright) {
@@ -60,9 +61,7 @@ public:
 		srvDesc(),
 		data(nullptr),
 		isWright(true),
-		roootParamater(),
-		shaderVisibility(D3D12_SHADER_VISIBILITY_ALL),
-		shaderRegister(0)
+		roootParamater()
 	{
 		*this = right;
 	}
@@ -73,7 +72,7 @@ public:
 			bufferResource->Release();
 			bufferResource.Reset();
 		}
-		bufferResource = Engine::CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
+		bufferResource = Engine::CreateBufferResuorce(sizeof(T) * instanceNum);
 		srvDesc.BufferLocation = bufferResource->GetGPUVirtualAddress();
 		srvDesc.SizeInBytes = UINT(bufferResource->GetDesc().Width);
 
@@ -86,7 +85,7 @@ public:
 
 		if (!isCreateView) {
 			assert(!"created view");
-			ErrorCheck::GetInstance()->ErrorTextBox("operator= Created view fail", "Const Buffer");
+			ErrorCheck::GetInstance()->ErrorTextBox("operator= Created view fail", "Structured Buffer");
 		}
 
 		return *this;
@@ -108,17 +107,21 @@ public:
 	}
 
 	T& operator[](uint32_t index) {
-		assert(kInstanseNum < index);
+		assert(index < instanceNum);
 		return data[index];
 	}
 
 	const T& operator[](uint32_t index) const {
-		assert(kInstanseNum < index);
+		assert(index < instanceNum);
 		return data[index];
 	}
 
+	/*void Resize(uint32_t indexNum, ShaderResourceHeap& srvHeap, uint32_t srvHeapIndex) {
+
+	}*/
+
 	uint32_t Size() const {
-		return kInstanseNum;
+		return instanceNum;
 	}
 
 	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVtlAdrs() const noexcept {
@@ -130,7 +133,7 @@ public:
 	}
 
 	void CrerateView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle) noexcept {
-		Engine::GetDevice()->CreateConstantBufferView(&srvDesc, descriptorHandle);
+		Engine::GetDevice()->CreateShaderResourceView(bufferResource.Get(), &srvDesc, descriptorHandle);
 		isCreateView = true;
 	}
 
@@ -147,5 +150,5 @@ private:
 
 	D3D12_ROOT_PARAMETER roootParamater;
 
-	const uint32_t kInstanseNum;
+	uint32_t instanceNum;
 };
