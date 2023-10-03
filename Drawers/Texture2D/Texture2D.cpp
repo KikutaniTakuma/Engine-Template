@@ -21,7 +21,6 @@ Texture2D::Texture2D() :
 	uvPibot(),
 	uvSize(Vector2::identity),
 	tex(nullptr),
-	isFirstLoad(true),
 	isLoad(false),
 	color(std::numeric_limits<uint32_t>::max()),
 	wvpMat(),
@@ -67,7 +66,6 @@ Texture2D& Texture2D::operator=(const Texture2D& right) {
 	worldPos = right.worldPos;
 
 	tex = right.tex;
-	isFirstLoad = right.isFirstLoad;
 	isLoad = right.isLoad;
 
 
@@ -95,8 +93,7 @@ Texture2D& Texture2D::operator=(Texture2D&& right) noexcept {
 	worldPos = std::move(right.worldPos);
 
 	tex = std::move(right.tex);
-
-	shader = std::move(right.shader);
+	isLoad = std::move(right.isLoad);
 
 	*wvpMat = *right.wvpMat;
 	*colorBuf = *right.colorBuf;
@@ -189,12 +186,6 @@ void Texture2D::LoadTexture(const std::string& fileName) {
 	tex = TextureManager::GetInstance()->LoadTexture(fileName);
 
 	if (tex && !isLoad) {
-		if (isFirstLoad) {
-			isFirstLoad = false;
-		}
-		else {
-			//SRVHeap.CreateTxtureView(tex, SRVHandle);
-		}
 		isLoad = true;
 	}
 }
@@ -207,9 +198,6 @@ void Texture2D::ThreadLoadTexture(const std::string& fileName) {
 
 void Texture2D::Update() {
 	if (tex && tex->CanUse() && !isLoad) {
-		if (isFirstLoad) {
-			isFirstLoad = false;
-		}
 		isLoad = true;
 	}
 

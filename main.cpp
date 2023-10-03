@@ -32,6 +32,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	float fpsLimit = 165.0f;
 
 	Camera camera{ Camera::Type::Othographic };
+	Texture2D tex;
+	tex.LoadTexture("./Resources/watame.png");
+	tex.scale = tex.GetTexSize();
+	Texture2D tex2 = tex;
 
 	/// 
 	/// メインループ
@@ -64,6 +68,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			tex.ThreadLoadTexture("./Resources/uvChecker.png");
 		}
 
+		tex.Debug("tex");
+		tex2.Debug("tex2");
+
+		tex.scale = tex.GetTexSize();
+		tex2.scale = tex2.GetTexSize();
+
+		tex.Update();
+		tex2.Update();
+
 		///
 		/// 更新処理ここまで
 		/// 
@@ -72,6 +85,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 描画処理
 		/// 
 		camera.Update();
+
+		tex.Draw(camera.GetViewOthographics());
+		tex2.Draw(camera.GetViewOthographics());
 
 		///
 		/// 描画処理ここまで

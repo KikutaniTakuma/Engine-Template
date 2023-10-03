@@ -138,9 +138,7 @@ private:
 	ConstBuffer<Vector4> colorBuf;
 
 	Texture* tex;
-	bool isFirstLoad;
 	bool isLoad;
-
 
 	// アニメーション変数
 	std::chrono::steady_clock::time_point aniStartTime_;
