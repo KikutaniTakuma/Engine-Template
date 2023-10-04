@@ -50,6 +50,18 @@ public:
 	}
 
 	template<class T>
+	void CreateConstBufferView(ConstBuffer<T>& conBuf, uint32_t heapIndex) {
+		assert(currentHadleIndex < heapSize);
+		if (currentHadleIndex >= heapSize) {
+			ErrorCheck::GetInstance()->ErrorTextBox("CreateConstBufferView failed\nOver HeapSize", "ShaderResourceHeap");
+		}
+
+		conBuf.CrerateView(heapHadles[heapIndex].first);
+
+		heapOrder[heapIndex] = HeapType::CBV;
+	}
+
+	template<class T>
 	uint32_t CreateStructuredBufferView(StructuredBuffer<T>& strcBuf) {
 		assert(currentHadleIndex < heapSize);
 		if (currentHadleIndex >= heapSize) {
@@ -62,6 +74,18 @@ public:
 		heapOrder.push_back(HeapType::SRV);
 
 		return currentHadleIndex - 1u;
+	}
+
+	template<class T>
+	void CreateStructuredBufferView(StructuredBuffer<T>& strcBuf, uint32_t heapIndex) {
+		assert(currentHadleIndex < heapSize);
+		if (currentHadleIndex >= heapSize) {
+			ErrorCheck::GetInstance()->ErrorTextBox("CreateStructuredBufferView failed\nOver HeapSize", "ShaderResourceHeap");
+		}
+
+		strcBuf.CrerateView(heapHadles[heapIndex].first);
+
+		heapOrder[heapIndex] = HeapType::SRV;
 	}
 
 	inline uint32_t CreateTxtureView(Texture* tex) {
@@ -87,6 +111,8 @@ public:
 			ErrorCheck::GetInstance()->ErrorTextBox("CreatTxtureBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 		tex->CreateSRVView(heapHadles[heapIndex].first);
+
+		heapOrder[heapIndex] = HeapType::SRV;
 	}
 
 	D3D12_ROOT_PARAMETER GetParameter();

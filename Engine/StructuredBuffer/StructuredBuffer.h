@@ -3,7 +3,7 @@
 #include <cassert>
 #include <wrl.h>
 #include "Engine/ErrorCheck/ErrorCheck.h"
-//#include "Engine/ShaderResource/ShaderResourceHeap.h"
+#include "Engine/ShaderResource/ShaderResourceHeap.h"
 
 // ポインタをテンプレートパラメータに設定してはいけない
 template<class T>
@@ -23,7 +23,6 @@ public:
 		roootParamater(),
 		instanceNum(instanceNum)
 	{
-		// バイトサイズは256アライメントする(vramを効率的に使うための仕組み)
 		bufferResource = Engine::CreateBufferResuorce(sizeof(T) * instanceNum);
 		srvDesc = {};
 		srvDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -53,43 +52,17 @@ public:
 	}
 
 	inline ~StructuredBuffer() noexcept {
-		bufferResource->Release();
-	}
-
-	inline StructuredBuffer(const StructuredBuffer& right) noexcept :
-		bufferResource(),
-		srvDesc(),
-		data(nullptr),
-		isWright(true),
-		roootParamater()
-	{
-		*this = right;
-	}
-
-	inline StructuredBuffer<T>& operator=(const StructuredBuffer& right) {
-
 		if (bufferResource) {
 			bufferResource->Release();
 			bufferResource.Reset();
 		}
-		bufferResource = Engine::CreateBufferResuorce(sizeof(T) * instanceNum);
-		srvDesc.BufferLocation = bufferResource->GetGPUVirtualAddress();
-		srvDesc.SizeInBytes = UINT(bufferResource->GetDesc().Width);
-
-		if (isWright) {
-			bufferResource->Map(0, nullptr, reinterpret_cast<void**>(&data));
-		}
-		roootParamater = right.roootParamater;
-
-		*data = *right.data;
-
-		if (!isCreateView) {
-			assert(!"created view");
-			ErrorCheck::GetInstance()->ErrorTextBox("operator= Created view fail", "Structured Buffer");
-		}
-
-		return *this;
 	}
+
+	inline StructuredBuffer(const StructuredBuffer& right) noexcept = delete;
+	inline StructuredBuffer(StructuredBuffer&& right) noexcept = delete;
+
+	inline StructuredBuffer<T>& operator=(const StructuredBuffer& right) = delete;
+	inline StructuredBuffer<T>& operator=(StructuredBuffer&& right) = delete;
 
 public:
 	void OnWright() noexcept {
@@ -116,9 +89,28 @@ public:
 		return data[index];
 	}
 
-	/*void Resize(uint32_t indexNum, ShaderResourceHeap& srvHeap, uint32_t srvHeapIndex) {
+	void Resize(uint32_t indexNum) {
+		OffWright();
 
-	}*/
+		if (bufferResource) {
+			bufferResource->Release();
+			bufferResource.Reset();
+		}
+
+		instanceNum = indexNum;
+		
+		bufferResource = Engine::CreateBufferResuorce(sizeof(T) * instanceNum);
+		srvDesc = {};
+		srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+		srvDesc.Buffer.FirstElement = 0;
+		srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+		srvDesc.Buffer.NumElements = UINT(instanceNum);
+		srvDesc.Buffer.StructureByteStride = sizeof(T);
+
+		OnWright();
+	}
 
 	uint32_t Size() const {
 		return instanceNum;

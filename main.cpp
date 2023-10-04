@@ -33,13 +33,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	float fpsLimit = 165.0f;
 
 	Camera camera{ Camera::Type::Othographic };
-	/*Texture2D tex;
-	tex.LoadTexture("./Resources/watame.png");
-	tex.scale = tex.GetTexSize();
-	Texture2D tex2 = tex;*/
 
-	Particle ptcl{5};
+	int32_t ptclIndex = 5;
+	Particle ptcl{ uint32_t(ptclIndex) };
 	ptcl.LoadTexture("./Resources/uvChecker.png");
+
 
 	/// 
 	/// メインループ
@@ -61,25 +59,18 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		// 入力処理
 		input->InputStart();
 
+
 		/// 
 		/// 更新処理
 		/// 
 
-		/*if (input->GetKey()->Pushed(DIK_1)) {
-			tex.ThreadLoadTexture("./Resources/sakabannbasupisu.png");
+		ImGui::Begin("ptclIndex");
+		ImGui::DragInt("num", &ptclIndex);
+		ImGui::End();
+
+		if (input->GetKey()->Pushed(DIK_RETURN)) {
+			ptcl.Resize(uint32_t(ptclIndex));
 		}
-		else if(input->GetKey()->Pushed(DIK_2)) {
-			tex.ThreadLoadTexture("./Resources/uvChecker.png");
-		}
-
-		tex.Debug("tex");
-		tex2.Debug("tex2");
-
-		tex.scale = tex.GetTexSize();
-		tex2.scale = tex2.GetTexSize();
-
-		tex.Update();
-		tex2.Update();*/
 
 		ptcl.Update();
 
@@ -93,9 +84,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera.Update();
 
 		ptcl.Draw(camera.GetViewOthographics());
-
-		/*tex.Draw(camera.GetViewOthographics());
-		tex2.Draw(camera.GetViewOthographics());*/
 
 		///
 		/// 描画処理ここまで

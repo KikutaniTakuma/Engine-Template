@@ -127,6 +127,18 @@ public:
 		return isAnimation_;
 	}
 
+	void Resize(uint32_t index) {
+		wvpMat.Resize(index);
+		srvHeap.CreateStructuredBufferView(wvpMat, 1);
+		wtfs.resize(index);
+		for (size_t i = 0; i < wtfs.size(); i++) {
+			wtfs[i].scale = Vector2::identity * 512.0f;
+			wtfs[i].pos.x = 10.0f * i;
+			wtfs[i].pos.y = 10.0f * i;
+			wtfs[i].pos.z += 0.3f;
+		}
+	}
+
 public:
 	std::vector<WorldTransForm> wtfs;
 
