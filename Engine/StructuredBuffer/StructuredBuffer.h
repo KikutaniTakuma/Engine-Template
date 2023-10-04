@@ -138,7 +138,9 @@ public:
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> bufferResource;
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
+
 	D3D12_DESCRIPTOR_RANGE range;
+	D3D12_ROOT_PARAMETER roootParamater;
 
 	T* data;
 
@@ -146,7 +148,6 @@ private:
 
 	bool isCreateView;
 
-	D3D12_ROOT_PARAMETER roootParamater;
 
 	uint32_t instanceNum;
 };

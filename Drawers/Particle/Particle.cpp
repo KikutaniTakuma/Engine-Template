@@ -204,6 +204,8 @@ void Particle::ThreadLoadTexture(const std::string& fileName) {
 }
 
 void Particle::Update() {
+	assert(wtfs.size() == wvpMat.Size());
+
 	if (tex && tex->CanUse() && !isLoad) {
 		srvHeap.InitializeReset(3);
 		srvHeap.CreateTxtureView(tex);

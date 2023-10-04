@@ -34,6 +34,46 @@ private:
 		Vector3 movePos;
 	};
 
+	enum class EmitterType {
+		Circle,
+		Cube,
+	};
+
+	struct Emitter {
+		Vector3 pos;
+		Vector3 pos;
+		Vector3 pos;
+
+
+		Vector3 size;
+		EmitterType type;
+		float circleSize;
+	};
+
+	struct Setting {
+		Emitter emitter;
+		
+		// 大きさ
+		Vector3 startSize;
+		Vector3 endSize;
+
+		// 移動
+		Vector3 startVelocity;
+		Vector3 endVelocity;
+
+		// 一度にいくつ出すか
+		uint32_t startParticleNum;
+		uint32_t endParticleNum;
+
+		// 出す頻度
+		std::chrono::milliseconds startFreq;
+		std::chrono::milliseconds endFreq;
+
+		// 消える時間
+		std::chrono::milliseconds startDeath;
+		std::chrono::milliseconds endDeath;
+	};
+
 public:
 	Particle() = delete;
 	Particle(uint32_t indexNum);
