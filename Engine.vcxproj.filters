@@ -134,6 +134,12 @@
     <ClCompile Include="Drawers\Particle\Particle.cpp">
       <Filter>Drawers\Particle</Filter>
     </ClCompile>
+    <ClCompile Include="Utils\UtilsLib\UtilsLib.cpp">
+      <Filter>Utils\UtilsLib</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Easeing\Easeing.cpp">
+      <Filter>Utils\Easeing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -255,6 +261,12 @@
     </Filter>
     <Filter Include="Engine\StructuredBuffer">
       <UniqueIdentifier>{67f2e570-6474-4122-b2bf-ce326d65d075}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\UtilsLib">
+      <UniqueIdentifier>{7361faea-b8e5-461b-8d0b-4bd9abd1948d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\Easeing">
+      <UniqueIdentifier>{f16e45ab-4143-42ad-8fd5-3f82c6326404}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -401,6 +413,12 @@
     </ClInclude>
     <ClInclude Include="Engine\StructuredBuffer\StructuredBuffer.h">
       <Filter>Engine\StructuredBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\UtilsLib\UtilsLib.h">
+      <Filter>Utils\UtilsLib</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Easeing\Easeing.h">
+      <Filter>Utils\Easeing</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

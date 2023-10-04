@@ -196,12 +196,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Utils\Camera\Camera.cpp" />
     <ClCompile Include="Utils\ConvertString\ConvertString.cpp" />
     <ClCompile Include="Utils\CsvLoad\CsvLoad.cpp" />
+    <ClCompile Include="Utils\Easeing\Easeing.cpp" />
     <ClCompile Include="Utils\Log\Log.cpp" />
     <ClCompile Include="Utils\Math\Mat4x4.cpp" />
     <ClCompile Include="Utils\Math\Vector2.cpp" />
     <ClCompile Include="Utils\Math\Vector3.cpp" />
     <ClCompile Include="Utils\Math\Vector4.cpp" />
     <ClCompile Include="Utils\UIeditor\UIeditor.cpp" />
+    <ClCompile Include="Utils\UtilsLib\UtilsLib.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AudioManager\AudioManager.h" />
@@ -252,12 +254,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Utils\Camera\Camera.h" />
     <ClInclude Include="Utils\ConvertString\ConvertString.h" />
     <ClInclude Include="Utils\CsvLoad\CsvLoad.h" />
+    <ClInclude Include="Utils\Easeing\Easeing.h" />
     <ClInclude Include="Utils\Log\Log.h" />
     <ClInclude Include="Utils\Math\Mat4x4.h" />
     <ClInclude Include="Utils\Math\Vector2.h" />
     <ClInclude Include="Utils\Math\Vector3.h" />
     <ClInclude Include="Utils\Math\Vector4.h" />
     <ClInclude Include="Utils\UIeditor\UIeditor.h" />
+    <ClInclude Include="Utils\UtilsLib\UtilsLib.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
