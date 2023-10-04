@@ -65,7 +65,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 
 		ImGui::Begin("ptclIndex");
-		ImGui::DragInt("num", &ptclIndex,1.0f,0, 10000);
+		ImGui::DragInt("num", &ptclIndex,1.0f,1, 10000);
 		ImGui::End();
 
 		if (input->GetKey()->Pushed(DIK_RETURN)) {
