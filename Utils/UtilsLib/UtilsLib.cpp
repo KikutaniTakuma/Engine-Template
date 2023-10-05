@@ -18,4 +18,13 @@ namespace UtilsLib {
 
 		return dist(rnd);
 	}
+
+	Flg::Flg():
+		flg_(false),
+		preFlg_(false)
+	{}
+
+	void Flg::Update() {
+		preFlg_ = flg_;
+	}
 }
