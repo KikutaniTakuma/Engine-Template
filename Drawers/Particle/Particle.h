@@ -41,9 +41,6 @@ private:
 
 	struct Emitter {
 		Vector3 pos;
-		Vector3 pos;
-		Vector3 pos;
-
 
 		Vector3 size;
 		EmitterType type;

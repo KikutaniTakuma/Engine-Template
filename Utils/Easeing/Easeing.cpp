@@ -1,14 +1,14 @@
 #include "Easeing.h"
 #include "Engine/FrameInfo/FrameInfo.h"
 #include "externals/imgui/imgui.h"
-#include <algorithm>
+
+#include "Utils/Math/Vector3.h"
+#include "Utils/Math/Vector2.h"
 #include <cmath>
 #include <numbers>
 
 void Easeing::Update() {
 	if (isActive_) {
-		current_ = Vector3::Lerp(start_, end_, ease_(t_));
-
 		t_ += spdT_ * FrameInfo::GetInstance()->GetDelta();
 		t_ = std::clamp(t_, 0.0f, 1.0f);
 
@@ -24,8 +24,6 @@ void Easeing::Update() {
 }
 
 void Easeing::Start(
-	const Vector3& start, 
-	const Vector3& end, 
 	bool isLoop, 
 	float easeTime, 
 	std::function<float(float)> ease
@@ -34,11 +32,6 @@ void Easeing::Start(
 	isLoop_ = isLoop;
 	t_ = 0.0f;
 	spdT_ = 1.0f / easeTime;
-
-	start_ = start;
-	end_ = end;
-
-	current_ = start_;
 
 	ease_ = ease;
 }
@@ -57,13 +50,21 @@ void Easeing::Stop() {
 	spdT_ = 0.0f;
 }
 
+template<>
+Vector3 Easeing::Get(const Vector3& start, const Vector3& end) {
+	return Vector3::Lerp(start, end, ease_(t_));
+}
+
+template<>
+Vector2 Easeing::Get(const Vector2& start, const Vector2& end) {
+	return Vector2::Lerp(start, end, ease_(t_));
+}
+
 void Easeing::Debug(const std::string& debugName) {
 #ifdef _DEBUG
 	easeTime_ = 1.0f / spdT_;
 	ImGui::Begin(debugName.c_str());
 	ImGui::SliderInt("easeType", &easeType_, 0, 30);
-	ImGui::DragFloat3("start", &start_.x, 0.1f);
-	ImGui::DragFloat3("end", &end_.x, 0.1f);
 	ImGui::DragFloat("easeSpd(seconds)", &easeTime_, 0.01f, 0.0f);
 	ImGui::Checkbox("isLoop", &isLoop_);
 	if (ImGui::Button("Start")) {
@@ -71,8 +72,6 @@ void Easeing::Debug(const std::string& debugName) {
 		t_ = 0.0f;
 
 	    spdT_ = 1.0f / easeTime_;
-
-		current_ = start_;
 
 		switch (easeType_)
 		{

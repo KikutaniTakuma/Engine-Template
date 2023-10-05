@@ -1,7 +1,8 @@
 #pragma once
 #include <functional>
-#include "Utils/Math/Vector3.h"
 #include <string>
+#include <algorithm>
+#include <cassert>
 
 class Easeing {
 public:
@@ -26,9 +27,7 @@ public:
 	/// <param name="easeTime">何秒でイージングするか</param>
 	/// <param name="ease">イージング関数</param>
 	void Start(
-		const Vector3& start, 
-		const Vector3& end, 
-		bool isLoop, 
+		bool isLoop,
 		float easeTime,
 		std::function<float(float)> ease = [](float t) {
 			return t;
@@ -51,11 +50,18 @@ public:
 	void Stop();
 
 	/// <summary>
-	/// イージングしたVector3を取得
+	/// スタートとエンドを入れるとtの値に応じた線形補完された値が返る
 	/// </summary>
-	/// <returns>イージングしたVector3</returns>
-	const Vector3& Get() const {
-		return current_;
+	/// <typeparam name="T">
+	/// 数値型とVector2とVector3のみ可能(ユーザー定義型とポインタ型は不可)
+	/// </typeparam>
+	/// <param name="start">始め</param>
+	/// <param name="end">終わり</param>
+	/// <returns>線形補完された値</returns>
+	template<typename T>
+	T Get(const T& start, const T& end) {
+		static_assert(!std::is_pointer<T>::value, "Do not use pointer types");
+		return std::lerp<T>(start, end, ease_(t_));
 	}
 
 	void Debug(const std::string& debugName);
@@ -67,11 +73,6 @@ private:
 #endif // _DEBUG
 
 	std::function<float(float)> ease_;
-
-	Vector3 current_;
-
-	Vector3 start_;
-	Vector3 end_;
 
 	bool isActive_;
 	bool isLoop_;

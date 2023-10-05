@@ -92,7 +92,7 @@ public:
 	void Resize(uint32_t indexNum) {
 		assert(0 < indexNum);
 		if (indexNum < 1) {
-			ErrorCheck::GetInstance()->ErrorTextBox("Resize : Index must be greater than or equal to 1 ->" + std::to_string(indexNum), "StructuredBuffer")
+			ErrorCheck::GetInstance()->ErrorTextBox("Resize : Index must be greater than or equal to 1 ->" + std::to_string(indexNum), "StructuredBuffer");
 			return;
 		}
 
