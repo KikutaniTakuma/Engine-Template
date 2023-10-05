@@ -29,9 +29,9 @@ private:
 		Vector2 scale;
 		Vector3 rotate;
 		Vector3 pos;
-		bool isActive;
 		
 		Vector3 movePos;
+		bool isActive;
 	};
 
 	enum class EmitterType {
@@ -81,8 +81,18 @@ public:
 	Particle(Particle&&) noexcept;
 	~Particle();
 
+public:
 	Particle& operator=(const Particle& right);
 	Particle& operator=(Particle&& right) noexcept;
+
+	inline WorldTransForm& operator[](size_t index) {
+		return wtfs[index];
+	}
+
+	inline const WorldTransForm& operator[](size_t index) const {
+		return wtfs[index];
+	}
+
 
 	/// <summary>
 	/// 静的メンバ関数
@@ -180,14 +190,16 @@ public:
 	}
 
 public:
-	std::vector<WorldTransForm> wtfs;
-
 	Vector2 uvPibot;
 	Vector2 uvSize;
 
 	uint32_t color;
 
+	std::deque<Setting> ssettings;
+
 private:
+	std::vector<WorldTransForm> wtfs;
+
 	ShaderResourceHeap srvHeap;
 
 
