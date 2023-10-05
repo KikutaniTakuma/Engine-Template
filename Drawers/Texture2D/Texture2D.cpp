@@ -172,7 +172,6 @@ void Texture2D::CreateGraphicsPipeline() {
 	PipelineManager::SetShader(shader);
 	PipelineManager::SetVertexInput("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT);
 	PipelineManager::SetVertexInput("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT);
-	//PipelineManager::IsDepth(false);
 
 	for (int32_t i = Pipeline::Blend::None; i < Pipeline::Blend::BlendTypeNum; i++) {
 		PipelineManager::SetState(Pipeline::Blend(i), Pipeline::SolidState::Solid);
