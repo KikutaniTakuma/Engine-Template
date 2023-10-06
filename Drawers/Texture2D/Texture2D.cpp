@@ -180,10 +180,24 @@ void Texture2D::CreateGraphicsPipeline() {
 	}
 
 	PipelineManager::StateReset();
+
+	for (auto& i : graphicsPipelineState) {
+		if (!i) {
+			ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Texture2D");
+			return;
+		}
+	}
 }
 
 void Texture2D::LoadTexture(const std::string& fileName) {
-	tex = TextureManager::GetInstance()->LoadTexture(fileName);
+	static TextureManager* textureManager = TextureManager::GetInstance();
+	assert(textureManager);
+	while (true) {
+		if (textureManager->ThreadLoadFinish()) {
+			tex = textureManager->LoadTexture(fileName);
+			break;
+		}
+	}
 
 	if (tex && !isLoad) {
 		isLoad = true;
@@ -191,8 +205,10 @@ void Texture2D::LoadTexture(const std::string& fileName) {
 }
 
 void Texture2D::ThreadLoadTexture(const std::string& fileName) {
+	static TextureManager* textureManager = TextureManager::GetInstance();
+	assert(textureManager);
 	tex = nullptr;
-	TextureManager::GetInstance()->LoadTexture(fileName, &tex);
+	textureManager->LoadTexture(fileName, &tex);
 	isLoad = false;
 }
 
@@ -247,13 +263,6 @@ void Texture2D::Draw(
 		*wvpMat = viewProjection;
 
 		auto commandlist = Engine::GetCommandList();
-
-		for (auto& i : graphicsPipelineState) {
-			if (!i) {
-				ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Texture2D");
-				return;
-			}
-		}
 
 		// 各種描画コマンドを積む
 		graphicsPipelineState[blend]->Use();
