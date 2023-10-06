@@ -16,6 +16,9 @@
 /// 基本的にポインタ型で使う
 /// </summary>
 class Mesh {
+public:
+	using MeshResource = std::pair<Microsoft::WRL::ComPtr<ID3D12Resource>, D3D12_VERTEX_BUFFER_VIEW>;
+
 private:
 	struct VertData {
 		Vector4 position;
@@ -38,17 +41,16 @@ private:
 	};
 
 	struct MeshData{
-		Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer = nullptr;
-		// 頂点バッファビュー
-		D3D12_VERTEX_BUFFER_VIEW vertexView{};
-		// 頂点バッファマップ
-		VertData* vertexMap = nullptr;
+		std::unordered_map<size_t, VertData> vertices;
 
-		Microsoft::WRL::ComPtr<ID3D12Resource> indexBuffer = nullptr;
-		// インデックスバッファビュー
-		D3D12_INDEX_BUFFER_VIEW indexView{};
-		// インデックスバッファマップ
-		uint32_t* indexMap = nullptr;
+		UINT sizeInBytes;
+		UINT strideInBytes;
+
+		//Microsoft::WRL::ComPtr<ID3D12Resource> indexBuffer = nullptr;
+		//// インデックスバッファビュー
+		//D3D12_INDEX_BUFFER_VIEW indexView{};
+		//// インデックスバッファマップ
+		//uint32_t* indexMap = nullptr;
 
 		// 頂点数
 		uint32_t vertNum = 0;
@@ -69,7 +71,9 @@ public:
 
 	void LoadMtl(const std::string& fileName);
 
-	void Use();
+	void Use(D3D12_VERTEX_BUFFER_VIEW vbv);
+
+	void CreateResource(Microsoft::WRL::ComPtr<ID3D12Resource>& resource, D3D12_VERTEX_BUFFER_VIEW& vbv);
 
 private:
 	std::unordered_map<std::string, MeshData> meshs_;

@@ -130,27 +130,16 @@ void Mesh::LoadObj(const std::string& objFileName) {
 		objFile.close();
 
 		for (auto i : indexDatas) {
-			meshs_[i.first].vertexBuffer = Engine::CreateBufferResuorce(sizeof(VertData) * indexDatas[i.first].size());
-			assert(meshData[i.first].vertexBuffer);
-
-
-			// リソースの先頭のアドレスから使う
-			meshs_[i.first].vertexView.BufferLocation = meshs_[i.first].vertexBuffer->GetGPUVirtualAddress();
-			// 使用するリソースのサイズは頂点3つ分のサイズ
-			meshs_[i.first].vertexView.SizeInBytes = static_cast<UINT>(sizeof(VertData) * indexDatas[i.first].size());
+			// 使用するリソースのサイズは頂点数分のサイズ
+			meshs_[i.first].sizeInBytes = static_cast<UINT>(sizeof(VertData) * indexDatas[i.first].size());
 			// 1頂点当たりのサイズ
-			meshs_[i.first].vertexView.StrideInBytes = sizeof(VertData);
-
-			// 頂点リソースにデータを書き込む
-			meshs_[i.first].vertexMap = nullptr;
-			// 書き込むためのアドレスを取得
-			meshs_[i.first].vertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&meshs_[i.first].vertexMap));
+			meshs_[i.first].strideInBytes = sizeof(VertData);
 
 			for (int32_t j = 0; j < indexDatas[i.first].size(); j++) {
-				meshs_[i.first].vertexMap[j].position = posDatas[indexDatas[i.first][j].vertNum];
-				meshs_[i.first].vertexMap[j].normal = normalDatas[indexDatas[i.first][j].normalNum];
+				meshs_[i.first].vertices[j].position = posDatas[indexDatas[i.first][j].vertNum];
+				meshs_[i.first].vertices[j].normal = normalDatas[indexDatas[i.first][j].normalNum];
 				if (!uvDatas.empty()) {
-					meshs_[i.first].vertexMap[j].uv = uvDatas[indexDatas[i.first][j].uvNum];
+					meshs_[i.first].vertices[j].uv = uvDatas[indexDatas[i.first][j].uvNum];
 				}
 			}
 
@@ -203,6 +192,10 @@ void Mesh::LoadMtl(const std::string& fileName) {
 	}
 }
 
-void Mesh::Use() {
+void Mesh::Use(D3D12_VERTEX_BUFFER_VIEW vbv) {
 
+}
+
+void Mesh::CreateResource(Microsoft::WRL::ComPtr<ID3D12Resource>& resource, D3D12_VERTEX_BUFFER_VIEW& vbv) {
+	resource = Engine::CreateBufferResuorce(sizeInBytes);
 }
