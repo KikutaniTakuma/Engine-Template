@@ -10,6 +10,7 @@
 #include "Utils/Math/Mat4x4.h"
 #include "Utils/Math/Vector2.h"
 #include "Utils/Math/Vector4.h"
+#include "Utils/Easeing/Easeing.h"
 
 #include <array>
 
@@ -45,6 +46,8 @@ private:
 		Vector3 size;
 		EmitterType type;
 		float circleSize;
+
+		std::deque<Easeing> eases;
 	};
 
 	struct Setting {
@@ -133,12 +136,7 @@ public:
 	void Debug(const std::string& guiName);
 
 	Vector2 GetTexSize() const {
-		if (tex) {
-			return tex->getSize();
-		}
-		else {
-			return Vector2::zero;
-		}
+		return tex != nullptr ? tex->getSize() : Vector2::zero;
 	}
 
 	/// <summary>
@@ -192,9 +190,13 @@ public:
 
 	uint32_t color;
 
-	std::deque<Setting> ssettings;
+	std::deque<Setting> settings;
 
 private:
+	Setting nowSetting;
+
+	std::queue<Setting> queueSettings;
+
 	std::vector<WorldTransForm> wtfs;
 
 	ShaderResourceHeap srvHeap;

@@ -76,12 +76,7 @@ public:
 	bool Colision(const Texture2D& tex2D) const;
 
 	Vector2 GetTexSize() const {
-		if (tex) {
-			return tex->getSize();
-		}
-		else {
-			return Vector2::zero;
-		}
+		return tex != nullptr ? tex->getSize() : Vector2::zero;
 	}
 
 	/// <summary>
