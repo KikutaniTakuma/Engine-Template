@@ -79,6 +79,9 @@ void Camera::Update(const Vector3& gazePoint) {
 		viewProjecction = projection * view;
 
 		viewProjecctionVp = VertMakeMatrixViewPort(0.0f, 0.0f, windowSize.x, windowSize.y, 0.0f, 1.0f) * viewProjecction;
+
+	/*	billViewProjecction = VertMakeMatrixViewPort(0.0f, 0.0f, windowSize.x, windowSize.y, 0.0f, 1.0f) * 
+			projection * ;*/
 		break;
 
 	case Camera::Type::Othographic:

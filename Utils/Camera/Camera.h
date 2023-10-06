@@ -56,6 +56,14 @@ public:
 	inline const Mat4x4& GetViewProjection() noexcept {
 		return viewProjecction;
 	}
+
+	/// <summary>
+	/// ビルボード用の透視投影行列を取得(TypeがOthographicの場合ゼロ行列が返る)
+	/// </summary>
+	/// <returns>透視投影行列</returns>
+	inline const Mat4x4& GetBillViewProjection() noexcept {
+		return billViewProjecction;
+	}
 	
 	/// <summary>
 	/// 平衡投影行列を取得(TypeがProjecctionの場合ゼロ行列が返る)
@@ -63,6 +71,14 @@ public:
 	/// <returns></returns>
 	inline const Mat4x4& GetViewOthographics() noexcept {
 		return viewOthograohics;
+	}
+
+	/// <summary>
+	/// ビルボード用の平衡投影行列を取得(TypeがProjecctionの場合ゼロ行列が返る)
+	/// </summary>
+	/// <returns></returns>
+	inline const Mat4x4& GetBillViewOthographics() noexcept {
+		return billViewOthograohics;
 	}
 
 	/// <summary>
@@ -125,7 +141,9 @@ private:
 	Mat4x4 othograohics;
 
 	Mat4x4 viewProjecction;
+	Mat4x4 billViewProjecction;
 	Mat4x4 viewOthograohics;
+	Mat4x4 billViewOthograohics;
 
 	Mat4x4 viewProjecctionVp;
 	Mat4x4 viewOthograohicsVp;
