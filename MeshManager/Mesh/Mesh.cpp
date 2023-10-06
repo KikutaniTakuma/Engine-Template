@@ -192,10 +192,12 @@ void Mesh::LoadMtl(const std::string& fileName) {
 	}
 }
 
-void Mesh::Use(D3D12_VERTEX_BUFFER_VIEW vbv) {
+void Mesh::Use(std::initializer_list<D3D12_VERTEX_BUFFER_VIEW> vbv) {
 
 }
 
-void Mesh::CreateResource(Microsoft::WRL::ComPtr<ID3D12Resource>& resource, D3D12_VERTEX_BUFFER_VIEW& vbv) {
-	resource = Engine::CreateBufferResuorce(sizeInBytes);
+void Mesh::CreateResource() {
+	for () {
+		resource.push_back(Engine::CreateBufferResuorce(sizeInBytes);
+	}
 }

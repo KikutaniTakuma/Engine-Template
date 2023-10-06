@@ -4,6 +4,7 @@
 #include <wrl.h>
 #include <string>
 #include <unordered_map>
+#include <initializer_list>
 
 #include "Utils/Math/Vector3.h"
 #include "Utils/Math/Mat4x4.h"
@@ -40,17 +41,19 @@ private:
 		}
 	};
 
+	struct VertResourece {
+		Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer = nullptr;
+		// 頂点バッファビュー
+		D3D12_VERTEX_BUFFER_VIEW vertexView{};
+		// 頂点バッファマップ
+		VertData* vertexMap = nullptr;
+	};
+
 	struct MeshData{
 		std::unordered_map<size_t, VertData> vertices;
 
 		UINT sizeInBytes;
 		UINT strideInBytes;
-
-		//Microsoft::WRL::ComPtr<ID3D12Resource> indexBuffer = nullptr;
-		//// インデックスバッファビュー
-		//D3D12_INDEX_BUFFER_VIEW indexView{};
-		//// インデックスバッファマップ
-		//uint32_t* indexMap = nullptr;
 
 		// 頂点数
 		uint32_t vertNum = 0;
@@ -71,11 +74,13 @@ public:
 
 	void LoadMtl(const std::string& fileName);
 
-	void Use(D3D12_VERTEX_BUFFER_VIEW vbv);
+	void Use(std::initializer_list<D3D12_VERTEX_BUFFER_VIEW> vbv);
 
-	void CreateResource(Microsoft::WRL::ComPtr<ID3D12Resource>& resource, D3D12_VERTEX_BUFFER_VIEW& vbv);
+	void CreateResource();
 
 private:
+	
+
 	std::unordered_map<std::string, MeshData> meshs_;
 
 	std::unordered_map<std::string, ShaderResourceHeap> SRVHeap_;
