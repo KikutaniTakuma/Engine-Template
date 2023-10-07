@@ -36,8 +36,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	Model model;
 	model.LoadObj("./Resources/Watame/Watame.obj");
-	model.LoadShader();
-	model.CreateGraphicsPipeline();
 
 	/// 
 	/// メインループ

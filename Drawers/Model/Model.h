@@ -47,18 +47,37 @@ public:
 	void LoadObj(const std::string& fileName);
 
 public:
-	void LoadShader(const std::string& vertex = "./Resources/Shaders/ModelShader/Model.VS.hlsl",
+	static void Initialize(
+		const std::string& vertex = "./Resources/Shaders/ModelShader/Model.VS.hlsl",
 		const std::string& pixel = "./Resources/Shaders/ModelShader/Model.PS.hlsl",
 		const std::string& geometory = "./Resources/Shaders/ModelShader/ModelNone.GS.hlsl",
 		const std::string& hull = {},
 		const std::string& domain = {}
 	);
 
+private:
+	static void LoadShader(
+		const std::string& vertex,
+		const std::string& pixel,
+		const std::string& geometory,
+		const std::string& hull,
+		const std::string& domain
+	);
+	static void CreateGraphicsPipeline();
+
+private:
+	static Shader shader;
+
+	static Pipeline* pipeline;
+	static bool loadShaderFlg;
+	static bool createGPFlg;
+
+
+public:
 	void Update();
 
 	void Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos);
 
-	void CreateGraphicsPipeline();
 
 	void Debug(const std::string& guiName);
 
@@ -80,13 +99,7 @@ private:
 
 	std::unordered_map<std::string, Mesh::CopyData> data;
 
-	Shader shader;
-
-	Pipeline* pipeline;
-
 	bool loadObjFlg;
-	bool loadShaderFlg;
-	bool createGPFlg;
 
 	ConstBuffer<MatrixData> wvpData;
 

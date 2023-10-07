@@ -14,57 +14,21 @@
 #include "Engine/PipelineManager/PipelineManager.h"
 #include "MeshManager/MeshManager.h"
 
+Shader Model::shader = {};
 
-Model::Model() :
-	pos(),
-	rotate(),
-	scale(Vector3::identity),
-	color(0xffffffff),
-	parent(nullptr),
-	mesh(nullptr),
-	data(),
-	shader(),
-	pipeline(nullptr),
-	loadObjFlg(false),
-	loadShaderFlg(false),
-	createGPFlg(false),
-	wvpData(),
-	dirLig(),
-	colorBuf()
-{
+Pipeline* Model::pipeline = {};
+bool Model::loadShaderFlg = false;
+bool Model::createGPFlg = false;
 
-	wvpData.shaderRegister = 0;
-	wvpData->worldMat = MakeMatrixIndentity();
-	wvpData->viewProjectoionMat = MakeMatrixIndentity();
-
-
-	dirLig.shaderRegister = 1;
-	dirLig->ligDirection = { 1.0f,-1.0f,-1.0f };
-	dirLig->ligDirection = dirLig->ligDirection.Normalize();
-	Vector4 colorTmp = UintToVector4(0xffffadff);
-	dirLig->ligColor = colorTmp.GetVector3();
-
-	dirLig->ptPos = { 5.0f,5.0f,5.0f };
-	dirLig->ptColor = { 15.0f,15.0f,15.0f };
-	dirLig->ptRange = 10.0f;
-
-	colorBuf.shaderRegister = 2;
-	*colorBuf = UintToVector4(color);
-}
-
-void Model::LoadObj(const std::string& fileName) {
-	if (!loadObjFlg) {
-		mesh = MeshManager::GetInstance()->LoadObj(fileName);
-
-		if (!mesh) {
-			ErrorCheck::GetInstance()->ErrorTextBox("LoadObj : mesh is nullptr", "Model");
-			return;
-		}
-
-		data = mesh->CreateResource();
-
-		loadObjFlg = true;
-	}
+void Model::Initialize(
+	const std::string& vertex,
+	const std::string& pixel,
+	const std::string& geometory,
+	const std::string& hull,
+	const std::string& domain
+) {
+	LoadShader(vertex, pixel, geometory, hull, domain);
+	CreateGraphicsPipeline();
 }
 
 void Model::LoadShader(
@@ -89,7 +53,7 @@ void Model::LoadShader(
 }
 
 void Model::CreateGraphicsPipeline() {
-	if (loadShaderFlg && loadObjFlg) {
+	if (loadShaderFlg) {
 		D3D12_DESCRIPTOR_RANGE range{};
 		range.NumDescriptors = 1;
 		range.BaseShaderRegister = 0;
@@ -130,48 +94,94 @@ void Model::CreateGraphicsPipeline() {
 	}
 }
 
+Model::Model() :
+	pos(),
+	rotate(),
+	scale(Vector3::identity),
+	color(0xffffffff),
+	parent(nullptr),
+	mesh(nullptr),
+	data(),
+	loadObjFlg(false),
+	wvpData(),
+	dirLig(),
+	colorBuf()
+{
+
+	wvpData.shaderRegister = 0;
+	wvpData->worldMat = MakeMatrixIndentity();
+	wvpData->viewProjectoionMat = MakeMatrixIndentity();
+
+
+	dirLig.shaderRegister = 1;
+	dirLig->ligDirection = { 1.0f,-1.0f,-1.0f };
+	dirLig->ligDirection = dirLig->ligDirection.Normalize();
+	Vector4 colorTmp = UintToVector4(0xffffadff);
+	dirLig->ligColor = colorTmp.GetVector3();
+
+	dirLig->ptPos = { 5.0f,5.0f,5.0f };
+	dirLig->ptColor = { 15.0f,15.0f,15.0f };
+	dirLig->ptRange = 10.0f;
+
+	colorBuf.shaderRegister = 2;
+	*colorBuf = UintToVector4(color);
+}
+
+void Model::LoadObj(const std::string& fileName) {
+	if (!loadObjFlg) {
+		mesh = MeshManager::GetInstance()->LoadObj(fileName);
+
+		if (!mesh) {
+			ErrorCheck::GetInstance()->ErrorTextBox("LoadObj : mesh is nullptr", "Model");
+			return;
+		}
+
+		data = mesh->CreateResource();
+
+		loadObjFlg = true;
+	}
+}
+
 void Model::Update() {
 	/*drawIndexNumber = 0;*/
 }
 
 void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	assert(createGPFlg);
-	/*if (drawIndexNumber >= maxDrawIndex) {
-		drawIndexNumber = 0;
-	}*/
+	if (loadObjFlg) {
+		wvpData->worldMat.HoriAffin(scale, rotate, pos);
+		if (parent) {
+			wvpData->worldMat *= MakeMatrixTransepose(parent->wvpData->worldMat);
+		}
+		wvpData->worldMat.Transepose();
+		wvpData->viewProjectoionMat = viewProjectionMat;
 
-	wvpData->worldMat.HoriAffin(scale, rotate, pos);
-	if (parent) {
-		wvpData->worldMat *= MakeMatrixTransepose(parent->wvpData->worldMat);
-	}
-	wvpData->worldMat.Transepose();
-	wvpData->viewProjectoionMat = viewProjectionMat;
+		*colorBuf = UintToVector4(color);
 
-	*colorBuf = UintToVector4(color);
-
-	dirLig->eyePos = cameraPos;
+		dirLig->eyePos = cameraPos;
 
 
-	auto commandlist = Engine::GetCommandList();
+		auto commandlist = Engine::GetCommandList();
 
-	if (!pipeline) {
-		ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Model");
-		return;
-	}
+		if (!pipeline) {
+			ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Model");
+			return;
+		}
 
-	[[maybe_unused]]size_t indexVertex = 0;
+		[[maybe_unused]] size_t indexVertex = 0;
 
-	for (auto& i : data) {
-		pipeline->Use();
-		i.second.tex->Use(0);
+		for (auto& i : data) {
+			pipeline->Use();
+			i.second.tex->Use(0);
 
 
-		commandlist->SetGraphicsRootConstantBufferView(1, wvpData.GetGPUVtlAdrs());
-		commandlist->SetGraphicsRootConstantBufferView(2, dirLig.GetGPUVtlAdrs());
-		commandlist->SetGraphicsRootConstantBufferView(3, colorBuf.GetGPUVtlAdrs());
+			commandlist->SetGraphicsRootConstantBufferView(1, wvpData.GetGPUVtlAdrs());
+			commandlist->SetGraphicsRootConstantBufferView(2, dirLig.GetGPUVtlAdrs());
+			commandlist->SetGraphicsRootConstantBufferView(3, colorBuf.GetGPUVtlAdrs());
 
-		commandlist->IASetVertexBuffers(0, 1, &i.second.resource.second);
-		commandlist->DrawInstanced(i.second.vertNum, 1, 0, 0);
+			commandlist->IASetVertexBuffers(0, 1, &i.second.resource.second);
+			commandlist->DrawInstanced(i.second.vertNum, 1, 0, 0);
+		}
 	}
 }
 

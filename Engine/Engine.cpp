@@ -14,6 +14,7 @@
 #include "Utils/Log/Log.h"
 
 #include "Drawers/Texture2D/Texture2D.h"
+#include "Drawers/Model/Model.h"
 
 #include "Utils/Math/Vector3.h"
 #include "Utils/Math/Mat4x4.h"
@@ -141,6 +142,7 @@ bool Engine::Initialize(const std::string& windowName, Resolution resolution) {
 	PipelineManager::Initialize();
 
 	Texture2D::Initialize();
+	Model::Initialize();
 
 	return true;
 }
