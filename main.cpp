@@ -32,11 +32,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	float fpsLimit = 165.0f;
 
 	Camera camera;
-	camera.pos.z = -10.0f;
-
-	Line line;
-	line.start.x = -1.0f;
-	line.end.x = 1.0f;
 
 	/// 
 	/// メインループ
@@ -74,7 +69,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		camera.Update();
 
-		line.Draw(camera.GetViewProjection(), 0xffffffff);
+
 
 		///
 		/// 描画処理ここまで
