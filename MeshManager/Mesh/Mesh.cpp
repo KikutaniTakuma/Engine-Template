@@ -157,7 +157,6 @@ void Mesh::LoadMtl(const std::string& fileName) {
 
 	std::string lineBuf;
 	std::unordered_map<std::string, Texture*>::iterator texItr;
-	std::unordered_map<std::string, ShaderResourceHeap>::iterator hepaItr;
 
 	std::string useMtlName;
 	while (std::getline(file, lineBuf)) {
@@ -172,30 +171,51 @@ void Mesh::LoadMtl(const std::string& fileName) {
 			line >> texName;
 
 			texItr->second = TextureManager::GetInstance()->LoadTexture(path.parent_path().string() + "/" + texName);
-			hepaItr->second.CreateTxtureView(texItr->second);
 		}
 		else if (identifier == "newmtl") {
 			line >> useMtlName;
-			texs_.insert({ useMtlName, nullptr });
+			texs_[useMtlName];
 			texItr = texs_.find(useMtlName);
-			SRVHeap_.insert({ useMtlName , ShaderResourceHeap() });
-			hepaItr = SRVHeap_.find(useMtlName);
-			hepaItr->second.InitializeReset(16);
 		}
 	}
 
 	for (auto& i : texs_) {
 		if (i.second == nullptr || !(*i.second)) {
 			i.second = TextureManager::GetInstance()->GetWhiteTex();
-			SRVHeap_[i.first].CreateTxtureView(i.second);
 		}
 	}
 }
 
-void Mesh::Use(D3D12_VERTEX_BUFFER_VIEW vbv) {
+std::unordered_map<std::string, Mesh::CopyData> Mesh::CreateResource() {
+	std::unordered_map<std::string, Mesh::CopyData> resource;
 
-}
+	for (auto& mesh : meshs_) {
+		// コンテナに追加
+		resource[mesh.first];
+		// resource生成
+		resource[mesh.first].resource.first = Engine::CreateBufferResuorce(mesh.second.sizeInBytes);
+		// view情報追加
+		resource[mesh.first].resource.second.BufferLocation = resource[mesh.first].resource.first->GetGPUVirtualAddress();
+		resource[mesh.first].resource.second.SizeInBytes = mesh.second.sizeInBytes;
+		resource[mesh.first].resource.second.StrideInBytes = mesh.second.strideInBytes;
+		
+		// 頂点情報コピー
+		VertData* vertMap = nullptr;
+		resource[mesh.first].resource.first->Map(0, nullptr, reinterpret_cast<void**>(&vertMap));
 
-void Mesh::CreateResource(Microsoft::WRL::ComPtr<ID3D12Resource>& resource, D3D12_VERTEX_BUFFER_VIEW& vbv) {
-	resource = Engine::CreateBufferResuorce(sizeInBytes);
+		for (auto& vert : mesh.second.vertices) {
+			assert(vertMap);
+			vertMap[vert.first] = vert.second;
+		}
+
+		resource[mesh.first].resource.first->Unmap(0, nullptr);
+
+		// 頂点数追加
+		resource[mesh.first].vertNum = mesh.second.vertNum;
+
+		// テクスチャ追加
+		resource[mesh.first].tex = texs_[mesh.first];
+	}
+
+	return resource;
 }

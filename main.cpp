@@ -9,7 +9,7 @@
 #include "Input/Input.h"
 
 #include "Utils/Camera/Camera.h"
-#include "Drawers/Texture2D/Texture2D.h"
+#include "Drawers/Model/Model.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
@@ -31,11 +31,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	float fpsLimit = 165.0f;
 
-	Camera camera{ Camera::Type::Othographic };
-	Texture2D tex;
-	tex.LoadTexture("./Resources/watame.png");
-	tex.scale = tex.GetTexSize();
-	//Texture2D tex2 = tex;
+	Camera camera;
+	camera.pos.z = -10.0f;
+
+	Model model;
+	model.LoadObj("./Resources/Watame/Watame.obj");
+	model.LoadShader();
+	model.CreateGraphicsPipeline();
 
 	/// 
 	/// メインループ
@@ -62,11 +64,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 
 
-		tex.Debug("tex");
-
-		tex.scale = tex.GetTexSize();
-
-		tex.Update();
+	
 
 		///
 		/// 更新処理ここまで
@@ -77,7 +75,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		camera.Update();
 
-		tex.Draw(camera.GetViewOthographics());
+		model.Draw(camera.GetViewProjection(), camera.GetPos());
 
 		///
 		/// 描画処理ここまで

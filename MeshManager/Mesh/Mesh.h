@@ -17,7 +17,11 @@
 /// </summary>
 class Mesh {
 public:
-	using MeshResource = std::pair<Microsoft::WRL::ComPtr<ID3D12Resource>, D3D12_VERTEX_BUFFER_VIEW>;
+	struct CopyData {
+		std::pair<ID3D12Resource*, D3D12_VERTEX_BUFFER_VIEW> resource;
+		uint32_t vertNum;
+		Texture* tex;
+	};
 
 private:
 	struct VertData {
@@ -69,16 +73,12 @@ public:
 public:
 	void LoadObj(const std::string& objfileName);
 
+	std::unordered_map<std::string, CopyData> CreateResource();
+private:
 	void LoadMtl(const std::string& fileName);
-
-	void Use(D3D12_VERTEX_BUFFER_VIEW vbv);
-
-	void CreateResource(Microsoft::WRL::ComPtr<ID3D12Resource>& resource, D3D12_VERTEX_BUFFER_VIEW& vbv);
 
 private:
 	std::unordered_map<std::string, MeshData> meshs_;
-
-	std::unordered_map<std::string, ShaderResourceHeap> SRVHeap_;
 
 	std::unordered_map<std::string, Texture*> texs_;
 

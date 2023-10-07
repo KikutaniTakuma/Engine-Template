@@ -10,43 +10,13 @@
 #include "TextureManager/TextureManager.h"
 #include "Engine/ShaderManager/ShaderManager.h"
 #include <unordered_map>
+#include "MeshManager/Mesh/Mesh.h"
+
 class Pipeline;
 
 #include <wrl.h>
 
 class Model {
-public:
-	struct VertData {
-		Vector4 position;
-		Vector3 normal;
-		Vector2 uv;
-	};
-	struct IndexData {
-		uint32_t vertNum;
-		uint32_t uvNum;
-		uint32_t normalNum;
-
-		inline bool operator==(const IndexData& right) {
-			return vertNum == right.vertNum
-				&& uvNum == right.uvNum
-				&& normalNum == right.normalNum;
-		}
-		inline bool operator!=(const IndexData& right) {
-			return !(*this == right);
-		}
-	};
-
-	struct Mesh {
-		Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer = nullptr;
-		// 頂点バッファビュー
-		D3D12_VERTEX_BUFFER_VIEW vertexView{};
-		// 頂点バッファマップ
-		VertData* vertexMap = nullptr;
-
-		// 頂点数
-		uint32_t vertNum = 0;
-	};
-
 private:
 	struct MatrixData {
 		Mat4x4 worldMat;
@@ -68,7 +38,6 @@ private:
 
 public:
 	Model();
-	Model(UINT maxDrawIndex_);
 	Model(const Model&) = default;
 	~Model();
 
@@ -76,8 +45,6 @@ public:
 
 public:
 	void LoadObj(const std::string& fileName);
-private:
-	void LoadMtl(const std::string fileName);
 
 public:
 	void LoadShader(const std::string& vertex = "./Resources/Shaders/ModelShader/Model.VS.hlsl",
@@ -109,9 +76,9 @@ public:
 
 
 private:
-	std::unordered_map<std::string, ShaderResourceHeap> SRVHeap;
+	Mesh* mesh;
 
-	std::unordered_map<std::string, Mesh> meshData;
+	std::unordered_map<std::string, Mesh::CopyData> data;
 
 	Shader shader;
 
@@ -121,14 +88,9 @@ private:
 	bool loadShaderFlg;
 	bool createGPFlg;
 
-	std::deque<ConstBuffer<MatrixData>> wvpData;
+	ConstBuffer<MatrixData> wvpData;
 
-	std::deque<ConstBuffer<DirectionLight>> dirLig;
+	ConstBuffer<DirectionLight> dirLig;
 
-	std::deque<ConstBuffer<Vector4>> colorBuf;
-
-	std::unordered_map<std::string, Texture*> tex;
-
-	UINT drawIndexNumber;
-	UINT maxDrawIndex;
+	ConstBuffer<Vector4> colorBuf;
 };
