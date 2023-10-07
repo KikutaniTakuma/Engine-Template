@@ -17,6 +17,14 @@ private:
 	static constexpr uint16_t kVertexNum = 2u;
 
 public:
+	static void Initialize();
+
+private:
+	static Shader shader;
+
+	static Pipeline* pipline;
+
+public:
 	Line();
 	~Line();
 
@@ -35,10 +43,6 @@ private:
 	VertexData* vertexMap;
 
 	ShaderResourceHeap heap;
-	
-	Shader shader;
-
-	Pipeline* pipline;
 
 	ConstBuffer<Mat4x4> wvpMat;
 };

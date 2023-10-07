@@ -9,7 +9,7 @@
 #include "Input/Input.h"
 
 #include "Utils/Camera/Camera.h"
-#include "Drawers/Model/Model.h"
+#include "Drawers/Line/Line.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
@@ -34,8 +34,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Camera camera;
 	camera.pos.z = -10.0f;
 
-	Model model;
-	model.LoadObj("./Resources/Watame/Watame.obj");
+	Line line;
+	line.start.x = -1.0f;
+	line.end.x = 1.0f;
 
 	/// 
 	/// メインループ
@@ -73,7 +74,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		camera.Update();
 
-		model.Draw(camera.GetViewProjection(), camera.GetPos());
+		line.Draw(camera.GetViewProjection(), 0xffffffff);
 
 		///
 		/// 描画処理ここまで

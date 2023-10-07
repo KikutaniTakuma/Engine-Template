@@ -15,6 +15,7 @@
 
 #include "Drawers/Texture2D/Texture2D.h"
 #include "Drawers/Model/Model.h"
+#include "Drawers/Line/Line.h"
 
 #include "Utils/Math/Vector3.h"
 #include "Utils/Math/Mat4x4.h"
@@ -143,6 +144,7 @@ bool Engine::Initialize(const std::string& windowName, Resolution resolution) {
 
 	Texture2D::Initialize();
 	Model::Initialize();
+	Line::Initialize();
 
 	return true;
 }

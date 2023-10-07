@@ -3,13 +3,40 @@
 #include <algorithm>
 #include "Engine/PipelineManager/PipelineManager.h"
 
+Shader Line::shader = {};
+
+Pipeline* Line::pipline = nullptr;
+
+void Line::Initialize() {
+	shader.vertex = ShaderManager::LoadVertexShader("./Resources/Shaders/LineShader/Line.VS.hlsl");
+	shader.pixel = ShaderManager::LoadPixelShader("./Resources/Shaders/LineShader/Line.PS.hlsl");
+
+	D3D12_DESCRIPTOR_RANGE range = {};
+	range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+	range.BaseShaderRegister = 0;
+	range.NumDescriptors = 1;
+	range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	D3D12_ROOT_PARAMETER paramater = {};
+	paramater.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	paramater.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	paramater.DescriptorTable.pDescriptorRanges = &range;
+	paramater.DescriptorTable.NumDescriptorRanges = 1;
+
+	PipelineManager::CreateRootSgnature(&paramater, 1, false);
+	PipelineManager::SetVertexInput("POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
+	PipelineManager::SetVertexInput("COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
+	PipelineManager::SetShader(shader);
+	PipelineManager::SetState(Pipeline::None, Pipeline::SolidState::Solid, Pipeline::CullMode::None, D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
+	pipline = PipelineManager::Create();
+	PipelineManager::StateReset();
+}
+
 Line::Line() : 
 	vertexBuffer(),
 	vertexView{},
 	vertexMap(nullptr),
 	heap(),
-	shader{},
-	pipline(nullptr),
 	wvpMat(),
 	start(),
 	end()
@@ -22,18 +49,6 @@ Line::Line() :
 	vertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vertexMap));
 
 	heap.CreateConstBufferView(wvpMat);
-
-	shader.vertex = ShaderManager::LoadVertexShader("./Resources/Shaders/LineShader/Line.VS.hlsl");
-	shader.pixel = ShaderManager::LoadPixelShader("./Resources/Shaders/LineShader/Line.PS.hlsl");
-
-	auto paramaterTmp = heap.GetParameter();
-	PipelineManager::CreateRootSgnature(&paramaterTmp, 1, false);
-	PipelineManager::SetVertexInput("POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
-	PipelineManager::SetVertexInput("COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
-	PipelineManager::SetShader(shader);
-	PipelineManager::SetState(Pipeline::None, Pipeline::SolidState::Solid, Pipeline::CullMode::None, D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
-	pipline = PipelineManager::Create();
-	PipelineManager::StateReset();
 }
 
 Line::~Line() {
