@@ -54,24 +54,26 @@ void Model::LoadShader(
 
 void Model::CreateGraphicsPipeline() {
 	if (loadShaderFlg) {
-		D3D12_DESCRIPTOR_RANGE range{};
-		range.NumDescriptors = 1;
-		range.BaseShaderRegister = 0;
-		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		std::array<D3D12_DESCRIPTOR_RANGE,1> range={};
+		range[0].NumDescriptors = 1;
+		range[0].BaseShaderRegister = 0;
+		range[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 
 		std::array<D3D12_ROOT_PARAMETER, 4> paramates = {};
 		paramates[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 		paramates[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-		paramates[0].DescriptorTable.pDescriptorRanges = &range;
-		paramates[0].DescriptorTable.NumDescriptorRanges = 1;
+		paramates[0].DescriptorTable.pDescriptorRanges = range.data();
+		paramates[0].DescriptorTable.NumDescriptorRanges = UINT(range.size());
 
 		paramates[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 		paramates[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 		paramates[1].Descriptor.ShaderRegister = 0;
+
 		paramates[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 		paramates[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 		paramates[2].Descriptor.ShaderRegister = 1;
+
 		paramates[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 		paramates[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 		paramates[3].Descriptor.ShaderRegister = 2;
@@ -125,6 +127,97 @@ Model::Model() :
 
 	colorBuf.shaderRegister = 2;
 	*colorBuf = UintToVector4(color);
+}
+
+Model::Model(const Model& right) :
+	Model()
+{
+	*this = right;
+}
+Model::Model(Model&& right) noexcept:
+	Model()
+{
+	*this = std::move(right);
+}
+
+Model& Model::operator=(const Model& right) {
+	pos = right.pos;
+	rotate = right.rotate;
+	scale = right.scale;
+	color = right.color;
+	parent = right.parent;
+
+	// 自身がロード済みだったらResourceを解放する
+	if (loadObjFlg) {
+		for (auto& i : data) {
+			if (i.second.resource.first) {
+				i.second.resource.first->Release();
+			}
+		}
+
+		data.clear();
+	}
+
+	// rightがロード済みだったら
+	if (right.loadObjFlg) {
+		mesh = right.mesh;
+
+		if (!mesh) {
+			ErrorCheck::GetInstance()->ErrorTextBox("operator=() : right mesh is nullptr", "Model");
+			return *this;
+		}
+
+		data = mesh->CreateResource();
+
+		loadObjFlg = true;
+	}
+
+	// 定数バッファの値をコピー
+	*wvpData = *right.wvpData;
+	*dirLig = *right.dirLig;
+	*colorBuf = *right.colorBuf;
+
+	return *this;
+}
+
+Model& Model::operator=(Model&& right) noexcept {
+	pos = std::move(right.pos);
+	rotate = std::move(right.rotate);
+	scale = std::move(right.scale);
+	color = std::move(right.color);
+	parent = std::move(right.parent);
+
+	// 自身がロード済みだったらResourceを解放する
+	if (loadObjFlg) {
+		for (auto& i : data) {
+			if (i.second.resource.first) {
+				i.second.resource.first->Release();
+			}
+		}
+
+		data.clear();
+	}
+
+	// rightがロード済みだったら
+	if (right.loadObjFlg) {
+		mesh = right.mesh;
+
+		if (!mesh) {
+			ErrorCheck::GetInstance()->ErrorTextBox("operator=() : right mesh is nullptr", "Model");
+			return *this;
+		}
+
+		data = mesh->CreateResource();
+
+		loadObjFlg = true;
+	}
+
+	// 定数バッファの値をコピー
+	*wvpData = *right.wvpData;
+	*dirLig = *right.dirLig;
+	*colorBuf = *right.colorBuf;
+
+	return *this;
 }
 
 void Model::LoadObj(const std::string& fileName) {
