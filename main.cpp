@@ -35,7 +35,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Camera camera;
 	camera.pos.z -= 10.0f;
 	Model model;
-	model.LoadObj("./Resources/Watame/Watame.obj");
+	model.LoadObj("./Resources/Cube.obj");
 
 	/// 
 	/// メインループ
