@@ -108,6 +108,8 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <WarningVersion>
+      </WarningVersion>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -133,6 +135,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <LanguageStandard>stdcpp20</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <WarningVersion>
+      </WarningVersion>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -189,6 +193,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="SceneManager\GameScene\GameScene.cpp" />
+    <ClCompile Include="SceneManager\SceneManager.cpp" />
     <ClCompile Include="TextureManager\TextureManager.cpp" />
     <ClCompile Include="TextureManager\Texture\Texture.cpp" />
     <ClCompile Include="Utils\Action\Frame\Frame.cpp" />
@@ -230,7 +236,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="GlobalVariables\GlobalVariables.h" />
-    <ClInclude Include="GlobalVariables\VariantItem.h" />
     <ClInclude Include="Input\Gamepad\Gamepad.h" />
     <ClInclude Include="Input\Input.h" />
     <ClInclude Include="Input\KeyInput\KeyInput.h" />
@@ -243,6 +248,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="SceneManager\GameScene\GameScene.h" />
+    <ClInclude Include="SceneManager\SceneManager.h" />
     <ClInclude Include="TextureManager\TextureManager.h" />
     <ClInclude Include="TextureManager\Texture\Texture.h" />
     <ClInclude Include="Utils\Action\Frame\Frame.h" />

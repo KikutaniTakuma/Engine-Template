@@ -10,6 +10,7 @@
 
 #include "Utils/Camera/Camera.h"
 #include "Drawers/Line/Line.h"
+#include "Drawers/Model/Model.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
@@ -32,6 +33,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	float fpsLimit = 165.0f;
 
 	Camera camera;
+	camera.pos.z -= 10.0f;
+	Model model;
+	model.LoadObj("./Resources/Watame/Watame.obj");
 
 	/// 
 	/// メインループ
@@ -68,7 +72,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 描画処理
 		/// 
 		camera.Update();
-
+		model.Draw(camera.GetViewProjection(), camera.GetPos());
 
 
 		///

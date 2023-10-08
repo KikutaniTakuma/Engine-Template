@@ -131,6 +131,12 @@
     <ClCompile Include="Utils\ConvertString\ConvertString.cpp">
       <Filter>Utils\ConvertString</Filter>
     </ClCompile>
+    <ClCompile Include="SceneManager\SceneManager.cpp">
+      <Filter>SceneManager</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager\GameScene\GameScene.cpp">
+      <Filter>SceneManager\GameScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -246,6 +252,27 @@
     </Filter>
     <Filter Include="Utils\ConvertString">
       <UniqueIdentifier>{5a7a3057-cf34-4af9-a2fc-9484d57e4dd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager">
+      <UniqueIdentifier>{fad8cc50-c290-488f-b4fb-cdbad1bbd763}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager\Title">
+      <UniqueIdentifier>{f9fb420e-c396-416f-8181-89c64124396b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager\GameScene">
+      <UniqueIdentifier>{d4d1cb10-a26f-4866-b520-1d5be8c63924}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{e16d5b6d-612f-4477-b4d3-85f9d99b2ab8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Player">
+      <UniqueIdentifier>{59d5891a-fe38-42fd-8e02-eff0e6cc8f21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Enemy">
+      <UniqueIdentifier>{9b3acda0-60e3-4f51-9f7a-cdeb0de855f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\MoveFloor">
+      <UniqueIdentifier>{ccb4e67f-317d-4ca7-988c-1166af7a4319}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -363,9 +390,6 @@
     <ClInclude Include="Engine\ShaderResource\ShaderResourceHeap.h">
       <Filter>Engine\ShaderResource</Filter>
     </ClInclude>
-    <ClInclude Include="GlobalVariables\VariantItem.h">
-      <Filter>GlobalVariables</Filter>
-    </ClInclude>
     <ClInclude Include="MeshManager\MeshManager.h">
       <Filter>MeshManager</Filter>
     </ClInclude>
@@ -386,6 +410,12 @@
     </ClInclude>
     <ClInclude Include="Utils\ConvertString\ConvertString.h">
       <Filter>Utils\ConvertString</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\SceneManager.h">
+      <Filter>SceneManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\GameScene\GameScene.h">
+      <Filter>SceneManager\GameScene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
