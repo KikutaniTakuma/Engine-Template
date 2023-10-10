@@ -12,6 +12,8 @@
 #include "Drawers/Line/Line.h"
 #include "Drawers/Model/Model.h"
 
+#include "Game/CollisionManager/Collider/Collider.h"
+
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	// ライブラリ初期化
@@ -34,8 +36,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	Camera camera;
 	camera.pos.z -= 10.0f;
-	Model model;
-	model.LoadObj("./Resources/Cube.obj");
+
+	Collider test;
+	Collider other = test;
+
+	test.scale_ *= 2.0f;
 
 	/// 
 	/// メインループ
@@ -61,8 +66,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 更新処理
 		/// 
 
-
+		test.Update();
+		other.Update();
 	
+		test.IsCollision(other);
 
 		///
 		/// 更新処理ここまで
@@ -72,8 +79,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 描画処理
 		/// 
 		camera.Update();
-		model.Draw(camera.GetViewProjection(), camera.GetPos());
 
+		other.DebugDraw(camera.GetViewProjection());
+		test.DebugDraw(camera.GetViewProjection());
 
 		///
 		/// 描画処理ここまで
