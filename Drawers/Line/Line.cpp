@@ -56,7 +56,7 @@ Line::Line(const Line& right):
 {
 	*this = right;
 }
-Line::Line(Line&& right) :
+Line::Line(Line&& right) noexcept :
 	Line()
 {
 	*this = std::move(right);

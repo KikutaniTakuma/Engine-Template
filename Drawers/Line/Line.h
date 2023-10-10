@@ -27,7 +27,7 @@ private:
 public:
 	Line();
 	Line(const Line& right);
-	Line(Line&& right);
+	Line(Line&& right) noexcept;
 	~Line();
 
 	Line& operator=(const Line& right);
