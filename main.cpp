@@ -12,7 +12,8 @@
 #include "Drawers/Line/Line.h"
 #include "Drawers/Model/Model.h"
 
-#include "Game/CollisionManager/Collider/Collider.h"
+#include "Game/Enemy/Enemy.h"
+#include "SceneManager/GameScene/GameScene.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
@@ -34,13 +35,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	float fpsLimit = 165.0f;
 
-	Camera camera;
-	camera.pos.z -= 10.0f;
-
-	Collider test;
-	Collider other = test;
-
-	test.scale_ *= 2.0f;
+	GameScene gameScene;
+	gameScene.Initialize(nullptr);
 
 	/// 
 	/// メインループ
@@ -66,10 +62,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 更新処理
 		/// 
 
-		test.Update();
-		other.Update();
-	
-		test.IsCollision(other);
+		gameScene.Update();
+
 
 		///
 		/// 更新処理ここまで
@@ -78,10 +72,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// 描画処理
 		/// 
-		camera.Update();
-
-		other.DebugDraw(camera.GetViewProjection());
-		test.DebugDraw(camera.GetViewProjection());
+		
+		gameScene.Draw();
 
 		///
 		/// 描画処理ここまで

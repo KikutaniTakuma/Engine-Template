@@ -2,6 +2,8 @@
 #include "Utils/Math/Vector3.h"
 #include "Utils/Math/Mat4x4.h"
 #include "Drawers/Line/Line.h"
+#include "Utils/UtilsLib/UtilsLib.h"
+#include <bitset>
 
 class Collider {
 public:
@@ -14,22 +16,42 @@ public:
 	Collider& operator=(Collider&&) noexcept = default;
 
 public:
-	void Update();
+	void UpdatePos();
 
 	bool IsCollision(const Vector3& pos);
-	bool IsCollision(const Collider& other);
+	void IsCollision(const Collider& other);
 
 	void DebugDraw(const Mat4x4& viewProjection);
+
+	void SetType(uint32_t type);
+
+	bool Filter(const Collider& other) const;
+
+	bool OnEnter() const{
+		return flg_.OnEnter();
+	}
+
+	bool OnStay() const {
+		return flg_.OnStay();
+	}
+
+	bool OnExit() const {
+		return flg_.OnExit();
+	}
 
 public:
 	Vector3 scale_;
 	Vector3 pos_;
 
-private:
+protected:
 	Vector3 max_;
 	Vector3 min_;
 
 	uint32_t color_;
 
 	std::array<Line, 12> lines_;
+
+	std::bitset<32> types_;
+
+	UtilsLib::Flg flg_;
 };

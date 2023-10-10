@@ -12,8 +12,10 @@ SceneManager::SceneManager() {
 }
 
 void SceneManager::SceneChange(BaseScene* next) {
-	scene_.reset(next);
-	scene_->Initialize(this);
+	if (next_) {
+		return;
+	}
+	next_.reset(next);
 }
 
 void SceneManager::Update() {

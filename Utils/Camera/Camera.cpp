@@ -61,7 +61,7 @@ void Camera::Update(const Vector3& gazePoint) {
 
 
 	view.VertAffin(scale, rotate, pos + gazePoint);
-	view = VertMakeMatrixAffin(Vector3::identity, Vector3(gazePointRotate.y, gazePointRotate.x, 0.0f), pos + gazePoint) * view;
+	view = /*VertMakeMatrixAffin(Vector3::identity, Vector3(gazePointRotate.y, gazePointRotate.x, 0.0f), pos + gazePoint) * */view;
 	worldPos = { view[0][3],view[1][3], view[2][3] };
 	view.Inverse();
 

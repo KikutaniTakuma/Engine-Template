@@ -31,7 +31,7 @@ protected:
 	static bool isPad_;
 
 protected:
-	std::vector<Camera> cmaeras_;
+	Camera camera_;
 };
 
 class SceneManager final {
@@ -56,4 +56,5 @@ public:
 
 private:
 	std::unique_ptr<BaseScene> scene_;
+	std::unique_ptr<BaseScene> next_;
 };

@@ -109,17 +109,17 @@ public:
 	Vector2 gazePointRotate;
 	float gazePointRotateSpd;
 
-private:
+protected:
 	Vector3 worldPos;
 
-private:
+protected:
 	static constexpr float kNearClip = 0.01f;
 
 public:
 	float farClip;
 	float fov;
 
-private:
+protected:
 	Mat4x4 view;
 	Mat4x4 projection;
 	Mat4x4 othograohics;
