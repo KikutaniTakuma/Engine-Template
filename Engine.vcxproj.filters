@@ -6,25 +6,25 @@
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>SceneManager\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui_demo.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>SceneManager\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui_draw.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>SceneManager\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>SceneManager\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>SceneManager\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui_tables.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>SceneManager\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui_widgets.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>SceneManager\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="Engine\WinApp\WinApp.cpp">
       <Filter>Engine\WinApp</Filter>
@@ -137,13 +137,16 @@
     <ClCompile Include="SceneManager\GameScene\GameScene.cpp">
       <Filter>SceneManager\GameScene</Filter>
     </ClCompile>
+    <ClCompile Include="Game\CollisionManager\CollisionManager.cpp">
+      <Filter>Game\CollisionManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\CollisionManager\Collider\Collider.cpp">
+      <Filter>Game\CollisionManager\Collider</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
       <UniqueIdentifier>{d3b2314c-5abb-4996-9d77-ddedf3938121}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ImGui">
-      <UniqueIdentifier>{5b876a97-01b6-4bd9-86f8-cc06c481da52}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\WinApp">
       <UniqueIdentifier>{b53c25de-314b-4648-8852-e97c158f0275}</UniqueIdentifier>
@@ -274,34 +277,43 @@
     <Filter Include="Game\MoveFloor">
       <UniqueIdentifier>{ccb4e67f-317d-4ca7-988c-1166af7a4319}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\CollisionManager">
+      <UniqueIdentifier>{1451ec42-a15b-4d2f-8a7d-7edbc8a26e9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager\ImGui">
+      <UniqueIdentifier>{5b876a97-01b6-4bd9-86f8-cc06c481da52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\CollisionManager\Collider">
+      <UniqueIdentifier>{9e6dd177-5172-4dfe-bf41-1cfaa76118cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Engine.h">
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imconfig.h">
-      <Filter>ImGui</Filter>
+      <Filter>SceneManager\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imgui.h">
-      <Filter>ImGui</Filter>
+      <Filter>SceneManager\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h">
-      <Filter>ImGui</Filter>
+      <Filter>SceneManager\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imgui_impl_win32.h">
-      <Filter>ImGui</Filter>
+      <Filter>SceneManager\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imgui_internal.h">
-      <Filter>ImGui</Filter>
+      <Filter>SceneManager\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imstb_rectpack.h">
-      <Filter>ImGui</Filter>
+      <Filter>SceneManager\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imstb_textedit.h">
-      <Filter>ImGui</Filter>
+      <Filter>SceneManager\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imstb_truetype.h">
-      <Filter>ImGui</Filter>
+      <Filter>SceneManager\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="Engine\WinApp\WinApp.h">
       <Filter>Engine\WinApp</Filter>
@@ -417,10 +429,16 @@
     <ClInclude Include="SceneManager\GameScene\GameScene.h">
       <Filter>SceneManager\GameScene</Filter>
     </ClInclude>
+    <ClInclude Include="Game\CollisionManager\CollisionManager.h">
+      <Filter>Game\CollisionManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\CollisionManager\Collider\Collider.h">
+      <Filter>Game\CollisionManager\Collider</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
-      <Filter>ImGui</Filter>
+      <Filter>SceneManager\ImGui</Filter>
     </Text>
   </ItemGroup>
 </Project>

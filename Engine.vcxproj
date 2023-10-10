@@ -179,6 +179,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Game\CollisionManager\Collider\Collider.cpp" />
+    <ClCompile Include="Game\CollisionManager\CollisionManager.cpp" />
     <ClCompile Include="GlobalVariables\GlobalVariables.cpp" />
     <ClCompile Include="Input\Gamepad\Gamepad.cpp" />
     <ClCompile Include="Input\Input.cpp" />
@@ -235,6 +237,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
+    <ClInclude Include="Game\CollisionManager\Collider\Collider.h" />
+    <ClInclude Include="Game\CollisionManager\CollisionManager.h" />
     <ClInclude Include="GlobalVariables\GlobalVariables.h" />
     <ClInclude Include="Input\Gamepad\Gamepad.h" />
     <ClInclude Include="Input\Input.h" />
