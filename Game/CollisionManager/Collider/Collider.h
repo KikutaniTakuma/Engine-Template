@@ -16,7 +16,7 @@ public:
 	Collider& operator=(Collider&&) noexcept = default;
 
 public:
-	void UpdatePos();
+	void UpdateCollision();
 
 	bool IsCollision(const Vector3& pos);
 	void IsCollision(const Collider& other);
@@ -39,9 +39,11 @@ public:
 		return flg_.OnExit();
 	}
 
+	//void Adjusment(Collider& other, const Vector3& moveVec);
+
 public:
 	Vector3 scale_;
-	Vector3 pos_;
+	Vector3 collisionPos_;
 
 protected:
 	Vector3 max_;

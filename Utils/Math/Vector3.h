@@ -91,4 +91,11 @@ public:
 	float x;
 	float y;
 	float z;
+
+
+/// <summary>
+/// 静的関数
+/// </summary>
+public:
+	static Vector3 Lerp(const Vector3& start, const Vector3& end, float t);
 };

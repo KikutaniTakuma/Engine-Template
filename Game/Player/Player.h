@@ -48,6 +48,8 @@ private:
 
 	Vector3 moveVec;
 
+	Vector3 pos_;
+
 	Camera* camera;
 
 	float freqSpd;

@@ -120,7 +120,7 @@
       <Filter>Engine\FrameInfo</Filter>
     </ClCompile>
     <ClCompile Include="Utils\CsvLoad\CsvLoad.cpp">
-      <Filter>Utils\CsvLoad</Filter>
+      <Filter>Utils\Easeing\CsvLoad</Filter>
     </ClCompile>
     <ClCompile Include="Input\Input.cpp">
       <Filter>Input</Filter>
@@ -151,6 +151,15 @@
     </ClCompile>
     <ClCompile Include="Game\Enemy\Enemy.cpp">
       <Filter>Game\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\MoveFloor\MoveFloor.cpp">
+      <Filter>Game\MoveFloor</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Easeing\Easeing.cpp">
+      <Filter>Utils\Easeing</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Goal\Goal.cpp">
+      <Filter>Game\Goal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -256,9 +265,6 @@
     <Filter Include="Engine\FrameInfo">
       <UniqueIdentifier>{0b450b74-986a-4b3d-9a34-b57d457b62d0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Utils\CsvLoad">
-      <UniqueIdentifier>{0801bfcf-a0f8-4f86-b79a-283b0de7cdd3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Utils\Log">
       <UniqueIdentifier>{50f0f596-926c-4b48-959c-d79c4f823f0f}</UniqueIdentifier>
     </Filter>
@@ -300,6 +306,12 @@
     </Filter>
     <Filter Include="Game\Goal">
       <UniqueIdentifier>{1bacb22f-e85f-43e8-a84f-be23ce3ec48e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\Easeing">
+      <UniqueIdentifier>{1dc7052e-fce1-4542-b5fb-a5f223d204de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\Easeing\CsvLoad">
+      <UniqueIdentifier>{0801bfcf-a0f8-4f86-b79a-283b0de7cdd3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -427,7 +439,7 @@
       <Filter>Engine\FrameInfo</Filter>
     </ClInclude>
     <ClInclude Include="Utils\CsvLoad\CsvLoad.h">
-      <Filter>Utils\CsvLoad</Filter>
+      <Filter>Utils\Easeing\CsvLoad</Filter>
     </ClInclude>
     <ClInclude Include="Input\Input.h">
       <Filter>Input</Filter>
@@ -458,6 +470,15 @@
     </ClInclude>
     <ClInclude Include="Game\Enemy\Enemy.h">
       <Filter>Game\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\MoveFloor\MoveFloor.h">
+      <Filter>Game\MoveFloor</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Easeing\Easeing.h">
+      <Filter>Utils\Easeing</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Goal\Goal.h">
+      <Filter>Game\Goal</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

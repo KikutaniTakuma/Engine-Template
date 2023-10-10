@@ -4,6 +4,7 @@
 #include "Utils/Camera/Camera.h"
 #include <vector>
 #include "Game/CollisionManager/Collider/Collider.h"
+#include "Utils/Easeing/Easeing.h"
 
 class Enemy : public Collider {
 public:
@@ -29,8 +30,15 @@ public:
 		player_ = player;
 	}
 
+	bool GetIsPlayerCollision() const {
+		return isPlayerCollsion;
+	}
+
 private:
 	std::vector<std::unique_ptr<Model>> model;
+
+	Easeing ease;
+	std::pair<Vector3, Vector3> easeDuration;
 
 	float spd;
 
@@ -43,4 +51,7 @@ private:
 	float radius;
 
 	class Player* player_=nullptr;
+
+	float distanceLimit;
+	bool isPlayerCollsion;
 };

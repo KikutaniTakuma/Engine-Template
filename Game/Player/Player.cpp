@@ -97,7 +97,7 @@ void Player::Animation() {
 
 void Player::Update() {
 	ApplyGlobalVariables();
-	UpdatePos();
+	UpdateCollision();
 	moveVec = {};
 	bool isMove = false;
 	Animation();
@@ -165,10 +165,11 @@ void Player::Update() {
 		model[0]->rotate.y = rotate.GetRad() - (std::numbers::pi_v<float> *0.5f);
 	}
 
-	ImGui::Begin("player");
-	ImGui::DragFloat3("pos", &pos_.x, 0.01f);
+	ImGui::Begin("Player");
+	ImGui::DragFloat3("pos_", &collisionPos_.x, 0.01f);
 	static auto cameraPos = camera->pos;
 	cameraPos = camera->pos;
+	ImGui::DragFloat3("scale_", &scale_.x, 0.01f);
 	ImGui::DragFloat3("cameraPos", &cameraPos.x, 0.01f);
 	ImGui::DragFloat("cameraRotate_", &cameraRotate_, 0.01f);
 	//camera->pos = cameraPos;
@@ -187,6 +188,8 @@ void Player::Draw() {
 	for (auto& i : model) {
 		i->Draw(camera->GetViewProjection(), camera->pos);
 	}
+
+	DebugDraw(camera->GetViewProjection());
 }
 
 void Player::Debug() {

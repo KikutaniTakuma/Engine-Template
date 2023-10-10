@@ -25,7 +25,16 @@ void GameScene::Initialize(SceneManager* const sceneManager) {
 	player_ = std::make_unique<Player>(&globalVariables_);
 	//camera_.pos = { 0.0f,5.0f,-20.0f };
 
+	camera_.farClip = 3000.0f;
+
+
 	player_->SetCamera(&camera_);
+
+	goal_ = std::make_unique<Goal>();
+
+	skyDome_ = std::make_unique<Model>();
+	skyDome_->LoadObj("./Resources/skydome/skydome.obj");
+	skyDome_->scale *= 1000.0f;
 }
 
 void GameScene::Update() {
@@ -37,6 +46,7 @@ void GameScene::Update() {
 		tex.Update();
 	}
 
+	player_->Debug();
 	player_->Update();
 }
 
@@ -50,6 +60,8 @@ void GameScene::Draw() {
 	for (auto& tex : texs_) {
 		tex.Draw(camera_.GetViewProjection());
 	}
+
+	skyDome_->Draw(camera_.GetViewProjection(), camera_.GetPos());
 
 	player_->Draw();
 }

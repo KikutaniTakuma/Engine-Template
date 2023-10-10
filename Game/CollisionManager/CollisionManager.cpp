@@ -8,7 +8,7 @@ void CollisionManager::SetCollider(class Collider* collider) {
 void CollisionManager::Update() {
 	for (auto i = colliders_.begin(); i != colliders_.end();i++) {
 		for (auto j = colliders_.begin(); j != colliders_.end(); j++) {
-			if (i == j || !(*i)->Filter(**j)) {
+			if (i == j) {
 				continue;
 			}
 			else {

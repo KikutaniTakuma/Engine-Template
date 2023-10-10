@@ -2,6 +2,7 @@
 #include "Engine/FrameInfo/FrameInfo.h"
 #include <numbers>
 #include <cmath>
+#include "Game/Player/Player.h"
 
 Enemy::Enemy() :
 	spd(10.0f),
@@ -14,11 +15,23 @@ Enemy::Enemy() :
 {
 	model.push_back(std::make_unique<Model>());
 	model[0]->LoadObj("AL_Resouce/Enemy/Enemy.obj");
+	model.push_back(std::make_unique<Model>());
+	model[1]->LoadObj("./Resources/Cube.obj");
+	model[1]->SetParent(model[1].get());
+	model[1]->scale *= 0.3f;
+
+	easeDuration.first.y = 1.0f;
+	easeDuration.first.y = 1.5f;
+
+	ease.Start(true, 1.0f, Easeing::InOutSine);
+
+	distanceLimit = 1.0f;
+	isPlayerCollsion = false;
 }
 
 
 void Enemy::Update() {
-	UpdatePos();
+	UpdateCollision();
 	moveVec = {};
 	float deltaTime = FrameInfo::GetInstance()->GetDelta();
 
@@ -27,14 +40,15 @@ void Enemy::Update() {
 		freq = 0.0f;
 	}
 
-	/*moveVec = { -std::sin(freq) * radius * freqSpd * deltaTime,
-				0.0f,
-				std::cos(freq) * radius * freqSpd* deltaTime
-			  };*/
+	if (player_) {
+		if ((player_->collisionPos_ + collisionPos_).Length() < distanceLimit) {
+			moveVec = (player_->collisionPos_ - collisionPos_).Normalize() * spd;
+		}
+	}
 
-	//pos_ += moveVec;
+	model[1]->pos = ease.Get(easeDuration.first, easeDuration.second);
 
-	model[0]->pos += pos_;
+	model[0]->pos += collisionPos_;
 
 	Vector2 rotate;
 	rotate.x = moveVec.x;
@@ -47,4 +61,6 @@ void Enemy::Draw() {
 	for (auto& i : model) {
 		i->Draw(camera->GetViewProjection(), camera->pos);
 	}
+
+	DebugDraw(camera->GetViewProjection());
 }
