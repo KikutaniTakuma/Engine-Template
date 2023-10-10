@@ -109,12 +109,15 @@ Texture2D& Texture2D::operator=(Texture2D&& right) noexcept {
 Texture2D::~Texture2D() {
 	if (vertexResource) {
 		vertexResource->Release();
-		indexResource.Reset();
+		vertexResource.Reset();
 	}
 }
 
 void Texture2D::Initialize(const std::string& vsFileName, const std::string& psFileName) {
-	if (indexResource) { indexResource->Release(); }
+	if (indexResource) { 
+		indexResource->Release();
+		indexResource.Reset();
+	}
 	
 	LoadShader(vsFileName, psFileName);
 
