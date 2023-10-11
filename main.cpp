@@ -38,12 +38,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	GameScene gameScene;
 	gameScene.Initialize(nullptr);
 
-	Camera camera;
-	camera.pos.z = -5.0f;
-
-	Collider test;
-	Collider test2;
-
 
 	/// 
 	/// メインループ
@@ -70,21 +64,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 
 		gameScene.Update();
-		ImGui::Begin("test");
-		ImGui::DragFloat3("pos", &test.collisionPos_.x, 0.01f);
-		ImGui::End();
-
-		ImGui::Begin("test2");
-		ImGui::DragFloat3("pos", &test2.collisionPos_.x, 0.01f);
-		ImGui::End();
-
-		//if (input->GetInstance()->GetKey()->Pushed(DIK_L)) {
-		//	test.Adjusment(test2, test.pos_ - test2.pos_);
-		//}
-
-		//test.UpdateCollision();
-
-		//test2.UpdateCollision();
 
 		///
 		/// 更新処理ここまで
@@ -93,11 +72,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// 描画処理
 		/// 
-		//camera.Update();
+		
 		gameScene.Draw();
-		/*test.DebugDraw(camera.GetViewProjection());
-		test2.DebugDraw(camera.GetViewProjection());*/
-
 
 		///
 		/// 描画処理ここまで

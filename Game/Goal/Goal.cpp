@@ -4,13 +4,15 @@
 Goal::Goal() {
 	model_ = std::make_unique<Model>();
 	model_->LoadObj("./Resources/Cube.obj");
+	model_->color = Vector4ToUint(Vector4::yIdy);
+	scale_ *= 2.0f;
 }
 
 void Goal::Update() {
 	UpdateCollision();
 
 	model_->pos = collisionPos_;
-	model_->scale = scale_;
+	model_->scale = scale_ * 0.5f;
 }
 
 void Goal::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {

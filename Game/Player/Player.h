@@ -20,6 +20,8 @@ public:
 	Player& operator=(const Player&) = default;
 
 public:
+	void Move();
+
 	void Update();
 
 	void Draw();
@@ -39,16 +41,17 @@ private:
 
 	void ApplyGlobalVariables();
 
+public:
+	Vector3 pos_;
+
+	Vector3 moveVec_;
+
 private:
 	class GlobalVariables* globalVariables_ = nullptr;
 
 	std::vector<std::unique_ptr<Model>> model;
 
 	float spd;
-
-	Vector3 moveVec;
-
-	Vector3 pos_;
 
 	Camera* camera;
 

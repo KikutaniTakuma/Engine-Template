@@ -23,6 +23,10 @@ public:
 public:
 	std::pair<Vector3, Vector3> moveDuration_;
 
+	Vector3 pos_;
+
+	Vector3 moveVec_;
+
 private:
 	std::unique_ptr<Model> model_;
 

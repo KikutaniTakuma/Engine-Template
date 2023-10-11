@@ -34,6 +34,11 @@ public:
 		return isPlayerCollsion;
 	}
 
+	void Move();
+
+public:
+	Vector3 pos_;
+	Vector3 moveVec;
 private:
 	std::vector<std::unique_ptr<Model>> model;
 
@@ -42,7 +47,7 @@ private:
 
 	float spd;
 
-	Vector3 moveVec;
+
 
 	Camera* camera;
 

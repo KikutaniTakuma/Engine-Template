@@ -32,23 +32,26 @@ bool Collider::IsCollision(const Vector3& pos) {
 	return false;
 }
 
-void Collider::IsCollision(const Collider& other) {
+void Collider::IsCollision(const Collider* other) {
 	std::array<Vector3, 8> positions = {
-		Vector3(other.min_), // 左下手前
-		Vector3(other.min_.x, other.min_.y, other.max_.z), // 左下奥
-		Vector3(other.max_.x, other.min_.y, other.min_.z), // 右下手前
-		Vector3(other.max_.x, other.min_.y, other.max_.z), // 右下奥
+		Vector3(other->min_), // 左下手前
+		Vector3(other->min_.x, other->min_.y, other->max_.z), // 左下奥
+		Vector3(other->max_.x, other->min_.y, other->min_.z), // 右下手前
+		Vector3(other->max_.x, other->min_.y, other->max_.z), // 右下奥
 
-		Vector3(other.min_.x, other.max_.y, other.min_.z), // 左上手前
-		Vector3(other.min_.x, other.max_.y, other.max_.z), // 左上奥
-		Vector3(other.max_.x, other.max_.y, other.min_.z), // 右上手前
-		Vector3(other.max_) // 右上奥
+		Vector3(other->min_.x, other->max_.y, other->min_.z), // 左上手前
+		Vector3(other->min_.x, other->max_.y, other->max_.z), // 左上奥
+		Vector3(other->max_.x, other->max_.y, other->min_.z), // 右上手前
+		Vector3(other->max_) // 右上奥
 	};
 
 	for (auto& pos : positions) {
 		if (IsCollision(pos)) {
 			flg_.flg_ = true;
 			return;
+		}
+		else {
+			flg_.flg_ = false;
 		}
 	}
 

@@ -3,9 +3,10 @@
 #include <numbers>
 #include <cmath>
 #include "Game/Player/Player.h"
+#include "externals/imgui/imgui.h"
 
 Enemy::Enemy() :
-	spd(10.0f),
+	spd(3.0f),
 	moveVec(),
 	camera(nullptr),
 	model(0),
@@ -17,20 +18,23 @@ Enemy::Enemy() :
 	model[0]->LoadObj("AL_Resouce/Enemy/Enemy.obj");
 	model.push_back(std::make_unique<Model>());
 	model[1]->LoadObj("./Resources/Cube.obj");
-	model[1]->SetParent(model[1].get());
-	model[1]->scale *= 0.3f;
+	model[1]->SetParent(model[0].get());
+	model[1]->scale *= 0.5f;
 
-	easeDuration.first.y = 1.0f;
-	easeDuration.first.y = 1.5f;
+	easeDuration.first.y = 2.0f;
+	easeDuration.second.y = 3.0f;
 
-	ease.Start(true, 1.0f, Easeing::InOutSine);
+	ease.Start(true, 2.0f, Easeing::InOutSine);
 
-	distanceLimit = 1.0f;
+	distanceLimit = 7.0f;
 	isPlayerCollsion = false;
+
+	scale_ = { 2.0f, 1.5f, 2.0f };
+
+	pos_.y = 8.0f;
 }
 
-
-void Enemy::Update() {
+void Enemy::Move() {
 	UpdateCollision();
 	moveVec = {};
 	float deltaTime = FrameInfo::GetInstance()->GetDelta();
@@ -41,20 +45,30 @@ void Enemy::Update() {
 	}
 
 	if (player_) {
-		if ((player_->collisionPos_ + collisionPos_).Length() < distanceLimit) {
-			moveVec = (player_->collisionPos_ - collisionPos_).Normalize() * spd;
+		if ((player_->pos_ - pos_).Length() < distanceLimit) {
+			moveVec = (player_->pos_ - pos_).Normalize() * spd;
+			moveVec.y = -15.0f;
+			Vector2 rotate = { moveVec.z, moveVec.x };
+
+			model[0]->rotate.y = rotate.GetRad() + (std::numbers::pi_v<float> *1.5f);
+		}
+		else {
+			model[0]->rotate.y = freq + (std::numbers::pi_v<float> *0.5f);
+			moveVec.y = -15.0f;
 		}
 	}
+}
+
+void Enemy::Update() {
+	float deltaTime = FrameInfo::GetInstance()->GetDelta();
+
+	pos_ += moveVec * deltaTime;
+	collisionPos_ = pos_;
+	model[0]->pos = pos_;
 
 	model[1]->pos = ease.Get(easeDuration.first, easeDuration.second);
 
-	model[0]->pos += collisionPos_;
-
-	Vector2 rotate;
-	rotate.x = moveVec.x;
-	rotate.y = moveVec.z;
-
-	model[0]->rotate.y = rotate.GetRad() + (std::numbers::pi_v<float> *0.5f);
+	ease.Update();
 }
 
 void Enemy::Draw() {

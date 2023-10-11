@@ -12,7 +12,7 @@ void Easeing::Update() {
 		t_ += spdT_ * FrameInfo::GetInstance()->GetDelta();
 		t_ = std::clamp(t_, 0.0f, 1.0f);
 
-		if (0.0f <= t_ || 1.0f <= t_) {
+		if (t_ <= 0.0f || 1.0f <= t_) {
 			if (isLoop_) {
 				spdT_ *= -1.0f;
 			}

@@ -9,7 +9,7 @@
 
 Player::Player(GlobalVariables* globalVariables):
 	spd(10.0f),
-	moveVec(),
+	moveVec_(),
 	camera(nullptr),
 	freqSpd(std::numbers::pi_v<float>),
 	freq(0.0f),
@@ -54,6 +54,14 @@ Player::Player(GlobalVariables* globalVariables):
 	globalVariables_->AddItem(groupName, "armFreqSpd", armFreqSpd);
 	globalVariables_->AddItem(groupName, "attackSpd", attackSpd);
 	globalVariables_->AddItem(groupName, "cmaeraRotateSpd_", cmaeraRotateSpd_);
+
+	collisionPos_.y = 1.85f;
+	scale_.y = 5.0f;
+	scale_.x = 2.09f;
+	scale_.z = 2.09f;
+
+	pos_.y = 8.0f;
+	pos_.x = 0.0f;
 }
 
 void Player::ApplyGlobalVariables() {
@@ -95,89 +103,77 @@ void Player::Animation() {
 	}
 }
 
-void Player::Update() {
+void Player::Move() {
 	ApplyGlobalVariables();
 	UpdateCollision();
-	moveVec = {};
-	bool isMove = false;
+	moveVec_ = {};
 	Animation();
+
+	bool isMove = false;
 
 	static Input* input = Input::GetInstance();
 
 	if (input->GetKey()->LongPush(DIK_W)) {
-		moveVec.z += spd;
+		moveVec_.z += spd;
 		isMove = true;
 	}
 	if (input->GetKey()->LongPush(DIK_A)) {
-		moveVec.x -= spd;
+		moveVec_.x -= spd;
 		isMove = true;
 	}
 	if (input->GetKey()->LongPush(DIK_S)) {
-		moveVec.z -= spd;
+		moveVec_.z -= spd;
 		isMove = true;
 	}
 	if (input->GetKey()->LongPush(DIK_D)) {
-		moveVec.x += spd;
+		moveVec_.x += spd;
 		isMove = true;
 	}
 
 	if (input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) > 0.15f || input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) < -0.15f) {
-		moveVec.x += spd * input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X);
+		moveVec_.x += spd * input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X);
 		isMove = true;
 	}
 	if (input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) > 0.15f || input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) < -0.15f) {
-		moveVec.z += spd * input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y);
+		moveVec_.z += spd * input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y);
 		isMove = true;
 	}
 
 	if (input->GetGamepad()->GetStick(Gamepad::Stick::RIGHT_X) > 0.15f || input->GetGamepad()->GetStick(Gamepad::Stick::RIGHT_X) < -0.15f) {
 		cameraRotate_ += cmaeraRotateSpd_ * input->GetGamepad()->GetStick(Gamepad::Stick::RIGHT_X) * FrameInfo::GetInstance()->GetDelta();
-		
+
 		isMove = true;
 	}
-	/*if (input->GetGamepad()->GetStick(Gamepad::Stick::RIGHT_Y) > 0.15f || input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) < -0.15f) {
-		moveVec.z += spd * input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y);
-		isMove = true;
-	}*/
-	
-	/*Vector2 moveRotate;
-	moveRotate.x = moveVec.x;
-	moveRotate.y = moveVec.z;
 
-	moveRotate.Rotate(camera->gazePointRotate.x);
-	ImGui::Begin("Hoge");
-	ImGui::DragFloat2("Hoge", &camera->gazePointRotate.x);
-	ImGui::End();
-	moveVec.x = moveRotate.x;
-	moveVec.z = moveRotate.y;*/
-
-	moveVec *= HoriMakeMatrixRotateY(cameraRotate_);
-
-	pos_ += moveVec.Normalize() * spd * FrameInfo::GetInstance()->GetDelta();
-
-	model[0]->pos = pos_;
+	moveVec_ *= HoriMakeMatrixRotateY(cameraRotate_);
 
 	if (isMove) {
 		Vector2 rotate;
-		rotate.x = -moveVec.x;
-		rotate.y = moveVec.z;
-		
+		rotate.x = -moveVec_.x;
+		rotate.y = moveVec_.z;
+
 		model[0]->rotate.y = rotate.GetRad() - (std::numbers::pi_v<float> *0.5f);
 	}
 
-	ImGui::Begin("Player");
-	ImGui::DragFloat3("pos_", &collisionPos_.x, 0.01f);
-	static auto cameraPos = camera->pos;
-	cameraPos = camera->pos;
-	ImGui::DragFloat3("scale_", &scale_.x, 0.01f);
-	ImGui::DragFloat3("cameraPos", &cameraPos.x, 0.01f);
-	ImGui::DragFloat("cameraRotate_", &cameraRotate_, 0.01f);
-	//camera->pos = cameraPos;
-	ImGui::End();
+	moveVec_.y = -15.0f;
+	collisionPos_ += moveVec_.Normalize() * spd * FrameInfo::GetInstance()->GetDelta();
+}
+
+void Player::Update() {
+	if (moveVec_.y!=0.0f) {
+		pos_.y += moveVec_.y * FrameInfo::GetInstance()->GetDelta();
+		moveVec_.y = 0.0f;
+	}
+	pos_ += moveVec_.Normalize() * spd * FrameInfo::GetInstance()->GetDelta();
+	collisionPos_ = pos_;
+	collisionPos_.y += 1.85f;
+
+	model[0]->pos = pos_;
 
 	if (camera) {
-		Vector3 offset = { 0.0f, 2.0f, -20.0f };
+		Vector3 offset = { 0.0f, 7.0f, -30.0f };
 		camera->rotate.y = cameraRotate_;
+		camera->rotate.x = 0.2f;
 		offset *= HoriMakeMatrixRotateY(cameraRotate_);
 		camera->pos = model[0]->pos + offset;
 		camera->Update();
