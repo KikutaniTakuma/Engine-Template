@@ -161,6 +161,9 @@
     <ClCompile Include="Game\Goal\Goal.cpp">
       <Filter>Game\Goal</Filter>
     </ClCompile>
+    <ClCompile Include="Utils\Timer.cpp">
+      <Filter>Utils\Timer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -312,6 +315,9 @@
     </Filter>
     <Filter Include="Utils\Easeing\CsvLoad">
       <UniqueIdentifier>{0801bfcf-a0f8-4f86-b79a-283b0de7cdd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\Timer">
+      <UniqueIdentifier>{2f713de0-4564-471e-aa8a-4f409eff48b8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -479,6 +485,9 @@
     </ClInclude>
     <ClInclude Include="Game\Goal\Goal.h">
       <Filter>Game\Goal</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Timer.h">
+      <Filter>Utils\Timer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

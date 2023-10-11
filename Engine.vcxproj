@@ -213,6 +213,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Utils\Math\Vector2.cpp" />
     <ClCompile Include="Utils\Math\Vector3.cpp" />
     <ClCompile Include="Utils\Math\Vector4.cpp" />
+    <ClCompile Include="Utils\Timer.cpp" />
     <ClCompile Include="Utils\UIeditor\UIeditor.cpp" />
     <ClCompile Include="Utils\UtilsLib\UtilsLib.cpp" />
   </ItemGroup>
@@ -276,6 +277,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Utils\Math\Vector2.h" />
     <ClInclude Include="Utils\Math\Vector3.h" />
     <ClInclude Include="Utils\Math\Vector4.h" />
+    <ClInclude Include="Utils\Timer.h" />
     <ClInclude Include="Utils\UIeditor\UIeditor.h" />
     <ClInclude Include="Utils\UtilsLib\UtilsLib.h" />
   </ItemGroup>
