@@ -26,7 +26,12 @@ private:
 
 public:
 	Line();
+	Line(const Line& right);
+	Line(Line&& right) noexcept;
 	~Line();
+
+	Line& operator=(const Line& right);
+	Line& operator=(Line&& right)noexcept;
 
 public:
 	void Draw(const Mat4x4& viewProjection, uint32_t color);

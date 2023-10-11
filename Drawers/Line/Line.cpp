@@ -51,6 +51,30 @@ Line::Line() :
 	heap.CreateConstBufferView(wvpMat);
 }
 
+Line::Line(const Line& right):
+	Line()
+{
+	*this = right;
+}
+Line::Line(Line&& right) noexcept :
+	Line()
+{
+	*this = std::move(right);
+}
+
+Line& Line::operator=(const Line& right) {
+	start = right.start;
+	end = right.end;
+
+	return *this;
+}
+Line& Line::operator=(Line&& right)noexcept {
+	start = std::move(right.start);
+	end = std::move(right.end);
+
+	return *this;
+}
+
 Line::~Line() {
 	vertexBuffer->Release();
 }

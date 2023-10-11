@@ -120,7 +120,7 @@
       <Filter>Engine\FrameInfo</Filter>
     </ClCompile>
     <ClCompile Include="Utils\CsvLoad\CsvLoad.cpp">
-      <Filter>Utils\CsvLoad</Filter>
+      <Filter>Utils\Easeing\CsvLoad</Filter>
     </ClCompile>
     <ClCompile Include="Input\Input.cpp">
       <Filter>Input</Filter>
@@ -131,13 +131,40 @@
     <ClCompile Include="Utils\ConvertString\ConvertString.cpp">
       <Filter>Utils\ConvertString</Filter>
     </ClCompile>
+    <ClCompile Include="SceneManager\SceneManager.cpp">
+      <Filter>SceneManager</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager\GameScene\GameScene.cpp">
+      <Filter>SceneManager\GameScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\CollisionManager\CollisionManager.cpp">
+      <Filter>Game\CollisionManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\CollisionManager\Collider\Collider.cpp">
+      <Filter>Game\CollisionManager\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\UtilsLib\UtilsLib.cpp">
+      <Filter>Utils\UtilsLib</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Player\Player.cpp">
+      <Filter>Game\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Enemy\Enemy.cpp">
+      <Filter>Game\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\MoveFloor\MoveFloor.cpp">
+      <Filter>Game\MoveFloor</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Easeing\Easeing.cpp">
+      <Filter>Utils\Easeing</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Goal\Goal.cpp">
+      <Filter>Game\Goal</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
       <UniqueIdentifier>{d3b2314c-5abb-4996-9d77-ddedf3938121}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ImGui">
-      <UniqueIdentifier>{5b876a97-01b6-4bd9-86f8-cc06c481da52}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\WinApp">
       <UniqueIdentifier>{b53c25de-314b-4648-8852-e97c158f0275}</UniqueIdentifier>
@@ -238,14 +265,53 @@
     <Filter Include="Engine\FrameInfo">
       <UniqueIdentifier>{0b450b74-986a-4b3d-9a34-b57d457b62d0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Utils\CsvLoad">
-      <UniqueIdentifier>{0801bfcf-a0f8-4f86-b79a-283b0de7cdd3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Utils\Log">
       <UniqueIdentifier>{50f0f596-926c-4b48-959c-d79c4f823f0f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Utils\ConvertString">
       <UniqueIdentifier>{5a7a3057-cf34-4af9-a2fc-9484d57e4dd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager">
+      <UniqueIdentifier>{fad8cc50-c290-488f-b4fb-cdbad1bbd763}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager\Title">
+      <UniqueIdentifier>{f9fb420e-c396-416f-8181-89c64124396b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager\GameScene">
+      <UniqueIdentifier>{d4d1cb10-a26f-4866-b520-1d5be8c63924}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{e16d5b6d-612f-4477-b4d3-85f9d99b2ab8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Player">
+      <UniqueIdentifier>{59d5891a-fe38-42fd-8e02-eff0e6cc8f21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Enemy">
+      <UniqueIdentifier>{9b3acda0-60e3-4f51-9f7a-cdeb0de855f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\MoveFloor">
+      <UniqueIdentifier>{ccb4e67f-317d-4ca7-988c-1166af7a4319}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\CollisionManager">
+      <UniqueIdentifier>{1451ec42-a15b-4d2f-8a7d-7edbc8a26e9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\CollisionManager\Collider">
+      <UniqueIdentifier>{9e6dd177-5172-4dfe-bf41-1cfaa76118cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImGui">
+      <UniqueIdentifier>{5b876a97-01b6-4bd9-86f8-cc06c481da52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\UtilsLib">
+      <UniqueIdentifier>{c6f84b96-4130-443c-b4b7-b47e1dc84f27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Goal">
+      <UniqueIdentifier>{1bacb22f-e85f-43e8-a84f-be23ce3ec48e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\Easeing">
+      <UniqueIdentifier>{1dc7052e-fce1-4542-b5fb-a5f223d204de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\Easeing\CsvLoad">
+      <UniqueIdentifier>{0801bfcf-a0f8-4f86-b79a-283b0de7cdd3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -363,9 +429,6 @@
     <ClInclude Include="Engine\ShaderResource\ShaderResourceHeap.h">
       <Filter>Engine\ShaderResource</Filter>
     </ClInclude>
-    <ClInclude Include="GlobalVariables\VariantItem.h">
-      <Filter>GlobalVariables</Filter>
-    </ClInclude>
     <ClInclude Include="MeshManager\MeshManager.h">
       <Filter>MeshManager</Filter>
     </ClInclude>
@@ -376,7 +439,7 @@
       <Filter>Engine\FrameInfo</Filter>
     </ClInclude>
     <ClInclude Include="Utils\CsvLoad\CsvLoad.h">
-      <Filter>Utils\CsvLoad</Filter>
+      <Filter>Utils\Easeing\CsvLoad</Filter>
     </ClInclude>
     <ClInclude Include="Input\Input.h">
       <Filter>Input</Filter>
@@ -386,6 +449,36 @@
     </ClInclude>
     <ClInclude Include="Utils\ConvertString\ConvertString.h">
       <Filter>Utils\ConvertString</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\SceneManager.h">
+      <Filter>SceneManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\GameScene\GameScene.h">
+      <Filter>SceneManager\GameScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\CollisionManager\CollisionManager.h">
+      <Filter>Game\CollisionManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\CollisionManager\Collider\Collider.h">
+      <Filter>Game\CollisionManager\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\UtilsLib\UtilsLib.h">
+      <Filter>Utils\UtilsLib</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Player\Player.h">
+      <Filter>Game\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Enemy\Enemy.h">
+      <Filter>Game\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\MoveFloor\MoveFloor.h">
+      <Filter>Game\MoveFloor</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Easeing\Easeing.h">
+      <Filter>Utils\Easeing</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Goal\Goal.h">
+      <Filter>Game\Goal</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

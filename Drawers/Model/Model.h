@@ -38,10 +38,12 @@ private:
 
 public:
 	Model();
-	Model(const Model&) = default;
+	Model(const Model& right);
+	Model(Model&& right) noexcept;
 	~Model();
 
-	Model& operator=(const Model&) = default;
+	Model& operator=(const Model& right);
+	Model& operator=(Model&& right) noexcept;
 
 public:
 	void LoadObj(const std::string& fileName);

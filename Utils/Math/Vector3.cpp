@@ -202,3 +202,13 @@ Vector3 Vector3::GetRad() const noexcept {
 
 	return result;
 }
+
+Vector3 Vector3::Lerp(const Vector3& start, const Vector3& end, float t) {
+	Vector3 result;
+
+	result.x = std::lerp(start.x, end.x, t);
+	result.y = std::lerp(start.y, end.y, t);
+	result.z = std::lerp(start.z, end.z, t);
+
+	return result;
+}
