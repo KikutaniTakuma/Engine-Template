@@ -130,16 +130,16 @@ void Player::Move() {
 		isMove = true;
 	}
 
-	if (input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) > 0.15f || input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) < -0.15f) {
+	if (input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) > 0.25f || input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) < -0.25f) {
 		moveVec_.x += spd * input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X);
 		isMove = true;
 	}
-	if (input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) > 0.15f || input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) < -0.15f) {
+	if (input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) > 0.25f || input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) < -0.25f) {
 		moveVec_.z += spd * input->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y);
 		isMove = true;
 	}
 
-	if (input->GetGamepad()->GetStick(Gamepad::Stick::RIGHT_X) > 0.15f || input->GetGamepad()->GetStick(Gamepad::Stick::RIGHT_X) < -0.15f) {
+	if (input->GetGamepad()->GetStick(Gamepad::Stick::RIGHT_X) > 0.25f || input->GetGamepad()->GetStick(Gamepad::Stick::RIGHT_X) < -0.25f) {
 		cameraRotate_ += cmaeraRotateSpd_ * input->GetGamepad()->GetStick(Gamepad::Stick::RIGHT_X) * FrameInfo::GetInstance()->GetDelta();
 
 		isMove = true;
