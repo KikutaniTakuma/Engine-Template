@@ -90,8 +90,8 @@ void StringOut::Draw() {
 	Engine::GetBatch(format)->End();
 }
 
+void StringOut::Debug([[maybe_unused]] const std::string& debugName) {
 #ifdef _DEBUG
-void StringOut::Debug(const std::string& debugName) {
 	static Vector4 debugColor;
 	debugColor = UintToVector4(color);
 	static std::string debugStr;
@@ -110,5 +110,5 @@ void StringOut::Debug(const std::string& debugName) {
 	str = ConvertString(debugStr);
 
 	color = Vector4ToUint(debugColor);
-}
 #endif // _DEBUG
+}

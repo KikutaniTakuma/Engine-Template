@@ -39,6 +39,9 @@ void GlobalVariables::SetValue(const std::string& groupName, const std::string& 
 }
 
 void GlobalVariables::Update() {
+#ifdef _DEBUG
+
+
 	if (!ImGui::Begin(" Global Variables", nullptr, ImGuiWindowFlags_MenuBar)) {
 		ImGui::End();
 		return;
@@ -87,6 +90,7 @@ void GlobalVariables::Update() {
 
 	ImGui::EndMenuBar();
 	ImGui::End();
+#endif // _DEBUG
 }
 
 void GlobalVariables::SaveFile(const std::string& groupName) {

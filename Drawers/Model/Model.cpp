@@ -278,7 +278,8 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	}
 }
 
-void Model::Debug(const std::string& guiName) {
+void Model::Debug([[maybe_unused]]const std::string& guiName) {
+#ifdef _DEBUG 
 	ImGui::Begin(guiName.c_str());
 	ImGui::DragFloat3("pos", &pos.x, 0.01f);
 	ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
@@ -291,6 +292,7 @@ void Model::Debug(const std::string& guiName) {
 	ImGui::DragFloat3("ptColor", &dirLig->ptColor.x, 0.01f);
 	ImGui::DragFloat("ptRange", &dirLig->ptRange);
 	ImGui::End();
+#endif // _DEBUG 
 }
 
 Model::~Model() {

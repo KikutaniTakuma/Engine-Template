@@ -359,7 +359,10 @@ bool Engine::InitializeDirect12() {
 	rtvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
 	// SRV用のヒープ
+#ifdef _DEBUG
 	srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
+#endif // _DEBUG
+
 
 	// SwepChainのメモリとディスクリプタと関連付け
 	// バックバッファの数を取得
@@ -389,6 +392,7 @@ bool Engine::InitializeDirect12() {
 		device->CreateRenderTargetView(swapChainResource[i].Get(), &rtvDesc, rtvHandles[i]);
 	}
 
+#ifdef _DEBUG
 	// ImGuiの初期化
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -402,6 +406,7 @@ bool Engine::InitializeDirect12() {
 		srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
 		srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart()
 	);
+#endif // _DEBUG
 
 
 	// 初期値0でFenceを作る
@@ -727,9 +732,12 @@ void Engine::FrameStart() {
 	static FrameInfo* const frameInfo = FrameInfo::GetInstance();
 	frameInfo->Start();
 
+#ifdef _DEBUG
 	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+#endif // _DEBUG
+
 
 	// これから書き込むバックバッファのインデックスを取得
 	UINT backBufferIndex = engine->swapChain->GetCurrentBackBufferIndex();
@@ -765,11 +773,13 @@ void Engine::FrameEnd() {
 	auto dsvH = engine->dsvHeap->GetCPUDescriptorHandleForHeapStart();
 	engine->commandList->OMSetRenderTargets(1, &engine->rtvHandles[backBufferIndex], false, &dsvH);
 
+#ifdef _DEBUG
 	engine->commandList->SetDescriptorHeaps(1, engine->srvDescriptorHeap.GetAddressOf());
 
 	// ImGui描画
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), engine->commandList.Get());
+#endif // _DEBUG
 
 	Barrier(
 		engine->swapChainResource[backBufferIndex].Get(),
@@ -847,9 +857,12 @@ void Engine::FrameEnd() {
 /// 各種解放処理
 /// 
 Engine::~Engine() {
+#ifdef _DEBUG
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
+#endif // _DEBUG
+
 
 	for (auto& i : fontHeap) {
 		i.second->Release();
@@ -857,6 +870,9 @@ Engine::~Engine() {
 	dsvHeap->Release();
 	depthStencilResource->Release();
 	CloseHandle(fenceEvent);
+#ifdef _DEBUG
 	srvDescriptorHeap->Release();
+#endif // _DEBUG
+
 	rtvDescriptorHeap->Release();
 }

@@ -830,7 +830,8 @@ void Particle::Draw(
 	}
 }
 
-void Particle::Debug(const std::string& guiName) {
+void Particle::Debug([[maybe_unused]]const std::string& guiName) {
+#ifdef _DEBUG 
 	if (!ImGui::Begin(guiName.c_str(), nullptr, ImGuiWindowFlags_MenuBar)) {
 		ImGui::End();
 		return;
@@ -1094,6 +1095,8 @@ void Particle::Debug(const std::string& guiName) {
 	}
 
 	ImGui::End();
+
+#endif // _DEBUG 
 }
 
 void Particle::AnimationStart(float aniUvPibot) {

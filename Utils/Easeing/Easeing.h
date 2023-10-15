@@ -5,9 +5,13 @@
 #include <cassert>
 #include <type_traits>
 #include "Utils/Math/Vector3.h"
+#include "Utils/Math/Vector2.h"
 
 template<class T>
-concept IsInt = std::is_integral_v<T>;
+concept IsIntEase = std::is_integral_v<T>;
+
+template<class T>
+concept IsNotPtrEase = std::is_pointer_v<T>;
 
 class Easeing {
 public:
@@ -63,7 +67,7 @@ public:
 	/// <param name="start">始め</param>
 	/// <param name="end">終わり</param>
 	/// <returns>線形補完された値</returns>
-	template<typename T>
+	template<IsNotPtrEase T>
 	T Get(const T& start, const T& end) {
 		static_assert(!std::is_pointer<T>::value, "Do not use pointer types");
 		return std::lerp<T>(start, end, ease_(t_));
@@ -71,6 +75,10 @@ public:
 
 	Vector3 Get(const Vector3& start, const Vector3& end) {
 		return Vector3::Lerp(start, end, ease_(t_));
+	}
+
+	Vector2 Get(const Vector2& start, const Vector2& end) {
+		return Vector2::Lerp(start, end, ease_(t_));
 	}
 
 	void Debug(const std::string& debugName);
@@ -92,7 +100,7 @@ private:
 	float spdT_;
 
 public:
-	template<IsInt T>
+	template<IsIntEase T>
 	static std::function<float(float)> GetFunction(T typeNum) {
 		std::function<float(float)> ease;
 

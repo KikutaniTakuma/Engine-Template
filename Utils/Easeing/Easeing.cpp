@@ -2,8 +2,6 @@
 #include "Engine/FrameInfo/FrameInfo.h"
 #include "externals/imgui/imgui.h"
 
-#include "Utils/Math/Vector3.h"
-#include "Utils/Math/Vector2.h"
 #include <cmath>
 #include <numbers>
 
@@ -48,11 +46,6 @@ void Easeing::Stop() {
 
 	t_ = 0.0f;
 	spdT_ = 0.0f;
-}
-
-template<>
-Vector2 Easeing::Get(const Vector2& start, const Vector2& end) {
-	return Vector2::Lerp(start, end, ease_(t_));
 }
 
 void Easeing::Debug([[maybe_unused]]const std::string& debugName) {

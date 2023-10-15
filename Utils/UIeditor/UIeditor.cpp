@@ -12,6 +12,9 @@ UIeditor* UIeditor::GetInstance() {
 }
 
 void UIeditor::Update() {
+#ifdef _DEBUG
+
+
 	if (!ImGui::Begin("UIEditor", nullptr, ImGuiWindowFlags_MenuBar)) {
 		ImGui::End();
 		return;
@@ -108,6 +111,7 @@ void UIeditor::Update() {
 
 	ImGui::EndMenuBar();
 	ImGui::End();
+#endif // _DEBUG
 
 	for (auto& i : textures) {
 		i.second.pos = GetVector3Value(i.first, "pos");

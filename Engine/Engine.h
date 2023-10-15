@@ -219,7 +219,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap;
 	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
 
+#ifdef _DEBUG
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap;
+#endif
 
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence;
 	uint64_t fenceVal = 0;
