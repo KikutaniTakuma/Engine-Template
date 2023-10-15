@@ -6,21 +6,10 @@
 
 class Camera {
 /// <summary>
-/// タイプ
-/// </summary>
-public:
-	enum class Type : uint8_t {
-		Projecction,
-		Othographic
-	};
-
-
-/// <summary>
 /// コンストラクタ
 /// </summary>
 public:
 	Camera() noexcept;
-	Camera(Camera::Type mode) noexcept;
 	Camera(const Camera& right) noexcept;
 	Camera(Camera&& right) noexcept;
 	~Camera() noexcept = default;
@@ -93,7 +82,6 @@ public:
 /// メンバ変数
 /// </summary>
 public:
-	Type type;
 	bool isDebug;
 
 public:

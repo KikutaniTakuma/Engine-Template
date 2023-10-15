@@ -47,11 +47,11 @@ void Collider::IsCollision(const Collider* other) {
 
 	for (auto& pos : positions) {
 		if (IsCollision(pos)) {
-			flg_.flg_ = true;
+			flg_ = true;
 			return;
 		}
 		else {
-			flg_.flg_ = false;
+			flg_ = false;
 		}
 	}
 

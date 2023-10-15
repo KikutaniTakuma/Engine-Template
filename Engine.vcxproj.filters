@@ -161,6 +161,9 @@
     <ClCompile Include="Game\Goal\Goal.cpp">
       <Filter>Game\Goal</Filter>
     </ClCompile>
+    <ClCompile Include="Drawers\Particle\Particle.cpp">
+      <Filter>Drawers\Particle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -312,6 +315,12 @@
     </Filter>
     <Filter Include="Utils\Easeing\CsvLoad">
       <UniqueIdentifier>{0801bfcf-a0f8-4f86-b79a-283b0de7cdd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\StructuredBuffer">
+      <UniqueIdentifier>{e1e79296-6a53-46cd-ad47-5079058ad278}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Drawers\Particle">
+      <UniqueIdentifier>{81d2d594-ca17-412f-85ce-bbbad35d144c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -479,6 +488,12 @@
     </ClInclude>
     <ClInclude Include="Game\Goal\Goal.h">
       <Filter>Game\Goal</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\StructuredBuffer\StructuredBuffer.h">
+      <Filter>Engine\StructuredBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Drawers\Particle\Particle.h">
+      <Filter>Drawers\Particle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

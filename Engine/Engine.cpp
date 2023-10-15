@@ -16,6 +16,7 @@
 #include "Drawers/Texture2D/Texture2D.h"
 #include "Drawers/Model/Model.h"
 #include "Drawers/Line/Line.h"
+#include "Drawers/Particle/Particle.h"
 
 #include "Utils/Math/Vector3.h"
 #include "Utils/Math/Mat4x4.h"
@@ -145,11 +146,13 @@ bool Engine::Initialize(const std::string& windowName, Resolution resolution) {
 	Texture2D::Initialize();
 	Model::Initialize();
 	Line::Initialize();
+	Particle::Initialize();
 
 	return true;
 }
 
 void Engine::Finalize() {
+	Particle::Finalize();
 	Texture2D::Finalize();
 
 	PipelineManager::Finalize();
@@ -201,6 +204,7 @@ bool Engine::InitializeDirect3D() {
 
 		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
 			Log::AddLog(ConvertString(std::format(L"Use Adapter:{}\n", adapterDesc.Description)));
+			Log::DebugLog(ConvertString(std::format(L"Use Adapter:{}", adapterDesc.Description)));
 			break;
 		}
 		useAdapter.Reset();
@@ -227,6 +231,7 @@ bool Engine::InitializeDirect3D() {
 
 		if (SUCCEEDED(hr)) {
 			Log::AddLog(std::format("FeatureLevel:{}\n", featureLevelString[i]));
+			Log::DebugLog(std::format("FeatureLevel:{}", featureLevelString[i]));
 			break;
 		}
 	}
@@ -235,10 +240,11 @@ bool Engine::InitializeDirect3D() {
 		return false;
 	}
 	Log::AddLog("Complete create D3D12Device!!!\n");
+	Log::DebugLog("Complete create D3D12Device!!!");
 
 #ifdef _DEBUG
-	ID3D12InfoQueue* infoQueue = nullptr;
-	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
+	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
+	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(infoQueue.GetAddressOf())))) {
 		// やばいエラーの予期に止まる
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
 		// エラーの時に止まる
@@ -261,7 +267,7 @@ bool Engine::InitializeDirect3D() {
 		infoQueue->PushStorageFilter(&filter);
 
 		// 解放
-		infoQueue->Release();
+		infoQueue.Reset();
 	}
 #endif
 
