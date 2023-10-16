@@ -123,7 +123,7 @@ void FrameInfo::Debug() {
 	ImGui::Text("Frame rate: %3.0lf fps", GetFps());
 	ImGui::Text("Delta Time: %.4lf", GetDelta());
 	ImGui::Text("Frame Count: %llu", GetFrameCount());
-	ImGui::DragFloat("fps limit", &fpsLimit, 1.0f, 30.0f, 165.0f);
+	ImGui::DragFloat("fps limit", &fpsLimit, 1.0f, 10.0f, 165.0f);
 	fpsLimit_ = static_cast<double>(fpsLimit);
 	SetFpsLimit(fpsLimit_);
 	ImGui::End();

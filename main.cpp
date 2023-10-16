@@ -36,6 +36,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	GameScene gameScene;
 	gameScene.Initialize(nullptr);
 
+	Camera camera;
+
+	Texture2D tex;
+
 
 	/// 
 	/// メインループ
@@ -56,6 +60,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		gameScene.Update();
 
+		tex.Debug("tex");
+		tex.Update();
+
 		///
 		/// 更新処理ここまで
 		/// 
@@ -63,6 +70,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// 描画処理
 		/// 
+		camera.Update();
+
+		tex.Draw(camera.GetViewOthographics());
 		
 		gameScene.Draw();
 
