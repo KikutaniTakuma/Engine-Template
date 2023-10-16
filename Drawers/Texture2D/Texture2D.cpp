@@ -279,6 +279,9 @@ void Texture2D::Draw(
 }
 
 void Texture2D::Debug(const std::string& guiName) {
+#ifdef _DEBUG
+
+
 	*colorBuf = UintToVector4(color);
 	ImGui::Begin(guiName.c_str());
 	ImGui::DragFloat2("scale", &scale.x, 1.0f);
@@ -289,6 +292,7 @@ void Texture2D::Debug(const std::string& guiName) {
 	ImGui::ColorEdit4("SphereColor", &colorBuf->color.r);
 	color = Vector4ToUint(*colorBuf);
 	ImGui::End();
+#endif // _DEBUG
 }
 
 bool Texture2D::Colision(const Vector2& pos2D) const {
