@@ -5,22 +5,14 @@
 #include "Engine/FrameInfo/FrameInfo.h"
 
 GameScene::GameScene():
+	BaseScene(BaseScene::ID::Game),
 	models_(),
 	texs_(),
 	player_(),
 	globalVariables_()
-{
-}
+{}
 
-void GameScene::Initialize(SceneManager* const sceneManager) {
-	sceneManager_ = sceneManager;
-
-	meshManager_ = MeshManager::GetInstance();
-
-	audioManager_ = AudioManager::GetInstance();
-
-	textureManager_ = TextureManager::GetInstance();
-
+void GameScene::Initialize() {
 	camera_.farClip = 3000.0f;
 
 	globalVariables_.LoadFile();
@@ -53,6 +45,10 @@ void GameScene::Initialize(SceneManager* const sceneManager) {
 
 	goal_ = std::make_unique<Goal>();
 	goal_->collisionPos_.z = 28.0f;
+}
+
+void GameScene::Finalize() {
+
 }
 
 void GameScene::Update() {

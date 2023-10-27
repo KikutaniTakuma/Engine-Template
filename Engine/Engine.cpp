@@ -121,6 +121,9 @@ bool Engine::Initialize(const std::string& windowName, Resolution resolution) {
 		return false;
 	}
 
+	// ディスクリプタヒープ初期化
+	ShaderResourceHeap::Initialize(524288);
+
 	// DirectX12生成
 	if (!engine->InitializeDirect12()) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Initialize() : InitializeDirect12() Failed", "Engine");
@@ -160,6 +163,8 @@ void Engine::Finalize() {
 	TextureManager::Finalize();
 	ShaderManager::Finalize();
 	Input::Finalize();
+
+	ShaderResourceHeap::Finalize();
 
 	delete engine;
 	engine = nullptr;
@@ -204,7 +209,6 @@ bool Engine::InitializeDirect3D() {
 
 		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
 			Log::AddLog(ConvertString(std::format(L"Use Adapter:{}\n", adapterDesc.Description)));
-			Log::DebugLog(ConvertString(std::format(L"Use Adapter:{}", adapterDesc.Description)));
 			break;
 		}
 		useAdapter.Reset();
@@ -231,7 +235,6 @@ bool Engine::InitializeDirect3D() {
 
 		if (SUCCEEDED(hr)) {
 			Log::AddLog(std::format("FeatureLevel:{}\n", featureLevelString[i]));
-			Log::DebugLog(std::format("FeatureLevel:{}", featureLevelString[i]));
 			break;
 		}
 	}
@@ -240,11 +243,10 @@ bool Engine::InitializeDirect3D() {
 		return false;
 	}
 	Log::AddLog("Complete create D3D12Device!!!\n");
-	Log::DebugLog("Complete create D3D12Device!!!");
 
 #ifdef _DEBUG
-	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
-	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(infoQueue.GetAddressOf())))) {
+	ID3D12InfoQueue* infoQueue = nullptr;
+	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
 		// やばいエラーの予期に止まる
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
 		// エラーの時に止まる
@@ -267,7 +269,7 @@ bool Engine::InitializeDirect3D() {
 		infoQueue->PushStorageFilter(&filter);
 
 		// 解放
-		infoQueue.Reset();
+		infoQueue->Release();
 	}
 #endif
 
@@ -358,12 +360,6 @@ bool Engine::InitializeDirect12() {
 	// デスクリプタヒープの作成
 	rtvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
-	// SRV用のヒープ
-#ifdef _DEBUG
-	srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
-#endif // _DEBUG
-
-
 	// SwepChainのメモリとディスクリプタと関連付け
 	// バックバッファの数を取得
 	DXGI_SWAP_CHAIN_DESC backBufferNum{};
@@ -393,6 +389,9 @@ bool Engine::InitializeDirect12() {
 	}
 
 #ifdef _DEBUG
+	// SRV用のヒープ
+	auto srvDescriptorHeap = ShaderResourceHeap::GetInstance();
+
 	// ImGuiの初期化
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -402,11 +401,11 @@ bool Engine::InitializeDirect12() {
 		device.Get(),
 		swapChainDesc.BufferCount,
 		rtvDesc.Format,
-		srvDescriptorHeap.Get(),
-		srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
-		srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart()
+		srvDescriptorHeap->Get(),
+		srvDescriptorHeap->GetSrvCpuHeapHandle(0),
+		srvDescriptorHeap->GetSrvGpuHeapHandle(0)
 	);
-#endif // _DEBUG
+#endif // DEBUG
 
 
 	// 初期値0でFenceを作る
@@ -738,7 +737,6 @@ void Engine::FrameStart() {
 	ImGui::NewFrame();
 #endif // _DEBUG
 
-
 	// これから書き込むバックバッファのインデックスを取得
 	UINT backBufferIndex = engine->swapChain->GetCurrentBackBufferIndex();
 
@@ -760,6 +758,11 @@ void Engine::FrameStart() {
 
 	// ビューポート
 	SetViewPort(engine->clientWidth, engine->clientHeight);
+
+	// SRV用のヒープ
+	static auto srvDescriptorHeap = ShaderResourceHeap::GetInstance();
+
+	srvDescriptorHeap->SetHeap();
 }
 
 void Engine::FrameEnd() {
@@ -768,19 +771,15 @@ void Engine::FrameEnd() {
 		return;
 	}
 
-	// 描画先をRTVを設定する
-	UINT backBufferIndex = engine->swapChain->GetCurrentBackBufferIndex();
-	auto dsvH = engine->dsvHeap->GetCPUDescriptorHandleForHeapStart();
-	engine->commandList->OMSetRenderTargets(1, &engine->rtvHandles[backBufferIndex], false, &dsvH);
 
 #ifdef _DEBUG
-	engine->commandList->SetDescriptorHeaps(1, engine->srvDescriptorHeap.GetAddressOf());
-
 	// ImGui描画
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), engine->commandList.Get());
-#endif // _DEBUG
+#endif // DEBUG
 
+	// 描画先をRTVを設定する
+	UINT backBufferIndex = engine->swapChain->GetCurrentBackBufferIndex();
 	Barrier(
 		engine->swapChainResource[backBufferIndex].Get(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET,
@@ -863,16 +862,10 @@ Engine::~Engine() {
 	ImGui::DestroyContext();
 #endif // _DEBUG
 
-
 	for (auto& i : fontHeap) {
 		i.second->Release();
 	}
-	dsvHeap->Release();
 	depthStencilResource->Release();
 	CloseHandle(fenceEvent);
-#ifdef _DEBUG
-	srvDescriptorHeap->Release();
-#endif // _DEBUG
-
 	rtvDescriptorHeap->Release();
 }

@@ -19,7 +19,9 @@ public:
 	GameScene& operator=(GameScene&&) = delete;
 
 public:
-	void Initialize(SceneManager* const sceneManager) override;
+	void Initialize() override;
+
+	void Finalize() override;
 
 	void Update() override;
 

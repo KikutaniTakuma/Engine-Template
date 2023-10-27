@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cassert>
 #include <numbers>
+#include <climits>
 #include <filesystem>
 #include "Utils/ConvertString/ConvertString.h"
 #include "Engine/ShaderManager/ShaderManager.h"
@@ -54,7 +55,7 @@ void Model::LoadShader(
 
 void Model::CreateGraphicsPipeline() {
 	if (loadShaderFlg) {
-		std::array<D3D12_DESCRIPTOR_RANGE,1> range={};
+		std::array<D3D12_DESCRIPTOR_RANGE, 1> range = {};
 		range[0].NumDescriptors = 1;
 		range[0].BaseShaderRegister = 0;
 		range[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
@@ -100,7 +101,7 @@ Model::Model() :
 	pos(),
 	rotate(),
 	scale(Vector3::identity),
-	color(0xffffffff),
+	color(std::numeric_limits<uint32_t>::max()),
 	parent(nullptr),
 	mesh(nullptr),
 	data(),
@@ -116,17 +117,24 @@ Model::Model() :
 
 
 	dirLig.shaderRegister = 1;
-	dirLig->ligDirection = { 1.0f,-1.0f,-1.0f };
-	dirLig->ligDirection = dirLig->ligDirection.Normalize();
-	Vector4 colorTmp = UintToVector4(0xffffadff);
-	dirLig->ligColor = colorTmp.GetVector3();
+	light.ligDirection = { 1.0f,-1.0f,-1.0f };
+	light.ligDirection = light.ligDirection.Normalize();
+	light.ligColor = UintToVector4(0xffffadff).GetVector3();
 
-	dirLig->ptPos = { 5.0f,5.0f,5.0f };
-	dirLig->ptColor = { 15.0f,15.0f,15.0f };
-	dirLig->ptRange = 10.0f;
+	light.ptPos = Vector3::zero;
+	light.ptColor = Vector3::zero;
+	light.ptRange = std::numeric_limits<float>::max();
+
+	*dirLig = light;
 
 	colorBuf.shaderRegister = 2;
 	*colorBuf = UintToVector4(color);
+}
+
+Model::Model(const std::string& fileName) :
+	Model()
+{
+	this->LoadObj(fileName);
 }
 
 Model::Model(const Model& right) :
@@ -134,7 +142,7 @@ Model::Model(const Model& right) :
 {
 	*this = right;
 }
-Model::Model(Model&& right) noexcept:
+Model::Model(Model&& right) noexcept :
 	Model()
 {
 	*this = std::move(right);
@@ -171,6 +179,8 @@ Model& Model::operator=(const Model& right) {
 
 		loadObjFlg = true;
 	}
+
+	light = right.light;
 
 	// 定数バッファの値をコピー
 	*wvpData = *right.wvpData;
@@ -212,6 +222,8 @@ Model& Model::operator=(Model&& right) noexcept {
 		loadObjFlg = true;
 	}
 
+	light = std::move(right.light);
+
 	// 定数バッファの値をコピー
 	*wvpData = *right.wvpData;
 	*dirLig = *right.dirLig;
@@ -235,8 +247,18 @@ void Model::LoadObj(const std::string& fileName) {
 	}
 }
 
+void Model::ChangeTexture(const std::string& useMtlName, const std::string& texName) {
+	data[useMtlName].tex = TextureManager::GetInstance()->LoadTexture(texName);
+	assert(data[useMtlName].tex->GetFileName() == texName);
+}
+
+void Model::ChangeTexture(const std::string& useMtlName, Texture* tex) {
+	assert(tex != nullptr);
+	data[useMtlName].tex = tex;
+}
+
 void Model::Update() {
-	/*drawIndexNumber = 0;*/
+	*dirLig = light;
 }
 
 void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
@@ -251,8 +273,8 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 
 		*colorBuf = UintToVector4(color);
 
+		light.eyePos = cameraPos;
 		dirLig->eyePos = cameraPos;
-
 
 		auto commandlist = Engine::GetCommandList();
 
@@ -278,8 +300,7 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	}
 }
 
-void Model::Debug([[maybe_unused]]const std::string& guiName) {
-#ifdef _DEBUG 
+void Model::Debug(const std::string& guiName) {
 	ImGui::Begin(guiName.c_str());
 	ImGui::DragFloat3("pos", &pos.x, 0.01f);
 	ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
@@ -292,7 +313,6 @@ void Model::Debug([[maybe_unused]]const std::string& guiName) {
 	ImGui::DragFloat3("ptColor", &dirLig->ptColor.x, 0.01f);
 	ImGui::DragFloat("ptRange", &dirLig->ptRange);
 	ImGui::End();
-#endif // _DEBUG 
 }
 
 Model::~Model() {

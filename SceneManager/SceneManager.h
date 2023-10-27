@@ -2,33 +2,63 @@
 #include <unordered_map>
 #include <string>
 #include <memory>
-#include "Utils/Camera/Camera.h"
 #include <vector>
+#include <bitset>
+#include "Utils/Camera/Camera.h"
+#include "Fade/Fade.h"
+#include "MeshManager/MeshManager.h"
+#include "TextureManager/TextureManager.h"
+#include "AudioManager/AudioManager.h"
+#include "Engine/FrameInfo/FrameInfo.h"
+#include "Input/Input.h"
 
 class BaseScene {
+	friend class SceneManager;
+
 public:
-	BaseScene() = default;
+	enum class ID {
+		Game,
+		Result,
+		Title,
+		StageSelect,
+	};
+
+public:
+	BaseScene(BaseScene::ID sceneID);
 	BaseScene(const BaseScene&) = delete;
 	BaseScene(BaseScene&&) = delete;
 	virtual ~BaseScene() = default;
 
+	BaseScene& operator=(const BaseScene&) = delete;
+	BaseScene& operator=(BaseScene&&) = delete;
+
 public:
-	virtual void Initialize(class SceneManager* sceneManager) = 0;
-	//virtual void Finalize() = 0;
+	void SceneInitialize(class SceneManager* sceneManager);
+
+	virtual void Initialize() = 0;
+	virtual void Finalize() = 0;
 
 	virtual void Update() = 0;
 	virtual void Draw() = 0;
 
+	inline BaseScene::ID GetID() const {
+		return sceneID_;
+	}
+
 protected:
 	class SceneManager* sceneManager_;
 
-	class MeshManager* meshManager_;
+	MeshManager* meshManager_;
 
-	class AudioManager* audioManager_;
+	AudioManager* audioManager_;
 
-	class TextureManager* textureManager_;
+	TextureManager* textureManager_;
 
-	static bool isPad_;
+	FrameInfo* frameInfo_;
+
+	Input* input_;
+
+	BaseScene::ID sceneID_;
 
 protected:
 	Camera camera_;
@@ -36,7 +66,7 @@ protected:
 
 class SceneManager final {
 private:
-	SceneManager();
+	SceneManager() = default;
 	SceneManager(const SceneManager&) = delete;
 	SceneManager(SceneManager&&) = delete;
 	~SceneManager() = default;
@@ -48,13 +78,32 @@ public:
 	static SceneManager* const GetInstace();
 
 public:
+	void Initialize(BaseScene* firstScene);
+	void Finalize();
+
 	void SceneChange(BaseScene* next);
 
 	void Update();
 
 	void Draw();
 
+	void Game();
+
+public:
+	inline bool GetIsPad() const {
+		return isPad_;
+	}
+
 private:
 	std::unique_ptr<BaseScene> scene_;
 	std::unique_ptr<BaseScene> next_;
+
+	std::unique_ptr<Fade> fade_;
+
+	Camera fadeCamera_;
+
+	FrameInfo* frameInfo_ = nullptr;
+	Input* input_ = nullptr;
+
+	bool isPad_ = false;
 };

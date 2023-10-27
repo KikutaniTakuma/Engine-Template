@@ -4,18 +4,17 @@
 #include <algorithm>
 #include <cassert>
 #include <type_traits>
-#include "Utils/Math/Vector3.h"
 #include "Utils/Math/Vector2.h"
+#include "Utils/Math/Vector3.h"
+#include "Utils/Math/Vector4.h"
+#include"Utils/UtilsLib/UtilsLib.h"
 
 template<class T>
-concept IsIntEase = std::is_integral_v<T>;
-
-template<class T>
-concept IsNotPtrEase = std::is_pointer_v<T>;
+concept IsInt = std::is_integral_v<T>;
 
 class Easeing {
 public:
-	Easeing() = default;
+	Easeing();
 	Easeing(const Easeing& right) = default;
 	Easeing(Easeing&& right) noexcept = default;
 	~Easeing() = default;
@@ -67,22 +66,42 @@ public:
 	/// <param name="start">始め</param>
 	/// <param name="end">終わり</param>
 	/// <returns>線形補完された値</returns>
-	template<IsNotPtrEase T>
+	template<typename T>
 	T Get(const T& start, const T& end) {
 		static_assert(!std::is_pointer<T>::value, "Do not use pointer types");
-		return std::lerp<T>(start, end, ease_(t_));
-	}
-
-	Vector3 Get(const Vector3& start, const Vector3& end) {
-		return Vector3::Lerp(start, end, ease_(t_));
+		return static_cast<T>(std::lerp<T>(start, end, ease_(t_)));
 	}
 
 	Vector2 Get(const Vector2& start, const Vector2& end) {
 		return Vector2::Lerp(start, end, ease_(t_));
 	}
 
+	Vector3 Get(const Vector3& start, const Vector3& end) {
+		return Vector3::Lerp(start, end, ease_(t_));
+	}
+
+	Vector4 Get(const Vector4& start, const Vector4& end) {
+		return ColorLerp(start, end, ease_(t_));
+	}
+
+	float GetT() const {
+		return ease_(t_);
+	}
+
 	void Debug(const std::string& debugName);
 	void DebugTreeNode(const std::string& debugName);
+
+	bool ActiveEnter() const {
+		return isActive_.OnEnter();
+	}
+
+	bool ActiveStay() const {
+		return isActive_.OnStay();
+	}
+
+	bool ActiveExit() const {
+		return isActive_.OnExit();
+	}
 
 private:
 #ifdef _DEBUG
@@ -92,15 +111,15 @@ private:
 
 	std::function<float(float)> ease_;
 
-	bool isActive_;
-	bool isLoop_;
+	UtilsLib::Flg isActive_;
+	UtilsLib::Flg isLoop_;
 
 	float t_;
 
 	float spdT_;
 
 public:
-	template<IsIntEase T>
+	template<IsInt T>
 	static std::function<float(float)> GetFunction(T typeNum) {
 		std::function<float(float)> ease;
 

@@ -17,12 +17,7 @@ class Pipeline;
 #include <wrl.h>
 
 class Model {
-private:
-	struct MatrixData {
-		Mat4x4 worldMat;
-		Mat4x4 viewProjectoionMat;
-	};
-
+public:
 	struct DirectionLight {
 		Vector3 ligDirection;
 		float pad0;
@@ -36,8 +31,15 @@ private:
 		float ptRange;
 	};
 
+private:
+	struct MatrixData {
+		Mat4x4 worldMat;
+		Mat4x4 viewProjectoionMat;
+	};
+
 public:
 	Model();
+	Model(const std::string& fileName);
 	Model(const Model& right);
 	Model(Model&& right) noexcept;
 	~Model();
@@ -86,6 +88,9 @@ public:
 	void SetParent(Model* parent_) {
 		parent = parent_;
 	}
+	
+	void ChangeTexture(const std::string& useMtlName, const std::string& texName);
+	void ChangeTexture(const std::string& useMtlName, Texture* tex);
 
 public:
 	Vector3 pos;
@@ -95,6 +100,7 @@ public:
 	uint32_t color;
 	Model* parent;
 
+	DirectionLight light;
 
 private:
 	Mesh* mesh;

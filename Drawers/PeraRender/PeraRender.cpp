@@ -2,7 +2,7 @@
 #include "Engine/Engine.h"
 #include <cassert>
 #include "Utils/ConvertString/ConvertString.h"
-#include "Engine/ShaderManager/ShaderManager.h"
+#include "Engine/ShaderResource/ShaderResourceHeap.h"
 #include "externals/imgui/imgui.h"
 
 PeraRender::PeraRender():
@@ -22,7 +22,12 @@ PeraRender::PeraRender(uint32_t width_, uint32_t height_):
 {}
 
 PeraRender::~PeraRender() {
-	peraVertexResource->Release();
+	static auto srvHeap = ShaderResourceHeap::GetInstance();
+	srvHeap->ReleaseView(render.GetViewHandleUINT());
+	if (peraVertexResource) {
+		peraVertexResource->Release();
+		peraVertexResource.Reset();
+	}
 }
 
 void PeraRender::Initialize(const std::string& vsFileName, const std::string& psFileName) {
@@ -47,6 +52,10 @@ void PeraRender::Initialize(const std::string& vsFileName, const std::string& ps
 	peraVertexResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedData));
 	std::copy(pv.begin(), pv.end(), mappedData);
 	peraVertexResource->Unmap(0, nullptr);
+
+	static auto srvHeap = ShaderResourceHeap::GetInstance();
+	srvHeap->BookingHeapPos(1u);
+	srvHeap->CreatePerarenderView(render);
 }
 
 void PeraRender::CreateShader(const std::string& vsFileName, const std::string& psFileName) {
@@ -57,10 +66,6 @@ void PeraRender::CreateShader(const std::string& vsFileName, const std::string& 
 }
 
 void PeraRender::CreateGraphicsPipeline() {
-	// RootSignatureの生成
-	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
 	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
 	descriptorRange[0].BaseShaderRegister = 0;
 	descriptorRange[0].NumDescriptors = 1;

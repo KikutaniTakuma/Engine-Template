@@ -2,6 +2,7 @@
 #include <fstream>
 #include "AudioManager/AudioManager.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
+#include "externals/imgui/imgui.h"
 
 Audio::Audio():
 	wfet(),
@@ -9,7 +10,8 @@ Audio::Audio():
 	bufferSize(0u),
 	pSourceVoice(nullptr),
 	loopFlg(false),
-	isStart(false)
+	isStart(false),
+	volume_(1.0f)
 {}
 
 Audio::~Audio() {
@@ -40,13 +42,22 @@ void Audio::Load(const std::string& fileName, bool loopFlg_) {
 
 	FormatChunk format{};
 	file.read((char*)&format, sizeof(ChunkHeader));
-	if (strncmp(format.chunk.id.data(), "fmt ", 4) != 0) {
-		ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found fmt", "Audio");
-		return;
+	int32_t nowRead = 0;
+	while (strncmp(format.chunk.id.data(), "fmt ", 4) != 0) {
+		file.seekg(nowRead, std::ios_base::beg);
+		if (file.eof()) {
+			ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found fmt", "Audio");
+			return;
+		}
+		nowRead++;
+		file.read((char*)&format, sizeof(ChunkHeader));
 	}
 
 	if (format.chunk.size > sizeof(format.fmt)) {
-		ErrorCheck::GetInstance()->ErrorTextBox("Load() : format.chunk.size > sizeof(format.fmt)", "Audio");
+		ErrorCheck::GetInstance()->ErrorTextBox(
+			"Load() : format chunk size is too big ->" + std::to_string(format.chunk.size) + " byte (max is " + std::to_string(sizeof(format.fmt)) + " byte)", 
+			"Audio"
+		);
 		return;
 	}
 	file.read((char*)&format.fmt, format.chunk.size);
@@ -61,11 +72,11 @@ void Audio::Load(const std::string& fileName, bool loopFlg_) {
 
 	while (strncmp(data.id.data(), "data", 4) != 0) {
 		file.seekg(data.size, std::ios_base::cur);
-		file.read((char*)&data, sizeof(data));
 		if (file.eof()) {
 			ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found data", "Audio");
 			return;
 		}
+		file.read((char*)&data, sizeof(data));
 	}
 
 	char* pBufferLocal = new char[data.size];
@@ -96,6 +107,7 @@ void Audio::Load(const std::string& fileName, bool loopFlg_) {
 
 void Audio::Start(float volume) {
 	HRESULT hr;
+	volume_ = volume;
 
 	Stop();
 	if (!pSourceVoice) {
@@ -117,7 +129,7 @@ void Audio::Start(float volume) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Start() : Start() failed", "Audio");
 		return;
 	}
-	pSourceVoice->SetVolume(volume);
+	pSourceVoice->SetVolume(volume_);
 
 	isStart = true;
 }
@@ -143,4 +155,35 @@ void Audio::Stop() {
 	pSourceVoice = nullptr;
 
 	isStart = false;
+}
+
+void Audio::SetAudio(float volume) {
+	volume_ = volume;
+	if (pSourceVoice && isStart) {
+		pSourceVoice->SetVolume(volume_);
+	}
+}
+
+void Audio::Debug([[maybe_unused]]const std::string& guiName) {
+#ifdef _DEBUG
+	ImGui::Begin(guiName.c_str());
+	ImGui::DragFloat("volume", &volume_, 0.001f, 0.0f, 1.0f);
+	SetAudio(volume_);
+	
+	ImGui::Checkbox("isLoop", &loopFlg);
+	if (ImGui::Button("Start")) {
+		Start(volume_);
+	}
+	if (ImGui::Button("Stop")) {
+		Stop();
+	}
+	if (ImGui::Button("ReStart")) {
+		ReStart();
+	}
+	if (ImGui::Button("Pause")) {
+		Pause();
+	}
+
+	ImGui::End();
+#endif // _DEBUG
 }

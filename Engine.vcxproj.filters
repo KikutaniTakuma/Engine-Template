@@ -164,6 +164,12 @@
     <ClCompile Include="Drawers\Particle\Particle.cpp">
       <Filter>Drawers\Particle</Filter>
     </ClCompile>
+    <ClCompile Include="SceneManager\Fade\Fade.cpp">
+      <Filter>SceneManager\Fade</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager\SubMenu\SubMenu.cpp">
+      <Filter>SceneManager\SubMenu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -277,9 +283,6 @@
     <Filter Include="SceneManager">
       <UniqueIdentifier>{fad8cc50-c290-488f-b4fb-cdbad1bbd763}</UniqueIdentifier>
     </Filter>
-    <Filter Include="SceneManager\Title">
-      <UniqueIdentifier>{f9fb420e-c396-416f-8181-89c64124396b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="SceneManager\GameScene">
       <UniqueIdentifier>{d4d1cb10-a26f-4866-b520-1d5be8c63924}</UniqueIdentifier>
     </Filter>
@@ -321,6 +324,12 @@
     </Filter>
     <Filter Include="Drawers\Particle">
       <UniqueIdentifier>{81d2d594-ca17-412f-85ce-bbbad35d144c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager\Fade">
+      <UniqueIdentifier>{fc86e848-5d67-4732-9a7d-9ea0a4889d0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager\SubMenu">
+      <UniqueIdentifier>{06de54b1-47bd-4884-994f-f76486248bca}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -494,6 +503,12 @@
     </ClInclude>
     <ClInclude Include="Drawers\Particle\Particle.h">
       <Filter>Drawers\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\Fade\Fade.h">
+      <Filter>SceneManager\Fade</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\SubMenu\SubMenu.h">
+      <Filter>SceneManager\SubMenu</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

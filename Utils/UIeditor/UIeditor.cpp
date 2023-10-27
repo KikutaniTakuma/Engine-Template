@@ -12,9 +12,6 @@ UIeditor* UIeditor::GetInstance() {
 }
 
 void UIeditor::Update() {
-#ifdef _DEBUG
-
-
 	if (!ImGui::Begin("UIEditor", nullptr, ImGuiWindowFlags_MenuBar)) {
 		ImGui::End();
 		return;
@@ -111,7 +108,6 @@ void UIeditor::Update() {
 
 	ImGui::EndMenuBar();
 	ImGui::End();
-#endif // _DEBUG
 
 	for (auto& i : textures) {
 		i.second.pos = GetVector3Value(i.first, "pos");
@@ -139,7 +135,7 @@ void UIeditor::Update(const Mat4x4& vpvpMat) {
 	mousePos = MakeMatrixInverse(vpvpMat) * mousePos;
 	
 	for (auto tex = textures.begin(); tex != textures.end(); tex++) {
-		if (tex->second.Colision({ mousePos.x, mousePos.y })) {
+		if (tex->second.Collision({ mousePos.x, mousePos.y })) {
 			if (mouse->Pushed(Mouse::Button::Left)) {
 				texItr = tex;
 				texItr->second.scale *= 1.2f;

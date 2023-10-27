@@ -47,7 +47,11 @@ public:
 	/// </summary>
 	/// <returns>デルタタイム</returns>
 	inline float GetDelta() const {
+#ifdef _DEBUG
+		return static_cast<float>(1.0 / fpsLimit_);
+#else
 		return static_cast<float>(deltaTime_);
+#endif
 	}
 
 	/// <summary>
@@ -68,8 +72,45 @@ public:
 
 	void SetFpsLimit(double fpsLimit);
 
+	/// <summary>
+	/// ゲームスピード取得
+	/// </summary>
+	/// <returns></returns>
+	inline float GetGameSpeedScale() const {
+		return static_cast<float>(gameSpeedSccale_);
+	}
+
+	void SetGameSpeedScale(float gameSpeedSccale);
+
+	/// <summary>
+	/// フレームの最初の時間を取得
+	/// </summary>
+	/// <returns>フレームの時間</returns>
+	std::chrono::steady_clock::time_point GetThisFrameTime() const {
+		return frameStartTime_;
+	}
+
+	/// <summary>
+	/// デバッグ関数
+	/// </summary>
 	void Debug();
 
+
+#ifdef _DEBUG
+	bool GetIsDebugStop() const {
+		return isDebugStopGame_;
+	}
+
+	bool GetIsOneFrameActive() const {
+		return isOneFrameActive_;
+	}
+
+	void SetIsOneFrameActive(bool isOneFramActive) {
+		if (isDebugStopGame_) {
+			isOneFrameActive_ = isOneFramActive;
+		}
+	}
+#endif // _DEBUG
 
 /// <summary>
 /// メンバ変数
@@ -90,4 +131,12 @@ private:
 
 	std::chrono::microseconds minTime;
 	std::chrono::microseconds minCheckTime;
+
+	double gameSpeedSccale_;
+
+#ifdef _DEBUG
+	bool isDebugStopGame_;
+	bool isOneFrameActive_;
+#endif // _DEBUG
+
 };

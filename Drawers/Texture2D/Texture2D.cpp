@@ -3,13 +3,14 @@
 #include "externals/imgui/imgui.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Utils/UtilsLib/UtilsLib.h"
+#include "Engine/ShaderResource/ShaderResourceHeap.h"
 #include <numeric>
 
 /// <summary>
 /// 静的変数のインスタンス化
 /// </summary>
 
-std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum)> Texture2D::graphicsPipelineState = {};
+std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum) * 2> Texture2D::graphicsPipelineState = {};
 Shader Texture2D::shader = {};
 
 D3D12_INDEX_BUFFER_VIEW Texture2D::indexView = {};
@@ -30,7 +31,8 @@ Texture2D::Texture2D() :
 	aniCount_(0.0f),
 	uvPibotSpd_(0.0f),
 	isAnimation_(0.0f),
-	isSameTexSize()
+	isSameTexSize(),
+	texScalar(1.0f)
 {
 	*wvpMat = MakeMatrixIndentity();
 	*colorBuf = Vector4::identity;
@@ -48,6 +50,17 @@ Texture2D::Texture2D() :
 	if (tex && !isLoad) {
 		isLoad = true;
 	}
+
+	auto srvHeap = ShaderResourceHeap::GetInstance();
+	srvHeap->BookingHeapPos(2u);
+	srvHeap->CreateConstBufferView(wvpMat);
+	srvHeap->CreateConstBufferView(colorBuf);
+}
+
+Texture2D::Texture2D(const std::string& fileName):
+	Texture2D()
+{
+	this->LoadTexture(fileName);
 }
 
 Texture2D::Texture2D(const Texture2D& right) :
@@ -87,6 +100,8 @@ Texture2D& Texture2D::operator=(const Texture2D& right) {
 
 	isSameTexSize = right.isSameTexSize;
 
+	texScalar = right.texScalar;
+
 	return *this;
 }
 
@@ -114,11 +129,16 @@ Texture2D& Texture2D::operator=(Texture2D&& right) noexcept {
 	uvPibotSpd_ = std::move(right.uvPibotSpd_);
 
 	isSameTexSize = std::move(right.isSameTexSize);
+	texScalar = std::move(right.texScalar);
 
 	return *this;
 }
 
 Texture2D::~Texture2D() {
+	auto descriptorHeap = ShaderResourceHeap::GetInstance();
+	descriptorHeap->ReleaseView(wvpMat.GetViewHandleUINT());
+	descriptorHeap->ReleaseView(colorBuf.GetViewHandleUINT());
+
 	if (vertexResource) {
 		vertexResource->Release();
 		vertexResource.Reset();
@@ -165,33 +185,45 @@ void Texture2D::LoadShader(const std::string& vsFileName, const std::string& psF
 }
 
 void Texture2D::CreateGraphicsPipeline() {
-	D3D12_DESCRIPTOR_RANGE range = {};
-	range.NumDescriptors = 1;
-	range.BaseShaderRegister = 0;
-	range.OffsetInDescriptorsFromTableStart = D3D12_APPEND_ALIGNED_ELEMENT;
-	range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	std::array<D3D12_DESCRIPTOR_RANGE, 1> texRange = {};
+	texRange[0].NumDescriptors = 1;
+	texRange[0].BaseShaderRegister = 0;
+	texRange[0].OffsetInDescriptorsFromTableStart = D3D12_APPEND_ALIGNED_ELEMENT;
+	texRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 
-	std::array<D3D12_ROOT_PARAMETER, 3> rootPrams{};
-	rootPrams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootPrams[0].Descriptor.ShaderRegister = 0;
+	std::array<D3D12_DESCRIPTOR_RANGE, 1> cbvRange = {};
+	cbvRange[0].NumDescriptors = 2;
+	cbvRange[0].BaseShaderRegister = 0;
+	cbvRange[0].OffsetInDescriptorsFromTableStart = D3D12_APPEND_ALIGNED_ELEMENT;
+	cbvRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+
+	std::array<D3D12_ROOT_PARAMETER, 2> rootPrams{};
+	rootPrams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootPrams[0].DescriptorTable.NumDescriptorRanges = UINT(texRange.size());
+	rootPrams[0].DescriptorTable.pDescriptorRanges = texRange.data();
 	rootPrams[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootPrams[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootPrams[1].Descriptor.ShaderRegister = 1;
+
+	rootPrams[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootPrams[1].DescriptorTable.NumDescriptorRanges = UINT(cbvRange.size());
+	rootPrams[1].DescriptorTable.pDescriptorRanges = cbvRange.data();
 	rootPrams[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootPrams[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootPrams[2].DescriptorTable.NumDescriptorRanges = 1;
-	rootPrams[2].DescriptorTable.pDescriptorRanges = &range;
-	rootPrams[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
 
 	PipelineManager::CreateRootSgnature(rootPrams.data(), rootPrams.size(), true);
 	PipelineManager::SetShader(shader);
 	PipelineManager::SetVertexInput("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT);
 	PipelineManager::SetVertexInput("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT);
-	//PipelineManager::IsDepth(false);
 
-	for (int32_t i = Pipeline::Blend::None; i < Pipeline::Blend::BlendTypeNum; i++) {
-		PipelineManager::SetState(Pipeline::Blend(i), Pipeline::SolidState::Solid);
-		graphicsPipelineState[i] = PipelineManager::Create();
+	for (int32_t i = Pipeline::Blend::None; i < graphicsPipelineState.size(); i++) {
+		if (i < Pipeline::Blend::BlendTypeNum) {
+			PipelineManager::SetState(Pipeline::Blend(i), Pipeline::SolidState::Solid);
+			graphicsPipelineState[i] = PipelineManager::Create();
+		}
+		else {
+			PipelineManager::IsDepth(false);
+			PipelineManager::SetState(Pipeline::Blend(i - Pipeline::Blend::BlendTypeNum), Pipeline::SolidState::Solid);
+			graphicsPipelineState[i] = PipelineManager::Create();
+		}
 	}
 
 	PipelineManager::StateReset();
@@ -235,7 +267,7 @@ void Texture2D::Update() {
 
 	if (tex && isLoad) {
 		if (isSameTexSize) {
-			scale = tex->getSize();
+			scale = tex->getSize() * texScalar;
 		}
 		else if(isSameTexSize.OnExit()) {
 			scale.x /= tex->getSize().x;
@@ -267,7 +299,8 @@ void Texture2D::Update() {
 
 void Texture2D::Draw(
 	const Mat4x4& viewProjection,
-	Pipeline::Blend blend
+	Pipeline::Blend blend,
+	bool isDepth
 ) {
 	if (tex && isLoad) {
 		const Vector2& uv0 = { uvPibot.x, uvPibot.y + uvSize.y }; const Vector2& uv1 = uvSize + uvPibot;
@@ -289,24 +322,31 @@ void Texture2D::Draw(
 
 		auto commandlist = Engine::GetCommandList();
 
+
 		// 各種描画コマンドを積む
-		graphicsPipelineState[blend]->Use();
-		commandlist->SetGraphicsRootConstantBufferView(0, wvpMat.GetGPUVtlAdrs());
-		commandlist->SetGraphicsRootConstantBufferView(1, colorBuf.GetGPUVtlAdrs());
-		tex->Use(2);
+		if (isDepth) {
+			graphicsPipelineState[blend]->Use();
+		}
+		else {
+			graphicsPipelineState[blend + Pipeline::Blend::BlendTypeNum]->Use();
+		}
+		
+		tex->Use(0);
+		commandlist->SetGraphicsRootDescriptorTable(1, wvpMat.GetViewHandle());
 		commandlist->IASetVertexBuffers(0, 1, &vertexView);
 		commandlist->IASetIndexBuffer(&indexView);
 		commandlist->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 }
 
-void Texture2D::Debug(const std::string& guiName) {
+void Texture2D::Debug([[maybe_unused]]const std::string& guiName) {
 #ifdef _DEBUG
-
-
 	*colorBuf = UintToVector4(color);
 	ImGui::Begin(guiName.c_str());
 	ImGui::Checkbox("is same scale and Texture", isSameTexSize.Data());
+	if (isSameTexSize) {
+		ImGui::DragFloat("tex scalar", &texScalar, 0.01f);
+	}
 	ImGui::DragFloat2("scale", &scale.x, 1.0f);
 	ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
 	ImGui::DragFloat3("pos", &pos.x, 1.0f);
@@ -317,7 +357,7 @@ void Texture2D::Debug(const std::string& guiName) {
 
 	if (ImGui::TreeNode("tex load")) {
 		if (isLoad) {
-		auto texures = UtilsLib::GetFilePahtFormDir("./Resources/", ".png");
+		auto texures = UtilsLib::GetFilePathFormDir("./Resources/", ".png");
 
 			for (auto& i : texures) {
 				if (ImGui::Button(i.string().c_str())) {
@@ -334,7 +374,7 @@ void Texture2D::Debug(const std::string& guiName) {
 #endif // _DEBUG
 }
 
-bool Texture2D::Colision(const Vector2& pos2D) const {
+bool Texture2D::Collision(const Vector2& pos2D) const {
 	Vector2 max;
 	Vector2 min;
 	max.x = std::max_element(worldPos.begin(), worldPos.end(),
@@ -363,7 +403,7 @@ bool Texture2D::Colision(const Vector2& pos2D) const {
 	return false;
 }
 
-bool Texture2D::Colision(const Texture2D& tex2D) const {
+bool Texture2D::Collision(const Texture2D& tex2D) const {
 	Vector3 max;
 	Vector3 min;
 	max.x = std::max_element(worldPos.begin(), worldPos.end(),
@@ -391,16 +431,46 @@ bool Texture2D::Colision(const Texture2D& tex2D) const {
 			return left.z < right.z;
 		})->z;
 
+	// 追加変更。by Korone
+	Vector3 max2;
+	Vector3 min2;
+	max2.x = std::max_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.x < right.x;
+		})->x;
+	max2.y = std::max_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.y < right.y;
+		})->y;
+	max2.z = std::max_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.z < right.z;
+		})->z;
+	min2.x = std::min_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.x < right.x;
+		})->x;
+	min2.y = std::min_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.y < right.y;
+		})->y;
+	min2.z = std::min_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.z < right.z;
+		})->z;
 
-	for (auto& i : tex2D.worldPos) {
-		if (min.x < i.x && i.x < max.x) {
-			if (min.y < i.y && i.y < max.y) {
-				if (min.z < i.z && i.z < max.z) {
-					return true;
-				}
+	if (min.x <= max2.x && max.x >= min2.x &&
+		min.y <= max2.y && max.y >= min2.y) {
+		return true;
+	}
+
+	/*for (auto& i : tex2D.worldPos) {
+		if (min.x <= i.x && i.x <= max.x) {
+			if (min.y <= i.y && i.y <= max.y) {
+				return true;
 			}
 		}
-	}
+	}*/
 
 	return false;
 }

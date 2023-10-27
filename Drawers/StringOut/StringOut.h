@@ -21,7 +21,9 @@ public:
 public:
 	void Draw();
 
+#ifdef _DEBUG
 	void Debug(const std::string& debugName);
+#endif // _DEBUG
 
 
 private:

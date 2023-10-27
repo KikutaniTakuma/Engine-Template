@@ -2,10 +2,25 @@
 #include "Engine/FrameInfo/FrameInfo.h"
 #include "externals/imgui/imgui.h"
 
+#include "Utils/Math/Vector3.h"
+#include "Utils/Math/Vector2.h"
 #include <cmath>
 #include <numbers>
 
+Easeing::Easeing():
+#ifdef _DEBUG
+	easeType_(0),easeTime_(1.0f),
+#endif // _DEBUG
+	ease_([](float num) {return num; }),
+	isActive_(false),
+	isLoop_(false),
+	t_(0.0f),
+	spdT_(1.0f)
+{}
+
 void Easeing::Update() {
+	isActive_.Update();
+	isLoop_.Update();
 	if (isActive_) {
 		t_ += spdT_ * FrameInfo::GetInstance()->GetDelta();
 		t_ = std::clamp(t_, 0.0f, 1.0f);
@@ -45,27 +60,30 @@ void Easeing::Stop() {
 	isLoop_ = false;
 
 	t_ = 0.0f;
-	spdT_ = 0.0f;
+	spdT_ = 1.0f;
 }
 
 void Easeing::Debug([[maybe_unused]]const std::string& debugName) {
 #ifdef _DEBUG
-	easeTime_ = 1.0f / spdT_;
 	ImGui::Begin(debugName.c_str());
 	ImGui::SliderInt("easeType", &easeType_, 0, 30);
-	ImGui::DragFloat("easeSpd(seconds)", &easeTime_, 0.01f, 0.0f);
-	ImGui::Checkbox("isLoop", &isLoop_);
+	ImGui::DragFloat("easeSpd(seconds)", &easeTime_, 0.01f, 0.0f, std::numeric_limits<float>::max());
+	ImGui::Checkbox("isLoop", isLoop_.Data());
 	if (ImGui::Button("Start")) {
 		isActive_ = true;
 		t_ = 0.0f;
 
-	    spdT_ = 1.0f / easeTime_;
+		if (easeTime_ == 0.0f) {
+			spdT_ = 1.0f;
+		}
+		else {
+			spdT_ = 1.0f / easeTime_;
+		}
 
 		ease_ = GetFunction(easeType_);
 	}
 	else if (ImGui::Button("Stop")) {
-		isActive_ = false;
-		t_ = 0.0f;
+		Stop();
 	}
 	ImGui::End();
 
@@ -74,11 +92,16 @@ void Easeing::Debug([[maybe_unused]]const std::string& debugName) {
 
 void Easeing::DebugTreeNode([[maybe_unused]] const std::string& debugName) {
 #ifdef _DEBUG
-	easeTime_ = 1.0f / spdT_;
+	if (spdT_) {
+		easeTime_ = 1.0f / spdT_;
+	}
+	else {
+		easeTime_ = 1.0f;
+	}
 	if (ImGui::TreeNode(debugName.c_str())) {
 		ImGui::SliderInt("easeType", &easeType_, 0, 30);
 		ImGui::DragFloat("easeSpd(seconds)", &easeTime_, 0.01f, 0.0f);
-		ImGui::Checkbox("isLoop", &isLoop_);
+		ImGui::Checkbox("isLoop", isLoop_.Data());
 
 		ease_ = GetFunction(easeType_);
 

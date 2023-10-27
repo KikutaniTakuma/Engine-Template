@@ -13,6 +13,10 @@
 #include <algorithm>
 
 FrameInfo::FrameInfo() :
+#ifdef _DEBUG
+	isDebugStopGame_(false),
+	isOneFrameActive_(false),
+#endif // _DEBUG
 	frameStartTime_(),
 	deltaTime_(0.0),
 	fps_(0.0),
@@ -21,7 +25,8 @@ FrameInfo::FrameInfo() :
 	frameCount_(0),
 	fpsLimit_(0.0),
 	minTime(),
-	minCheckTime()
+	minCheckTime(),
+	gameSpeedSccale_(1.0)
 {
 	//画面情報構造体
 	DEVMODE mode{};
@@ -98,6 +103,7 @@ void FrameInfo::End() {
 	deltaTime_ = static_cast<double>(frameTime.count()) * unitAdjustment;
 	fps_ = 1.0f / deltaTime_;
 
+
 	if (std::chrono::duration_cast<std::chrono::seconds>(end - gameStartTime_) > std::chrono::seconds(1)) {
 		maxFps_ = std::max(fps_, maxFps_);
 		minFps_ = std::min(fps_, minFps_);
@@ -109,7 +115,7 @@ void FrameInfo::End() {
 
 void FrameInfo::SetFpsLimit(double fpsLimit) {
 	fpsLimit_ = std::clamp(fpsLimit, 10.0, maxFpsLimit_);
-
+	           
 	minTime = std::chrono::microseconds(uint64_t(1000000.0 / fpsLimit_));
 	minCheckTime = std::chrono::microseconds(uint64_t(1000000.0 / fpsLimit_) - 1282LLU);
 }
@@ -120,12 +126,26 @@ void FrameInfo::Debug() {
 	fpsLimit = static_cast<float>(fpsLimit_);
 
 	ImGui::Begin("fps");
-	ImGui::Text("Frame rate: %3.0lf fps", GetFps());
-	ImGui::Text("Delta Time: %.4lf", GetDelta());
-	ImGui::Text("Frame Count: %llu", GetFrameCount());
+	ImGui::Text("Frame rate: %3.0lf fps", fps_);
+	ImGui::Text("Delta Time: %.4lf", deltaTime_);
+	ImGui::Text("Frame Count: %llu", frameCount_);
 	ImGui::DragFloat("fps limit", &fpsLimit, 1.0f, 10.0f, 165.0f);
 	fpsLimit_ = static_cast<double>(fpsLimit);
 	SetFpsLimit(fpsLimit_);
+	if (ImGui::TreeNode("DEBUG")) {
+		ImGui::Checkbox("is Debug Stop", &isDebugStopGame_);
+		if (isDebugStopGame_) {
+			if (ImGui::Button("DEBUG frame next")) {
+				isOneFrameActive_ = true;
+			}
+		}
+		ImGui::TreePop();
+	}
 	ImGui::End();
 #endif // _DEBUG
+}
+
+void FrameInfo::SetGameSpeedScale(float gameSpeedSccale) {
+	gameSpeedSccale = std::clamp(gameSpeedSccale, 0.0f, 10.0f);
+	gameSpeedSccale_ = static_cast<double>(gameSpeedSccale);
 }

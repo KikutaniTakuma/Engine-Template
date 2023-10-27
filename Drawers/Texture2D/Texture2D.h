@@ -26,7 +26,11 @@ public:
 	};
 
 public:
+	/// <summary>
+	/// デフォルトのコンストラクタではwhite2x2.pngを読み込む
+	/// </summary>
 	Texture2D();
+	Texture2D(const std::string& fileName);
 	Texture2D(const Texture2D&);
 	Texture2D(Texture2D&&) noexcept;
 	~Texture2D();
@@ -54,7 +58,7 @@ private:
 /// 静的メンバ変数
 /// </summary>
 private:
-	static std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum)> graphicsPipelineState;
+	static std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum) * 2> graphicsPipelineState;
 	static Shader shader;
 
 	static D3D12_INDEX_BUFFER_VIEW indexView;
@@ -70,13 +74,14 @@ public:
 
 	void Draw(
 		const Mat4x4& viewProjection,
-		Pipeline::Blend blend = Pipeline::Blend::Normal
+		Pipeline::Blend blend = Pipeline::Blend::Normal,
+		bool isDepth = true
 	);
 
 	void Debug(const std::string& guiName);
 
-	bool Colision(const Vector2& pos2D) const;
-	bool Colision(const Texture2D& tex2D) const;
+	bool Collision(const Vector2& pos2D) const;
+	bool Collision(const Texture2D& tex2D) const;
 
 	Vector2 GetTexSize() const {
 		if (tex) {
@@ -133,6 +138,9 @@ public:
 	uint32_t color;
 
 	UtilsLib::Flg isSameTexSize;
+
+	// テクスチャと同じスケールにしたときのスケール倍率
+	float texScalar;
 
 private:
 	D3D12_VERTEX_BUFFER_VIEW vertexView;
