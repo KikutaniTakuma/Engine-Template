@@ -19,7 +19,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	sceneManager->Initialize(scene);
 
 	// メインループ
-	sceneManager->Game();
+	sceneManager->Game(BaseScene::ID::Game);
 
 	sceneManager->Finalize();
 

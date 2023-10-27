@@ -99,7 +99,7 @@ void SceneManager::Draw() {
 	fade_->Draw(fadeCamera_.GetViewOthographics());
 }
 
-void SceneManager::Game() {
+void SceneManager::Game(std::optional<BaseScene::ID> finishID) {
 	/// 
 	/// メインループ
 	/// 
@@ -134,7 +134,7 @@ void SceneManager::Game() {
 		Engine::FrameEnd();
 
 		// Escapeが押されたら終了
-		if (scene_->GetID() == BaseScene::ID::Title) {
+		if (scene_->GetID() == finishID) {
 			if (input_->GetKey()->Pushed(DIK_ESCAPE) || input_->GetGamepad()->Pushed(Gamepad::Button::START)) {
 				break;
 			}

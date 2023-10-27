@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <bitset>
+#include <optional>
 #include "Utils/Camera/Camera.h"
 #include "Fade/Fade.h"
 #include "MeshManager/MeshManager.h"
@@ -87,7 +88,7 @@ public:
 
 	void Draw();
 
-	void Game();
+	void Game(std::optional<BaseScene::ID> finishID = BaseScene::ID::Title);
 
 public:
 	inline bool GetIsPad() const {
