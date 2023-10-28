@@ -41,42 +41,11 @@ public:
 		}
 	}
 
-	inline ConstBuffer(const ConstBuffer& right) noexcept :
-		bufferResource(),
-		cbvDesc(),
-		data(nullptr),
-		isWright(true),
-		roootParamater(),
-		shaderVisibility(D3D12_SHADER_VISIBILITY_ALL),
-		shaderRegister(0)
-	{
-		*this = right;
-	}
+	inline ConstBuffer(const ConstBuffer&) noexcept = delete;
+	inline ConstBuffer(ConstBuffer&&) noexcept = delete;
 
-	inline ConstBuffer<T>& operator=(const ConstBuffer& right) {
-
-		if (bufferResource) {
-			bufferResource->Release();
-			bufferResource.Reset();
-		}
-		bufferResource = Direct3D::GetInstance()->CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
-		cbvDesc.BufferLocation = bufferResource->GetGPUVirtualAddress();
-		cbvDesc.SizeInBytes = UINT(bufferResource->GetDesc().Width);
-
-		if (isWright) {
-			bufferResource->Map(0, nullptr, reinterpret_cast<void**>(&data));
-		}
-		roootParamater = right.roootParamater;
-
-		*data = *right.data;
-
-		if (!isCreateView) {
-			assert(!"created view");
-			ErrorCheck::GetInstance()->ErrorTextBox("operator= Created view fail", "Const Buffer");
-		}
-
-		return *this;
-	}
+	inline ConstBuffer<T>& operator=(const ConstBuffer&) = delete;
+	inline ConstBuffer<T>& operator=(ConstBuffer&&) = delete;
 
 public:
 	void OnWright() noexcept {
