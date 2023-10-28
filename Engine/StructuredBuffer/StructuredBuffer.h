@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Engine.h"
+#include "Engine/EngineParts/Direct3D/Direct3D.h"
 #include <cassert>
 #include <wrl.h>
 #include "Engine/ErrorCheck/ErrorCheck.h"
@@ -134,7 +135,8 @@ public:
 	}
 
 	void CrerateView(D3D12_CPU_DESCRIPTOR_HANDLE descHandle, D3D12_GPU_DESCRIPTOR_HANDLE descHandleGPU, UINT dsecIndex) noexcept {
-		Engine::GetDevice()->CreateShaderResourceView(bufferResource.Get(), &srvDesc, descHandle);
+		static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+		device->CreateShaderResourceView(bufferResource.Get(), &srvDesc, descHandle);
 		isCreateView = true;
 		descriptorHandle_ = descHandleGPU;
 		dsecIndex_ = dsecIndex;

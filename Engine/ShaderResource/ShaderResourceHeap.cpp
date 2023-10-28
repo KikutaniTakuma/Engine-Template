@@ -2,6 +2,7 @@
 #include "Utils/ConvertString/ConvertString.h"
 #include "Engine/WinApp/WinApp.h"
 #include "Engine/Engine.h"
+#include "Engine/EngineParts/Direct3D/Direct3D.h"
 #include <cassert>
 #include <cmath>
 #include <algorithm>
@@ -40,14 +41,16 @@ ShaderResourceHeap::ShaderResourceHeap(UINT numDescriptor) :
 {
 	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, numDescriptor, true);
 
+	UINT incrementSRVCBVUAVHeap = Direct3D::GetInstance()->GetIncrementSRVCBVUAVHeap();
+
 	heapHandles.reserve(heapSize);
 	heapHandles.push_back({ SRVHeap->GetCPUDescriptorHandleForHeapStart(),
 							SRVHeap->GetGPUDescriptorHandleForHeapStart() });
 	auto heapHandleFirstItr = heapHandles.begin();
 	for (uint32_t i = 1; i < heapSize; i++) {
 		auto hadleTmp = *heapHandleFirstItr;
-		hadleTmp.first.ptr += Engine::GetIncrementSRVCBVUAVHeap() * i;
-		hadleTmp.second.ptr += Engine::GetIncrementSRVCBVUAVHeap() * i;
+		hadleTmp.first.ptr += incrementSRVCBVUAVHeap * i;
+		hadleTmp.second.ptr += incrementSRVCBVUAVHeap * i;
 		heapHandles.push_back(hadleTmp);
 	}
 	bookingHandle_.clear();

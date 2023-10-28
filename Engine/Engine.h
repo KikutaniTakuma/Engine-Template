@@ -91,10 +91,6 @@ public:
 		return engine->commandQueue.Get();
 	}
 
-	static inline ID3D12Device* GetDevice() {
-		return engine->device.Get();
-	}
-
 	static inline ID3D12DescriptorHeap* GetDSVHeap() {
 		return engine->dsvHeap.Get();
 	}
@@ -169,34 +165,10 @@ private:
 	/// Dirct3D
 	/// 
 private:
-	bool InitializeDirect3D();
+	void InitializeDirect3D();
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12Device> device;
-	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory;
-	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter;
-
-	static UINT incrementSRVCBVUAVHeap;
-	static UINT incrementRTVHeap;
-	static UINT incrementDSVHeap;
-	static UINT incrementSAMPLER;
-public:
-	static UINT GetIncrementSRVCBVUAVHeap() {
-		return incrementSRVCBVUAVHeap;
-	}
-
-	static UINT GetIncrementRTVHeap() {
-		return incrementRTVHeap;
-	}
-
-	static UINT GetIncrementDSVHeap() {
-		return incrementDSVHeap;
-	}
-
-	static UINT GetIncrementSAMPLER() {
-		return incrementSAMPLER;
-	}
-
+	class Direct3D* direct3D_ = nullptr;
 
 
 

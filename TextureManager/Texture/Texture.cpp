@@ -1,5 +1,6 @@
 #include "Utils/ConvertString/ConvertString.h"
 #include "Engine/Engine.h"
+#include "Engine/EngineParts/Direct3D/Direct3D.h"
 #include <cassert>
 #include <iostream>
 #include <filesystem>
@@ -135,6 +136,8 @@ DirectX::ScratchImage Texture::LoadTexture(const std::string& filePath) {
 }
 
 ID3D12Resource* Texture::CreateTextureResource(const DirectX::TexMetadata& metaData) {
+	ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+
 	if (metaData.width == 0 || metaData.height == 0) {
 		return nullptr;
 	}
@@ -155,7 +158,7 @@ ID3D12Resource* Texture::CreateTextureResource(const DirectX::TexMetadata& metaD
 
 	// Resouceの生成
 	ID3D12Resource* resource = nullptr;
-	HRESULT hr = Engine::GetDevice()->CreateCommittedResource(
+	HRESULT hr = device->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
 		&resourceDesc,
@@ -172,8 +175,10 @@ ID3D12Resource* Texture::CreateTextureResource(const DirectX::TexMetadata& metaD
 
 [[nodiscard]]
 ID3D12Resource* Texture::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages) {
+	static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+	
 	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
-	DirectX::PrepareUpload(Engine::GetDevice(), mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
+	DirectX::PrepareUpload(device, mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
 	uint64_t intermediateSize = GetRequiredIntermediateSize(texture, 0, UINT(subresources.size()));
 	ID3D12Resource* resource = Engine::CreateBufferResuorce(intermediateSize);
 	UpdateSubresources(Engine::GetCommandList(), texture, resource, 0, 0, UINT(subresources.size()), subresources.data());
@@ -190,8 +195,10 @@ ID3D12Resource* Texture::UploadTextureData(ID3D12Resource* texture, const Direct
 
 [[nodiscard]]
 ID3D12Resource* Texture::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, ID3D12GraphicsCommandList* commandList) {
+	static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+	
 	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
-	DirectX::PrepareUpload(Engine::GetDevice(), mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
+	DirectX::PrepareUpload(device, mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
 	uint64_t intermediateSize = GetRequiredIntermediateSize(texture, 0, UINT(subresources.size()));
 	ID3D12Resource* resource = Engine::CreateBufferResuorce(intermediateSize);
 	UpdateSubresources(commandList, texture, resource, 0, 0, UINT(subresources.size()), subresources.data());
@@ -220,7 +227,8 @@ ID3D12Resource* Texture::UploadTextureData(ID3D12Resource* texture, const Direct
 
 
 void Texture::CreateSRVView(D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle) {
-	Engine::GetDevice()->CreateShaderResourceView(textureResouce.Get(), &srvDesc, descHeapHandle);
+	static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+	device->CreateShaderResourceView(textureResouce.Get(), &srvDesc, descHeapHandle);
 }
 
 

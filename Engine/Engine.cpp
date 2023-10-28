@@ -2,15 +2,19 @@
 #include <cassert>
 #include <format>
 #include <filesystem>
+
 #include "WinApp/WinApp.h"
+#include "EngineParts/Direct3D/Direct3D.h"
+
 #include "ShaderManager/ShaderManager.h"
-#include "Utils/ConvertString/ConvertString.h"
 #include "TextureManager/TextureManager.h"
-#include "Input/Input.h"
 #include "AudioManager/AudioManager.h"
 #include "PipelineManager/PipelineManager.h"
+
+#include "Input/Input.h"
 #include "ErrorCheck/ErrorCheck.h"
 #include "FrameInfo/FrameInfo.h"
+#include "Utils/ConvertString/ConvertString.h"
 #include "Utils/Log/Log.h"
 
 #include "Drawers/Texture2D/Texture2D.h"
@@ -116,10 +120,7 @@ bool Engine::Initialize(const std::string& windowName, Resolution resolution) {
 #endif
 
 	// Direct3D生成
-	if (!engine->InitializeDirect3D()) {
-		ErrorCheck::GetInstance()->ErrorTextBox("Initialize() : InitializeDirect3D() Failed", "Engine");
-		return false;
-	}
+	engine->InitializeDirect3D();
 
 	// ディスクリプタヒープ初期化
 	ShaderResourceHeap::Initialize(524288);
@@ -181,103 +182,9 @@ void Engine::Finalize() {
 /// Direct3D初期化
 /// 
 
-UINT Engine::incrementSRVCBVUAVHeap = 0u;
-UINT Engine::incrementRTVHeap = 0u;
-UINT Engine::incrementDSVHeap = 0u;
-UINT Engine::incrementSAMPLER = 0u;
-bool Engine::InitializeDirect3D() {
-	// IDXGIFactory生成
-	auto hr = CreateDXGIFactory(IID_PPV_ARGS(dxgiFactory.GetAddressOf()));
-	assert(SUCCEEDED(hr));
-	if (!SUCCEEDED(hr)) {
-		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect3D() : CreateDXGIFactory() Failed", "Engine");
-		return false;
-	}
-
-	// 使用するグラボの設定
-	useAdapter = nullptr;
-	for (UINT i = 0;
-		dxgiFactory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(useAdapter.GetAddressOf())) != DXGI_ERROR_NOT_FOUND;
-		++i) {
-
-		DXGI_ADAPTER_DESC3 adapterDesc{};
-		hr = useAdapter->GetDesc3(&adapterDesc);
-		if (hr != S_OK) {
-			ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect3D() : GetDesc3() Failed", "Engine");
-			return false;
-		}
-
-		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
-			Log::AddLog(ConvertString(std::format(L"Use Adapter:{}\n", adapterDesc.Description)));
-			break;
-		}
-		useAdapter.Reset();
-	}
-	if (useAdapter == nullptr) {
-		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect3D() : GPU not Found", "Engine");
-		return false;
-	}
-
-
-	// Deviceの初期化
-	// 使用しているデバイスによってD3D_FEATURE_LEVELの対応バージョンが違うので成功するまでバージョンを変えて繰り返す
-	D3D_FEATURE_LEVEL featureLevels[] = {
-		D3D_FEATURE_LEVEL_12_2,
-		D3D_FEATURE_LEVEL_12_1,
-		D3D_FEATURE_LEVEL_12_0,
-	};
-	const char* featureLevelString[] = {
-		"12.2", "12.1", "12.0"
-	};
-
-	for (size_t i = 0; i < _countof(featureLevels); ++i) {
-		hr = D3D12CreateDevice(useAdapter.Get(), featureLevels[i], IID_PPV_ARGS(device.GetAddressOf()));
-
-		if (SUCCEEDED(hr)) {
-			Log::AddLog(std::format("FeatureLevel:{}\n", featureLevelString[i]));
-			break;
-		}
-	}
-
-	if (device == nullptr) {
-		return false;
-	}
-	Log::AddLog("Complete create D3D12Device!!!\n");
-
-#ifdef _DEBUG
-	ID3D12InfoQueue* infoQueue = nullptr;
-	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
-		// やばいエラーの予期に止まる
-		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
-		// エラーの時に止まる
-		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
-		// 警告時に止まる
-		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
-
-		// 抑制するメッセージのID
-		D3D12_MESSAGE_ID denyIds[] = {
-			D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE
-		};
-		// 抑制するレベル
-		D3D12_MESSAGE_SEVERITY severities[] = { D3D12_MESSAGE_SEVERITY_INFO };
-		D3D12_INFO_QUEUE_FILTER filter{};
-		filter.DenyList.NumIDs = _countof(denyIds);
-		filter.DenyList.pIDList = denyIds;
-		filter.DenyList.NumSeverities = _countof(severities);
-		filter.DenyList.pSeverityList = severities;
-		// 指定したメッセージの表示を抑制する
-		infoQueue->PushStorageFilter(&filter);
-
-		// 解放
-		infoQueue->Release();
-	}
-#endif
-
-	incrementSRVCBVUAVHeap = engine->device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	incrementRTVHeap = engine->device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	incrementDSVHeap = engine->device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-	incrementSAMPLER = engine->device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
-	return true;
+void Engine::InitializeDirect3D() {
+	Direct3D::Initialize();
+	direct3D_ = Direct3D::GetInstance();
 }
 
 
@@ -290,13 +197,14 @@ bool Engine::InitializeDirect3D() {
 ID3D12DescriptorHeap* Engine::CreateDescriptorHeap(
 	D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderrVisible
 ) {
+	static ID3D12Device* device = engine->direct3D_->GetDevice();
 	ID3D12DescriptorHeap* descriptorHeap = nullptr;
 	static D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc{};
 	descriptorHeapDesc = {};
 	descriptorHeapDesc.Type = heapType;
 	descriptorHeapDesc.NumDescriptors = numDescriptors;
 	descriptorHeapDesc.Flags = shaderrVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	if (SUCCEEDED(engine->device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap)))) {
+	if (SUCCEEDED(device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap)))) {
 		return descriptorHeap;
 	}
 	assert(!"Failed");
@@ -306,6 +214,10 @@ ID3D12DescriptorHeap* Engine::CreateDescriptorHeap(
 }
 
 bool Engine::InitializeDirect12() {
+	static ID3D12Device* device = engine->direct3D_->GetDevice();
+	static IDXGIFactory7* dxgiFactory = engine->direct3D_->GetDxgiFactory();
+	static UINT incrementRTVHeap = engine->direct3D_->GetIncrementRTVHeap();
+
 	// コマンドキューを作成
 	commandQueue = nullptr;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
@@ -398,7 +310,7 @@ bool Engine::InitializeDirect12() {
 	ImGui::StyleColorsDark();
 	ImGui_ImplWin32_Init(WinApp::GetInstance()->GetHwnd());
 	ImGui_ImplDX12_Init(
-		device.Get(),
+		device,
 		swapChainDesc.BufferCount,
 		rtvDesc.Format,
 		srvDescriptorHeap->Get(),
@@ -437,13 +349,15 @@ bool Engine::InitializeDirect12() {
 /// 文字表示関係
 /// </summary>
 bool Engine::InitializeSprite() {
+	static ID3D12Device* device = engine->direct3D_->GetDevice();
 	// GraphicsMemory初期化
-	gmemory.reset(new DirectX::GraphicsMemory(device.Get()));
+	gmemory.reset(new DirectX::GraphicsMemory(device));
 
 	return static_cast<bool>(gmemory);
 }
 
 void Engine::LoadFont(const std::string& formatName) {
+	static ID3D12Device* device = engine->direct3D_->GetDevice();
 	if (!std::filesystem::exists(std::filesystem::path(formatName))) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Engine::LoadFont() Failed : This file is not exist -> " + formatName, "Engine");
 		return;
@@ -458,7 +372,7 @@ void Engine::LoadFont(const std::string& formatName) {
 		)
 	);
 
-	DirectX::ResourceUploadBatch resUploadBach(engine->device.Get());
+	DirectX::ResourceUploadBatch resUploadBach(device);
 	resUploadBach.Begin();
 	DirectX::RenderTargetState rtState(
 		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
@@ -469,7 +383,7 @@ void Engine::LoadFont(const std::string& formatName) {
 
 	// SpriteFontオブジェクトの初期化
 	engine->spriteBatch.insert(
-		std::make_pair(formatName, std::make_unique<DirectX::SpriteBatch>(engine->device.Get(), resUploadBach, pd)));
+		std::make_pair(formatName, std::make_unique<DirectX::SpriteBatch>(device, resUploadBach, pd)));
 	// ビューポート
 	D3D12_VIEWPORT viewport{};
 	// クライアント領域のサイズと一緒にして画面全体に表示
@@ -485,7 +399,7 @@ void Engine::LoadFont(const std::string& formatName) {
 		std::make_pair(
 			formatName,
 			std::make_unique<DirectX::SpriteFont>(
-				engine->device.Get(),
+				device,
 				resUploadBach,
 				ConvertString(formatName).c_str(),
 				engine->fontHeap[formatName]->GetCPUDescriptorHandleForHeapStart(),
@@ -523,7 +437,8 @@ void Engine::LoadFont(const std::string& formatName) {
 /// 
 
 ID3D12Resource* Engine::CreateBufferResuorce(size_t sizeInBytes) {
-	if (!engine->device) {
+	static ID3D12Device* device = engine->direct3D_->GetDevice();
+	if (!device) {
 		OutputDebugStringA("device is nullptr!!");
 		return nullptr;
 	}
@@ -549,7 +464,7 @@ ID3D12Resource* Engine::CreateBufferResuorce(size_t sizeInBytes) {
 	// 実際にリソースを作る
 	static ID3D12Resource* resuorce = nullptr;
 	resuorce = nullptr;
-	HRESULT hr = engine->device->CreateCommittedResource(&uploadHeapPropaerties, D3D12_HEAP_FLAG_NONE, &resouceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&resuorce));
+	HRESULT hr = device->CreateCommittedResource(&uploadHeapPropaerties, D3D12_HEAP_FLAG_NONE, &resouceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&resuorce));
 	if (!SUCCEEDED(hr)) {
 		OutputDebugStringA("CreateCommittedResource Function Failed!!");
 		ErrorCheck::GetInstance()->ErrorTextBox("CreateBufferResuorce() : CreateCommittedResource() Failed", "Engine");
@@ -560,6 +475,8 @@ ID3D12Resource* Engine::CreateBufferResuorce(size_t sizeInBytes) {
 }
 
 ID3D12Resource* Engine::CreateDepthStencilTextureResource(int32_t width, int32_t height) {
+	static ID3D12Device* device = engine->direct3D_->GetDevice();
+
 	static D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc = {};
 	resourceDesc.Width = width;
@@ -582,7 +499,7 @@ ID3D12Resource* Engine::CreateDepthStencilTextureResource(int32_t width, int32_t
 	static ID3D12Resource* resource = nullptr;
 	resource = nullptr;
 	if (!SUCCEEDED(
-		engine->device->CreateCommittedResource(
+		device->CreateCommittedResource(
 			&heapProperties,
 			D3D12_HEAP_FLAG_NONE,
 			&resourceDesc,
@@ -598,6 +515,8 @@ ID3D12Resource* Engine::CreateDepthStencilTextureResource(int32_t width, int32_t
 }
 
 bool Engine::InitializeDraw() {
+	static ID3D12Device* device = engine->direct3D_->GetDevice();
+
 	// DepthStencilTextureをウィンドウサイズで作成
 	depthStencilResource = CreateDepthStencilTextureResource(clientWidth, clientHeight);
 	assert(depthStencilResource);
@@ -868,4 +787,6 @@ Engine::~Engine() {
 	depthStencilResource->Release();
 	CloseHandle(fenceEvent);
 	rtvDescriptorHeap->Release();
+
+	Direct3D::Finalize();
 }

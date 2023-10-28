@@ -1,5 +1,6 @@
 #include "RenderTarget.h"
 #include "Engine/Engine.h"
+#include "Engine/EngineParts/Direct3D/Direct3D.h"
 #include "Utils/ConvertString/ConvertString.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include <cassert>
@@ -27,8 +28,10 @@ RenderTarget::RenderTarget():
 		clearValue.Color[i] = clsValue[i];
 	}
 
+	static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+
 	// 実際にリソースを作る
-	HRESULT hr = Engine::GetDevice()->
+	HRESULT hr = device->
 		CreateCommittedResource(
 			&heapPropaerties, 
 			D3D12_HEAP_FLAG_NONE, 
@@ -48,7 +51,7 @@ RenderTarget::RenderTarget():
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
-	Engine::GetDevice()->
+	device->
 		CreateRenderTargetView(
 			resource.Get(),
 			&rtvDesc,
@@ -87,8 +90,10 @@ RenderTarget::RenderTarget(uint32_t width_, uint32_t height_) :
 		clearValue.Color[i] = clsValue[i];
 	}
 
+	static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+
 	// 実際にリソースを作る
-	HRESULT hr = Engine::GetDevice()->
+	HRESULT hr = device->
 		CreateCommittedResource(
 			&heapPropaerties,
 			D3D12_HEAP_FLAG_NONE,
@@ -108,7 +113,7 @@ RenderTarget::RenderTarget(uint32_t width_, uint32_t height_) :
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
-	Engine::GetDevice()->
+	device->
 		CreateRenderTargetView(
 			resource.Get(),
 			&rtvDesc,
@@ -173,7 +178,9 @@ void RenderTarget::UseThisRenderTargetShaderResource() {
 }
 
 void RenderTarget::CreateView(D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle, D3D12_GPU_DESCRIPTOR_HANDLE descHeapHandleGPU, UINT descHeapHandleUINT) {
-	Engine::GetDevice()->CreateShaderResourceView(
+	static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+	
+	device->CreateShaderResourceView(
 		resource.Get(),
 		&srvDesc,
 		descHeapHandle

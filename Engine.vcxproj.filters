@@ -170,6 +170,9 @@
     <ClCompile Include="SceneManager\SubMenu\SubMenu.cpp">
       <Filter>SceneManager\SubMenu</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\EngineParts\Direct3D\Direct3D.cpp">
+      <Filter>Engine\EngineParts\Direct3D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -330,6 +333,12 @@
     </Filter>
     <Filter Include="SceneManager\SubMenu">
       <UniqueIdentifier>{06de54b1-47bd-4884-994f-f76486248bca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\EngineParts">
+      <UniqueIdentifier>{d48493c0-fbf6-4f90-a87e-20a9f228c0ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\EngineParts\Direct3D">
+      <UniqueIdentifier>{fc72a1ac-b158-4732-9c50-43f6c06d90e9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -509,6 +518,9 @@
     </ClInclude>
     <ClInclude Include="SceneManager\SubMenu\SubMenu.h">
       <Filter>SceneManager\SubMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\EngineParts\Direct3D\Direct3D.h">
+      <Filter>Engine\EngineParts\Direct3D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

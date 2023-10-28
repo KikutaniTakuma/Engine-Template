@@ -3,6 +3,7 @@
 #include <algorithm>
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Engine/RootSignature/RootSignature.h"
+#include "Engine/EngineParts/Direct3D/Direct3D.h"
 #include "Engine/Engine.h"
 
 Pipeline::Pipeline():
@@ -198,7 +199,8 @@ void Pipeline::Create(
 		graphicsPipelineStateDesc.BlendState.RenderTarget[i].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 	}
 
-	HRESULT hr = Engine::GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(graphicsPipelineState.GetAddressOf()));
+	static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+	HRESULT hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(graphicsPipelineState.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Create() : CreateGraphicsPipelineState", "Pipeline");
@@ -207,6 +209,8 @@ void Pipeline::Create(
 }
 
 void Pipeline::Use() const {
+	static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+
 	assert(graphicsPipelineState);
 	if (!graphicsPipelineState) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Use() : GraphicsPipelineState is nullptr", "Pipeline");
