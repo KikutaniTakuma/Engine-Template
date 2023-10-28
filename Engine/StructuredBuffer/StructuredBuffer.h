@@ -1,6 +1,6 @@
 #pragma once
-#include "Engine/Engine.h"
 #include "Engine/EngineParts/Direct3D/Direct3D.h"
+#include "Engine/EngineParts/Direct12/Direct12.h"
 #include <cassert>
 #include <wrl.h>
 #include "Engine/ErrorCheck/ErrorCheck.h"
@@ -25,7 +25,7 @@ public:
 		roootParamater(),
 		instanceNum(instanceNum)
 	{
-		bufferResource = Engine::CreateBufferResuorce(sizeof(T) * instanceNum);
+		bufferResource = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(T) * instanceNum);
 		srvDesc = {};
 		srvDesc.Format = DXGI_FORMAT_UNKNOWN;
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -107,7 +107,7 @@ public:
 
 		instanceNum = indexNum;
 		
-		bufferResource = Engine::CreateBufferResuorce(sizeof(T) * instanceNum);
+		bufferResource = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(T) * instanceNum);
 		srvDesc = {};
 		srvDesc.Format = DXGI_FORMAT_UNKNOWN;
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;

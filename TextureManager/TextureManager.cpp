@@ -303,7 +303,7 @@ void TextureManager::ResetCommandList() {
 }
 
 void TextureManager::Use(int32_t texIndex, UINT rootParam) {
-	auto* const mainComlist = Engine::GetCommandList();
+	auto* const mainComlist = Direct12::GetInstance()->GetCommandList();
 	mainComlist->SetGraphicsRootDescriptorTable(
 		rootParam, srvHeap->GetSrvGpuHeapHandle(texIndex));
 }

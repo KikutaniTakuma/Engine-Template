@@ -5,7 +5,7 @@
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// ライブラリ初期化
-	if (!Engine::Initialize("DirectXGame", Engine::Resolution::HD)) {
+	if (!Engine::Initialize("DirectXGame", Vector2{ 1280.0f, 720.0f })) {
 		ErrorCheck::GetInstance()->ErrorTextBox(
 			"Engine::Initialize() Failed",
 			"WinMain"

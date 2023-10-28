@@ -3,14 +3,9 @@
 #include <vector>
 #include <list>
 #include <deque>
-#include <wrl.h>
-#include <d3d12.h>
-#pragma comment(lib, "d3d12.lib")
-#include "Engine/ConstBuffer/ConstBuffer.h"
 #include "Engine/StructuredBuffer/StructuredBuffer.h"
 #include "TextureManager/Texture/Texture.h"
 #include "Engine/RenderTarget/RenderTarget.h"
-#include "Engine/ErrorCheck/ErrorCheck.h"
 
 class ShaderResourceHeap {
 private:

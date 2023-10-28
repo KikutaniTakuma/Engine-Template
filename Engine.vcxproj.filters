@@ -173,6 +173,9 @@
     <ClCompile Include="Engine\EngineParts\Direct3D\Direct3D.cpp">
       <Filter>Engine\EngineParts\Direct3D</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\EngineParts\Direct12\Direct12.cpp">
+      <Filter>Engine\EngineParts\Direct12</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -339,6 +342,9 @@
     </Filter>
     <Filter Include="Engine\EngineParts\Direct3D">
       <UniqueIdentifier>{fc72a1ac-b158-4732-9c50-43f6c06d90e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\EngineParts\Direct12">
+      <UniqueIdentifier>{bc6d847e-8d29-46e3-885f-56b456010f29}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -521,6 +527,9 @@
     </ClInclude>
     <ClInclude Include="Engine\EngineParts\Direct3D\Direct3D.h">
       <Filter>Engine\EngineParts\Direct3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\EngineParts\Direct12\Direct12.h">
+      <Filter>Engine\EngineParts\Direct12</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

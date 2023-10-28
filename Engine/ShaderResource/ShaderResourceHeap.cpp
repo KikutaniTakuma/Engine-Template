@@ -1,8 +1,8 @@
 #include "ShaderResourceHeap.h"
 #include "Utils/ConvertString/ConvertString.h"
 #include "Engine/WinApp/WinApp.h"
-#include "Engine/Engine.h"
 #include "Engine/EngineParts/Direct3D/Direct3D.h"
+#include "Engine/EngineParts/Direct12/Direct12.h"
 #include <cassert>
 #include <cmath>
 #include <algorithm>
@@ -39,7 +39,7 @@ ShaderResourceHeap::ShaderResourceHeap(UINT numDescriptor) :
 	useHandle_(),
 	bookingHandle_()
 {
-	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, numDescriptor, true);
+	SRVHeap = Direct3D::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, numDescriptor, true);
 
 	UINT incrementSRVCBVUAVHeap = Direct3D::GetInstance()->GetIncrementSRVCBVUAVHeap();
 
@@ -65,17 +65,17 @@ ShaderResourceHeap::~ShaderResourceHeap() {
 }
 
 void ShaderResourceHeap::SetHeap() {
-	static auto commandlist = Engine::GetCommandList();
+	static auto commandlist = Direct12::GetInstance()->GetCommandList();
 	commandlist->SetDescriptorHeaps(1, SRVHeap.GetAddressOf());
 }
 
 void ShaderResourceHeap::Use(D3D12_GPU_DESCRIPTOR_HANDLE handle, UINT rootParmIndex) {
-	static auto commandlist = Engine::GetCommandList();
+	static auto commandlist = Direct12::GetInstance()->GetCommandList();
 	commandlist->SetGraphicsRootDescriptorTable(rootParmIndex, handle);
 }
 
 void ShaderResourceHeap::Use(uint32_t handleIndex, UINT rootParmIndex) {
-	auto commandlist = Engine::GetCommandList();
+	auto commandlist = Direct12::GetInstance()->GetCommandList();
 	commandlist->SetGraphicsRootDescriptorTable(rootParmIndex, heapHandles[handleIndex].second);
 }
 

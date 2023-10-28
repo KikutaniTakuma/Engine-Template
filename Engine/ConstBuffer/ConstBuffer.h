@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/EngineParts/Direct3D/Direct3D.h"
-#include "Engine/Engine.h"
+#include "Engine/EngineParts/Direct12/Direct12.h"
 #include <cassert>
 #include <wrl.h>
 #include "Engine/ErrorCheck/ErrorCheck.h"
@@ -24,7 +24,7 @@ public:
 		shaderRegister(0)
 	{
 		// バイトサイズは256アライメントする(vramを効率的に使うための仕組み)
-		bufferResource = Engine::CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
+		bufferResource = Direct3D::GetInstance()->CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
 		cbvDesc.BufferLocation = bufferResource->GetGPUVirtualAddress();
 		cbvDesc.SizeInBytes = UINT(bufferResource->GetDesc().Width);
 
@@ -59,7 +59,7 @@ public:
 			bufferResource->Release();
 			bufferResource.Reset();
 		}
-		bufferResource = Engine::CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
+		bufferResource = Direct3D::GetInstance()->CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
 		cbvDesc.BufferLocation = bufferResource->GetGPUVirtualAddress();
 		cbvDesc.SizeInBytes = UINT(bufferResource->GetDesc().Width);
 

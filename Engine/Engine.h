@@ -1,7 +1,4 @@
 #pragma once
-#include <Windows.h>
-#undef max
-#undef min
 #include <d3d12.h>
 #pragma comment(lib, "d3d12.lib")
 #include <dxgi1_6.h>
@@ -14,14 +11,11 @@
 #if DIRECTINPUT_VERSION != 0x0800
 #define DIRECTINPUT_VERSION 0x0800
 #endif
-#include <dinput.h>
-#pragma comment(lib, "dinput8.lib")
 #include <SpriteFont.h>
 #include <ResourceUploadBatch.h>
 #pragma comment(lib, "DirectXTK12.lib")
 
 #include <string>
-#include <vector>
 #include <memory>
 #include <unordered_map>
 
@@ -44,20 +38,6 @@ public:
 		ResolutionNum // 設定では使わない(これをセットした場合FHDになる)
 	};
 
-public:
-	/// <summary>
-	/// 静的関数
-	/// </summary>
-	static ID3D12DescriptorHeap* CreateDescriptorHeap(
-		D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderrVisible
-	);
-
-	static ID3D12Resource* CreateBufferResuorce(size_t sizeInBytes);
-
-	static ID3D12Resource* CreateDepthStencilTextureResource(int32_t width, int32_t height);
-
-	static void Barrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after, UINT subResource = 0);
-
 private:
 	Engine() = default;
 	~Engine();
@@ -67,8 +47,8 @@ public:
 	/// 失敗した場合内部でassertで止められる
 	/// </summary>
 	/// <param name="windowName">Windowの名前</param>
-	/// <param name="resolution">画質設定</param>
-	static bool Initialize(const std::string& windowName, Resolution resolution = Resolution::User);
+	/// <param name="windowSize">ウィンドウの大きさ(バックバッファの大きさも同じになる)</param>
+	static bool Initialize(const std::string& windowName, const Vector2& windowSize);
 
 	static void Finalize();
 
@@ -83,34 +63,14 @@ public:
 		return engine;
 	}
 
-	static ID3D12GraphicsCommandList* GetCommandList() {
-		return engine->commandList.Get();
-	}
-
-	static ID3D12CommandQueue* GetCommandQueue() {
-		return engine->commandQueue.Get();
-	}
-
 	static inline ID3D12DescriptorHeap* GetDSVHeap() {
 		return engine->dsvHeap.Get();
-	}
-
-	static inline D3D12_DESCRIPTOR_HEAP_DESC GetMainRTVDesc() {
-		return engine->rtvDescriptorHeap->GetDesc();
-	}
-
-	static inline D3D12_RESOURCE_DESC GetSwapchainBufferDesc() {
-		return engine->swapChainResource[0]->GetDesc();
 	}
 
 	static inline D3D12_CPU_DESCRIPTOR_HANDLE GetDsvHandle() {
 		return engine->dsvHeap->GetCPUDescriptorHandleForHeapStart();
 	}
 
-	static inline D3D12_CPU_DESCRIPTOR_HANDLE GetMainRendertTargetHandle() {
-		UINT backBufferIndex = engine->swapChain->GetCurrentBackBufferIndex();
-		return engine->rtvHandles[backBufferIndex];
-	}
 
 	static inline DirectX::SpriteFont* GetFont(const std::string& fontName) {
 		return engine->spriteFonts[fontName].get();
@@ -122,10 +82,6 @@ public:
 
 	static inline Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetFontHeap(const std::string& fontName) {
 		return engine->fontHeap[fontName];
-	}
-
-	static inline bool GetIsCloseCommandList() {
-		return engine->isCommandListClose;
 	}
 
 
@@ -176,23 +132,10 @@ private:
 	/// DirectX12
 	/// 
 private:
-	bool InitializeDirect12();
+	void InitializeDirect12();
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
-	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
-	bool isCommandListClose = false;
-
-	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain;
-	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> swapChainResource;
-
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap;
-	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
-
-	Microsoft::WRL::ComPtr<ID3D12Fence> fence;
-	uint64_t fenceVal = 0;
-	HANDLE fenceEvent = nullptr;
+	class Direct12* direct12_ = nullptr;
 	
 
 
@@ -220,18 +163,10 @@ private:
 	/// 
 private:
 	bool InitializeDraw();
-	void ChangeResolution();
-
-public:
-	static void SetResolution(Resolution set);
-	static void SetViewPort(uint32_t widht, uint32_t height);
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap;
-
-	Resolution resolution;
-	Resolution setResolution;
 
 	///
 	/// MainLoop

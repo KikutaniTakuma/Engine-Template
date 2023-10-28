@@ -1,6 +1,7 @@
 #include "RenderTarget.h"
 #include "Engine/Engine.h"
 #include "Engine/EngineParts/Direct3D/Direct3D.h"
+#include "Engine/EngineParts/Direct12/Direct12.h"
 #include "Utils/ConvertString/ConvertString.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include <cassert>
@@ -15,7 +16,7 @@ RenderTarget::RenderTarget():
 	height(Engine::GetInstance()->clientHeight),
 	srvDesc{}
 {
-	auto resDesc = Engine::GetSwapchainBufferDesc();
+	auto resDesc = Direct12::GetInstance()->GetSwapchainBufferDesc();
 
 	// Resourceを生成する
 	// リソース用のヒープの設定
@@ -45,7 +46,7 @@ RenderTarget::RenderTarget():
 		return;
 	}
 
-	RTVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
+	RTVHeap = Direct3D::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
 
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
@@ -74,7 +75,7 @@ RenderTarget::RenderTarget(uint32_t width_, uint32_t height_) :
 	height(height_),
 	srvDesc{}
 {
-	auto resDesc = Engine::GetSwapchainBufferDesc();
+	auto resDesc = Direct12::GetInstance()->GetSwapchainBufferDesc();
 	resDesc.Width = width;
 	resDesc.Height = height;
 
@@ -107,7 +108,7 @@ RenderTarget::RenderTarget(uint32_t width_, uint32_t height_) :
 		return;
 	}
 
-	RTVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
+	RTVHeap = Direct3D::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
 
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
@@ -136,7 +137,7 @@ RenderTarget::~RenderTarget() {
 void RenderTarget::SetThisRenderTarget() {
 	isResourceStateChange = false;
 
-	Engine::Barrier(
+	Direct12::GetInstance()->Barrier(
 		resource.Get(),
 		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 		D3D12_RESOURCE_STATE_RENDER_TARGET
@@ -144,16 +145,16 @@ void RenderTarget::SetThisRenderTarget() {
 
 	auto rtvHeapHandle = RTVHeap->GetCPUDescriptorHandleForHeapStart();
 	auto dsvH = Engine::GetDsvHandle();
-	Engine::GetCommandList()->OMSetRenderTargets(1, &rtvHeapHandle, false, &dsvH);
+	Direct12::GetInstance()->GetCommandList()->OMSetRenderTargets(1, &rtvHeapHandle, false, &dsvH);
 
 	Vector4 clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-	Engine::GetCommandList()->ClearRenderTargetView(rtvHeapHandle, clearColor.m.data(), 0, nullptr);
+	Direct12::GetInstance()->GetCommandList()->ClearRenderTargetView(rtvHeapHandle, clearColor.m.data(), 0, nullptr);
 	//Engine::SetViewPort(width, height);
 }
 
 void RenderTarget::ChangeResourceState() {
 	if (!isResourceStateChange) {
-		Engine::Barrier(
+		Direct12::GetInstance()->Barrier(
 			resource.Get(),
 			D3D12_RESOURCE_STATE_RENDER_TARGET,
 			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
@@ -164,16 +165,12 @@ void RenderTarget::ChangeResourceState() {
 
 void RenderTarget::SetMainRenderTarget() {
 	ChangeResourceState();
-	// 描画先をメインレンダーターゲットに変更
-	auto rtvHeapHandle = Engine::GetMainRendertTargetHandle();
-	auto dsvH = Engine::GetDsvHandle();
-
-	static auto mainComList = Engine::GetCommandList();
-	mainComList->OMSetRenderTargets(1, &rtvHeapHandle, false, &dsvH);
+	
+	Direct12::GetInstance()->SetMainRenderTarget();
 }
 
 void RenderTarget::UseThisRenderTargetShaderResource() {
-	static auto mainComList = Engine::GetCommandList();
+	static auto mainComList = Direct12::GetInstance()->GetCommandList();
 	mainComList->SetGraphicsRootDescriptorTable(0, srvHeapHandle);
 }
 

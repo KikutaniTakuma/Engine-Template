@@ -4,6 +4,7 @@
 #pragma comment(lib, "d3d12.lib")
 #include <dxgi1_6.h>
 #pragma comment(lib, "dxgi.lib")
+#include <cstdint>
 
 class Direct3D {
 private:
@@ -24,6 +25,15 @@ public:
 
 private:
 	static Direct3D* instance_;
+
+public:
+	ID3D12DescriptorHeap* CreateDescriptorHeap(
+		D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderrVisible
+	);
+
+	ID3D12Resource* CreateBufferResuorce(size_t sizeInBytes);
+
+	ID3D12Resource* CreateDepthStencilTextureResource(int32_t width, int32_t height);
 
 public:
 	inline UINT GetIncrementSRVCBVUAVHeap() const {

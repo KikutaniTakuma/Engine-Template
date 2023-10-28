@@ -1,19 +1,14 @@
 #include "Model.h"
-#include "Engine/Engine.h"
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <algorithm>
 #include <cassert>
-#include <numbers>
 #include <climits>
-#include <filesystem>
 #include "Utils/ConvertString/ConvertString.h"
-#include "Engine/ShaderManager/ShaderManager.h"
+#include "Engine/ShaderResource/ShaderResourceHeap.h"
 #include "externals/imgui/imgui.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Engine/PipelineManager/PipelineManager.h"
 #include "MeshManager/MeshManager.h"
+#undef max
+#undef min
 
 Shader Model::shader = {};
 
@@ -276,14 +271,12 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 		light.eyePos = cameraPos;
 		dirLig->eyePos = cameraPos;
 
-		auto commandlist = Engine::GetCommandList();
+		auto commandlist = Direct12::GetInstance()->GetCommandList();
 
 		if (!pipeline) {
 			ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Model");
 			return;
 		}
-
-		[[maybe_unused]] size_t indexVertex = 0;
 
 		for (auto& i : data) {
 			pipeline->Use();

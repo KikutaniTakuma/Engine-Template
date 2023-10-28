@@ -4,7 +4,7 @@
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Engine/RootSignature/RootSignature.h"
 #include "Engine/EngineParts/Direct3D/Direct3D.h"
-#include "Engine/Engine.h"
+#include "Engine/EngineParts/Direct12/Direct12.h"
 
 Pipeline::Pipeline():
 	graphicsPipelineState(),
@@ -216,7 +216,7 @@ void Pipeline::Use() const {
 		ErrorCheck::GetInstance()->ErrorTextBox("Use() : GraphicsPipelineState is nullptr", "Pipeline");
 		return;
 	}
-	auto commandlist = Engine::GetCommandList();
+	auto commandlist = Direct12::GetInstance()->GetCommandList();
 	commandlist->SetGraphicsRootSignature(rootSignature);
 	commandlist->SetPipelineState(graphicsPipelineState.Get());
 
