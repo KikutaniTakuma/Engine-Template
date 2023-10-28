@@ -43,8 +43,6 @@ void SceneManager::Initialize(BaseScene* firstScene) {
 	frameInfo_ = FrameInfo::GetInstance();
 	input_ = Input::GetInstance();
 
-	frameInfo_->SetFpsLimit(60.0);
-
 	assert(firstScene != nullptr);
 	scene_.reset(firstScene);
 	scene_->SceneInitialize(this);
