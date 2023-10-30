@@ -122,7 +122,7 @@ Model::Model() :
 	dirLig->ligColor = colorTmp.GetVector3();
 
 	dirLig->ptPos = { 5.0f,5.0f,5.0f };
-	dirLig->ptColor = { 15.0f,15.0f,15.0f };
+	dirLig->ptColor = { 0.0f,0.0f,0.0f };
 	dirLig->ptRange = 10.0f;
 
 	colorBuf.shaderRegister = 2;
