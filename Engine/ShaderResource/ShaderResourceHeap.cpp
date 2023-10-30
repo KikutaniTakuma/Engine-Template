@@ -147,54 +147,65 @@ uint32_t ShaderResourceHeap::CreatePerarenderView(RenderTarget& renderTarget) {
 }
 
 void ShaderResourceHeap::BookingHeapPos(UINT nextCreateViewNum) {
+	// リリースハンドルがないなら予約しない
 	if (releaseHandle_.empty()) {
 		bookingHandle_.clear();
 		return;
 	}
-	else {
-		for (auto i : releaseHandle_) {
-			std::erase(useHandle_, i);
-		}
-	}
+	// ディスクリプタが一つも作られてない場合は0を指定
 	if (useHandle_.empty()) {
 		currentHandleIndex = 0u;
 		return;
 	}
 
+	// リリースハンドルがの最初のイテレータ
 	auto releaseHandle = releaseHandle_.begin();
+	// 予約済みを使えるかどうか
 	bool isCanUseHandle = true;
-	bookingHandle_.clear();
+
 	do {
+		// ループするのでここでも初期化
 		isCanUseHandle = true;
+		// 予約済みのハンドルをクリア
 		bookingHandle_.clear();
-		for (uint32_t i = 0; i < nextCreateViewNum; i++) {
+
+		// 予約する数分格納
+		if (nextCreateViewNum != 0u) {
 			bookingHandle_.push_back(*releaseHandle);
+		}
+		for (uint32_t i = 1; i < nextCreateViewNum; i++) {
 			releaseHandle++;
+			// 格納中にリリースハンドルが最後まで行ってしまったら
+			// 解放しループを抜ける
 			if (releaseHandle == releaseHandle_.end()) {
 				bookingHandle_.clear();
 				break;
 			}
+			bookingHandle_.push_back(*releaseHandle);
 		}
 
+		// 予約出来なかったらループを抜けて早期リターン
 		if (bookingHandle_.empty()) {
-			bookingHandle_.clear();
-			break;
+			return;
 		}
 
+		// 予約したものが連続したハンドルか
 		for (size_t i = 0; i < bookingHandle_.size() - 1; i++) {
+			// 連続してない場合予約ハンドルを解放してループを抜ける
 			if (bookingHandle_[i] != bookingHandle_[i + 1llu]) {
 				isCanUseHandle = false;
 				bookingHandle_.clear();
 				break;
 			}
 		}
+
+		// ちゃんと予約出来るまでループ
 	} while (!isCanUseHandle);
 
 	for (auto& i : bookingHandle_) {
+		// 予約済みになったリリースハンドルを解放
 		std::erase(releaseHandle_, i);
-	}
-
-	for (auto& i : bookingHandle_) {
+		// 予約済みになったUseハンドルを解放
 		std::erase(useHandle_, i);
 	}
 }
@@ -202,14 +213,20 @@ void ShaderResourceHeap::BookingHeapPos(UINT nextCreateViewNum) {
 
 void ShaderResourceHeap::ReleaseView(UINT viewHandle) {
 	if (!releaseHandle_.empty()) {
+		// リリースハンドルにすでに格納されているか
 		auto isReleased = std::find(releaseHandle_.begin(), releaseHandle_.end(), viewHandle);
-		if (isReleased == releaseHandle_.end()) {
-			return;
-		}
-		isReleased = std::find(useHandle_.begin(), useHandle_.end(), viewHandle);
-		if (isReleased != useHandle_.end()) {
+		if (isReleased != releaseHandle_.end()) {
+			// すでにリリースハンドルがある
 			return;
 		}
 	}
+	// Useハンドルの中に今から解放するハンドルがあるか
+	auto isReleased = std::find(useHandle_.begin(), useHandle_.end(), viewHandle);
+	if (isReleased == useHandle_.end()) {
+		// そもそも解放するディスクリプタがないので早期リターン
+		return;
+	}
+
+	// リリースハンドルに格納
 	releaseHandle_.push_back(viewHandle);
 }
