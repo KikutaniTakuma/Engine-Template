@@ -88,13 +88,10 @@ void PeraRender::CreateGraphicsPipeline() {
 
 	PipelineManager::IsDepth(false);
 
-	piplines[0] = PipelineManager::Create();
-
-	PipelineManager::SetState(Pipeline::Normal, Pipeline::SolidState::Solid);
-	piplines[1] = PipelineManager::Create();
-
-	PipelineManager::SetState(Pipeline::Add, Pipeline::SolidState::Solid);
-	piplines[2] = PipelineManager::Create();
+	for (int32_t i = Pipeline::Blend::None; i < Pipeline::Blend::BlendTypeNum; i++) {
+		PipelineManager::SetState(Pipeline::Blend(i), Pipeline::SolidState::Solid);
+		piplines[i] = PipelineManager::Create();
+	}
 
 	PipelineManager::StateReset();
 }
@@ -114,24 +111,8 @@ void PeraRender::Draw(Pipeline::Blend blend, PeraRender* pera) {
 	}
 
 	// 各種描画コマンドを積む
-	switch (blend){
-	case Pipeline::None:
-	case Pipeline::Sub:
-	case Pipeline::Mul:
-	case Pipeline::BlendTypeNum:
-	default:
-		piplines[0]->Use();
-		break;
-
-	case Pipeline::Normal:
-		piplines[1]->Use();
-		break;
-
-	case Pipeline::Add:
-		piplines[2]->Use();
-		break;
-	}
 	ID3D12GraphicsCommandList* commandList = Direct12::GetInstance()->GetCommandList();
+	piplines[blend]->Use();
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	commandList->IASetVertexBuffers(0, 1, &peraVertexView);
 	render.UseThisRenderTargetShaderResource();

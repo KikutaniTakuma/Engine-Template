@@ -52,5 +52,5 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> peraVertexResource = nullptr;
 	Shader shader;
 
-	std::array<class Pipeline*, 3> piplines;
+	std::array<class Pipeline*, Pipeline::Blend::BlendTypeNum> piplines;
 };
