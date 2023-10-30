@@ -60,46 +60,55 @@ bool Gamepad::PushAnyKey() {
 	return instance->state.Gamepad.wButtons != instance->preButton;
 }
 
-float Gamepad::GetTriger(Triger type) {
+float Gamepad::GetTriger(Triger type, float deadZone) {
 	static constexpr float kNormal = 1.0f / static_cast<float>(UCHAR_MAX);
-
+	float moveTriger = 0.0f;
 	switch (type)
 	{
 	case Gamepad::Triger::LEFT:
-		return static_cast<float>(state.Gamepad.bLeftTrigger) * kNormal;
+		moveTriger = static_cast<float>(state.Gamepad.bLeftTrigger) * kNormal;
 		break;
 
 	case Gamepad::Triger::RIGHT:
-		return static_cast<float>(state.Gamepad.bRightTrigger) * kNormal;
+		moveTriger = static_cast<float>(state.Gamepad.bRightTrigger) * kNormal;
 		break;
 
 	default:
 		return 0.0f;
-		break;
 	}
+
+	return moveTriger <= deadZone ? 0.0f : moveTriger;
 }
 
-float Gamepad::GetStick(Stick type) {
+float Gamepad::GetStick(Stick type, float deadZone) {
 	static constexpr float kNormal = 1.0f / static_cast<float>(SHRT_MAX);
+	float moveStick = 0.0f;
+	deadZone = std::clamp(deadZone, 0.0f, 1.0f);
 
 	switch (type)
 	{
 	case Gamepad::Stick::LEFT_X:
-		return static_cast<float>(state.Gamepad.sThumbLX) * kNormal;
+		moveStick = static_cast<float>(state.Gamepad.sThumbLX) * kNormal;
 		break;
 	case Gamepad::Stick::LEFT_Y:
-		return static_cast<float>(state.Gamepad.sThumbLY) * kNormal;
+		moveStick = static_cast<float>(state.Gamepad.sThumbLY) * kNormal;
 		break;
 	case Gamepad::Stick::RIGHT_X:
-		return static_cast<float>(state.Gamepad.sThumbRX) * kNormal;
+		moveStick = static_cast<float>(state.Gamepad.sThumbRX) * kNormal;
 		break;
 	case Gamepad::Stick::RIGHT_Y:
-		return static_cast<float>(state.Gamepad.sThumbRY) * kNormal;
+		moveStick = static_cast<float>(state.Gamepad.sThumbRY) * kNormal;
 		break;
 	default:
 		return 0.0f;
-		break;
 	}
+
+	// もしデッドゾーン内だった場合は0.0fを返す
+	if (-deadZone <= moveStick && moveStick <= deadZone) {
+		return 0.0f;
+	}
+
+	return moveStick;
 }
 
 void Gamepad::Vibration(float leftVibIntensity, float rightVibIntensity) {
@@ -112,6 +121,7 @@ void Gamepad::Vibration(float leftVibIntensity, float rightVibIntensity) {
 }
 
 void Gamepad::Debug() {
+#ifdef _DEBUG
 	ImGui::SetNextWindowSizeConstraints({}, { 210.0f, 400.0f });
 	ImGui::Begin("Gamepad Debug");
 	if (ImGui::TreeNode("stick")) {
@@ -158,4 +168,5 @@ void Gamepad::Debug() {
 	}
 
 	ImGui::End();
+#endif // _DEBUG
 }

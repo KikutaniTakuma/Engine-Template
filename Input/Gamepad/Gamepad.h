@@ -115,14 +115,15 @@ public:
 	/// </summary>
 	/// <param name="type">トリガーのタイプ</param>
 	/// <returns>0.0f ～ 1.0f の値</returns>
-	float GetTriger(Triger type);
+	float GetTriger(Triger type, float deadZone = 0.3f);
 
 	/// <summary>
 	/// Stick
 	/// </summary>
 	/// <param name="type">スティックのタイプ</param>
+	/// <param name="deadZone">デッドゾーン(0.0f～1.0f)の範囲内なら0.0fを返す</param>
 	/// <returns>-1.0f ～ 1.0f の値</returns>
-	float GetStick(Stick type);
+	float GetStick(Stick type, float deadZone = 0.3f);
 
 	/// <summary>
 	/// バイブレーション
