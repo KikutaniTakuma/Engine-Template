@@ -31,6 +31,7 @@ public:
 public:
 	Model model_;
 
+	float rotateSpd_;
+
 	PeraRender pera_;
-	PeraRender grayScale_;
 };

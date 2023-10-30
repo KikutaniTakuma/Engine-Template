@@ -3,10 +3,12 @@
 #include "TextureManager/TextureManager.h"
 #include "AudioManager/AudioManager.h"
 #include "Engine/FrameInfo/FrameInfo.h"
+#include <numbers>
 
 GameScene::GameScene():
 	BaseScene(BaseScene::ID::Game),
-	model_()
+	model_(),
+	rotateSpd_(std::numbers::pi_v<float> * 0.5f)
 {}
 
 void GameScene::Initialize() {
@@ -20,10 +22,6 @@ void GameScene::Initialize() {
 		"./Resources/Shaders/PostShader/Post.VS.hlsl",
 		"./Resources/Shaders/PostShader/PostEdge.PS .hlsl"
 	);
-	grayScale_.Initialize(
-		"./Resources/Shaders/PostShader/Post.VS.hlsl",
-		"./Resources/Shaders/PostShader/PostGrayScale.PS.hlsl"
-	);
 }
 
 void GameScene::Finalize() {
@@ -31,14 +29,15 @@ void GameScene::Finalize() {
 }
 
 void GameScene::Update() {
+	model_.rotate.y += rotateSpd_ * frameInfo_->GetDelta();
 	model_.Update();
 }
 
 void GameScene::Draw() {
 	camera_.Update();
 	
+	model_.Draw(camera_.GetViewProjection(), camera_.GetPos());
 	pera_.PreDraw();
 	model_.Draw(camera_.GetViewProjection(), camera_.GetPos());
-	pera_.Draw(Pipeline::None, &grayScale_);
-	grayScale_.Draw(Pipeline::None);
+	pera_.Draw(Pipeline::Mul);
 }
