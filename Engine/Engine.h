@@ -8,9 +8,6 @@
 #include <dxcapi.h>
 #pragma comment(lib, "dxcompiler.lib")
 #include <wrl.h>
-#if DIRECTINPUT_VERSION != 0x0800
-#define DIRECTINPUT_VERSION 0x0800
-#endif
 #include <SpriteFont.h>
 #include <ResourceUploadBatch.h>
 #pragma comment(lib, "DirectXTK12.lib")
