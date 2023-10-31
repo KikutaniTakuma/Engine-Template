@@ -139,7 +139,7 @@ private:
 		UtilsLib::Flg isValid;
 
 
-		// 今有効か
+		// 縦横の大きさを同じにするか
 		UtilsLib::Flg isSameHW;
 	};
 
