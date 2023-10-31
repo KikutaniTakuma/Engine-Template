@@ -31,13 +31,7 @@ public:
 
 public:
 	Model model_;
+	Texture2D tex2D_;
 
-	Model rabbit_;
-
-	//float rotateSpd_;
-
-	Particle particle_;
-
-	PeraRender pera_;
-	Camera peraCamera_;
+	Texture* texture_;
 };

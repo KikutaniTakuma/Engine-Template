@@ -7,28 +7,29 @@
 
 GameScene::GameScene():
 	BaseScene(BaseScene::ID::Game),
-	model_()/*,
-	rotateSpd_(std::numbers::pi_v<float> * 0.5f)*/
+	model_(),
+	tex2D_(),
+	texture_(nullptr)
 {}
 
 void GameScene::Initialize() {
 	camera_.farClip = 3000.0f;
-	camera_.pos.z = -5.0f;
+	camera_.pos.z = -20.0f;
 	camera_.pos.y = 1.1f;
 	
-	model_.LoadObj("./Resources/Watame/Watame.obj");
+	// objファイル読み込み
+	model_.LoadObj("./Resources/Rabbit/Rabbit.obj");
+	model_.rotate.y = std::numbers::pi_v<float>;
 
-	pera_.Initialize(
-		"./Resources/Shaders/PostShader/Post.VS.hlsl",
-		"./Resources/Shaders/PostShader/PostNone.PS.hlsl"
-	);
+	// テクスチャ読み込み
+	tex2D_.LoadTexture("./Resources/uvChecker.png");
+	tex2D_.pos = Vector2{ 380.0f,  -80.0f };
+	tex2D_.isSameTexSize = true;
+	tex2D_.texScalar = 0.5f;
 
-	particle_.LoadSettingDirectory("enemy-generation-delete");
-
-	rabbit_.LoadObj("./Resources/Rabbit/player.obj");
-
-	peraCamera_.Update();
-	pera_.scale_ = { 1280.0f, 720.0f };
+	// テクスチャ単体でも読み込み出来る
+	texture_ =
+		textureManager_->LoadTexture("./Resources/Rabbit/Rabbit_face.png");
 }
 
 void GameScene::Finalize() {
@@ -36,30 +37,28 @@ void GameScene::Finalize() {
 }
 
 void GameScene::Update() {
-	//model_.rotate.y += rotateSpd_ * frameInfo_->GetDelta();
+	model_.Debug("model");
 	model_.Update();
-	rabbit_.Debug("rabbit_");
 
-	if (input_->GetKey()->Pushed(DIK_SPACE)) {
-		rabbit_.ChangeTexture("face", pera_.GetTex());
+	if (input_->GetKey()->Pushed(DIK_1)) {
+		// ロード済みのテクスチャに変更することも可能
+		model_.ChangeTexture("face", texture_);
 	}
-	rabbit_.Update();
-	camera_.Debug("camera");
-
-	particle_.Debug("particle_");
-	particle_.Update();
-
-	pera_.Update();
+	if (input_->GetKey()->Pushed(DIK_2)) {
+		// ロードしてなくてもここでパスを指定すれば読み込んで変更できる
+		model_.ChangeTexture("face", "./Resources/Rabbit/Rabbit_face_happy.png");
+	}
+	
+	tex2D_.Debug("tex");
+	tex2D_.Update();
 }
 
 void GameScene::Draw() {
 	camera_.Update(Vector3::zero);
 	
+	// 投資投影で描画
 	model_.Draw(camera_.GetViewProjection(), camera_.GetPos());
-	//particle_.Draw(camera_.rotate, camera_.GetViewProjection());
-	pera_.PreDraw();
-	model_.Draw(camera_.GetViewProjection(), camera_.GetPos());
-	pera_.SetMainRenderTarget();
-
-	rabbit_.Draw(camera_.GetViewProjection(), camera_.GetPos());
+	
+	// 平行投影で描画
+	tex2D_.Draw(camera_.GetOthographics(), Pipeline::Normal, true);
 }
