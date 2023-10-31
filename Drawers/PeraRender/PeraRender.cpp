@@ -30,13 +30,20 @@ PeraRender::PeraRender(uint32_t width_, uint32_t height_):
 	render_(width_, height_),
 	peraVertexResource_(nullptr),
 	peraVertexView_(),
+	indexView_{},
+	indexResource_{ nullptr },
 	shader_{},
-	piplines_{ nullptr }, 
+	piplines_{ nullptr },
 	pos_{},
 	rotate_{},
 	scale_{ Vector3::identity },
 	wvpMat_{},
-	isPreDraw_(false)
+	colorBuf_{},
+	isPreDraw_(false),
+	uvPibot_(),
+	uvSize_(Vector2::identity),
+	worldPos_{},
+	color_(std::numeric_limits<uint32_t>::max())
 {}
 
 PeraRender::~PeraRender() {
