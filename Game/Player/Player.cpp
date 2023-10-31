@@ -145,7 +145,7 @@ void Player::Move() {
 		isMove = true;
 	}
 
-	moveVec_ *= HoriMakeMatrixRotateY(cameraRotate_);
+	moveVec_ *= MakeMatrixRotateY(cameraRotate_);
 
 	if (isMove) {
 		Vector2 rotate;
@@ -174,7 +174,7 @@ void Player::Update() {
 		Vector3 offset = { 0.0f, 7.0f, -30.0f };
 		camera->rotate.y = cameraRotate_;
 		camera->rotate.x = 0.2f;
-		offset *= HoriMakeMatrixRotateY(cameraRotate_);
+		offset *= MakeMatrixRotateY(cameraRotate_);
 		camera->pos = model[0]->pos + offset;
 		camera->Update();
 	}

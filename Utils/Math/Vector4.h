@@ -13,6 +13,7 @@ public:
 	Vector4(float x, float y, float z, float w) noexcept;
 	Vector4(const class Vector3& vec3, float w) noexcept;
 	Vector4(const class Vector2& vec2, float z, float w) noexcept;
+	Vector4(uint32_t right) noexcept;
 public:
 	~Vector4() = default;
 
@@ -24,6 +25,7 @@ public:
 	Vector4& operator=(const class Vector3& right) noexcept;
 	Vector4& operator=(const class Vector2& right) noexcept;
 	Vector4& operator=(Vector4&& right) noexcept;
+	Vector4& operator=(uint32_t right) noexcept;
 
 	Vector4 operator+(const Vector4& right) const noexcept;
 	Vector4& operator+=(const Vector4& right) noexcept;
@@ -84,7 +86,7 @@ public:
 	/// </summary>
 	static const Vector4 zIdy;
 	/// <summary>
-	/// x = 0.0f, y = 0.0f, z = 1.0f w = 0.0f
+	/// x = 0.0f, y = 0.0f, z = 0.0f w = 1.0f
 	/// </summary>
 	static const Vector4 wIdy;
 

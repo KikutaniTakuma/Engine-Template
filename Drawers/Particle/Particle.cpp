@@ -122,7 +122,7 @@ Particle::Particle() :
 	srvHeap->CreateStructuredBufferView<Mat4x4>(wvpMat);
 	srvHeap->CreateStructuredBufferView<Vector4>(colorBuf);
 	for (uint32_t i = 0; i < wvpMat.Size(); i++) {
-		wvpMat[i] = MakeMatrixIndentity();
+		wvpMat[i] = Mat4x4::kIdentity_;
 	}
 
 	for (uint32_t i = 0; i < colorBuf.Size(); i++) {
@@ -191,7 +191,7 @@ Particle::Particle(uint32_t indexNum) :
 	srvHeap->CreateStructuredBufferView<Vector4>(colorBuf);
 
 	for (uint32_t i = 0; i < wvpMat.Size();i++) {
-		wvpMat[i] = MakeMatrixIndentity();
+		wvpMat[i] = Mat4x4::kIdentity_;
 	}
 	
 	for (uint32_t i = 0; i < colorBuf.Size(); i++) {
@@ -774,7 +774,7 @@ void Particle::Update() {
 					maxPos.x += settings[currentSettingIndex].emitter.circleSize;
 					pos = UtilsLib::Random(settings[currentSettingIndex].emitter.pos, maxPos);
 					posRotate = UtilsLib::Random(settings[currentSettingIndex].emitter.rotate.first, settings[currentSettingIndex].emitter.rotate.second);
-					pos *= HoriMakeMatrixAffin(Vector3::identity, posRotate, Vector3::zero);
+					pos *= MakeMatrixAffin(Vector3::identity, posRotate, Vector3::zero);
 					break;
 				}
 
@@ -796,7 +796,7 @@ void Particle::Update() {
 				Vector3 moveRotate = UtilsLib::Random(settings[currentSettingIndex].moveRotate.first, settings[currentSettingIndex].moveRotate.second);
 
 				// 速度回転
-				velocity *= HoriMakeMatrixAffin(Vector3::identity, moveRotate, Vector3::zero);
+				velocity *= MakeMatrixAffin(Vector3::identity, moveRotate, Vector3::zero);
 
 				// 回転
 				Vector3 rotate = UtilsLib::Random(settings[currentSettingIndex].rotate.first, settings[currentSettingIndex].rotate.second);
@@ -898,7 +898,7 @@ void Particle::Draw(
 		assert(wtfs.size() == wvpMat.Size());
 		for (uint32_t i = 0; i < wvpMat.Size();i++) {
 			if (wtfs[i].isActive) {
-				wvpMat[drawCount] = viewProjection * VertMakeMatrixAffin(wtfs[i].scale, wtfs[i].rotate, wtfs[i].pos);
+				wvpMat[drawCount] = MakeMatrixAffin(wtfs[i].scale, wtfs[i].rotate, wtfs[i].pos) * viewProjection;
 				colorBuf[drawCount] = UintToVector4(wtfs[i].color);
 				drawCount++;
 			}

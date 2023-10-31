@@ -34,7 +34,7 @@ Texture2D::Texture2D() :
 	isSameTexSize(),
 	texScalar(1.0f)
 {
-	*wvpMat = MakeMatrixIndentity();
+	*wvpMat = Mat4x4::kIdentity_;
 	*colorBuf = Vector4::identity;
 
 	if (vertexResource) { vertexResource->Release(); }
@@ -283,7 +283,7 @@ void Texture2D::Update() {
 
 		std::copy(pv.begin(), pv.end(), worldPos.begin());
 		auto&& worldMat =
-			HoriMakeMatrixAffin(
+			MakeMatrixAffin(
 				Vector3(scale.x, scale.y, 1.0f),
 				rotate,
 				pos

@@ -106,8 +106,8 @@ Model::Model() :
 {
 
 	wvpData.shaderRegister = 0;
-	wvpData->worldMat = MakeMatrixIndentity();
-	wvpData->viewProjectoionMat = MakeMatrixIndentity();
+	wvpData->worldMat = Mat4x4::kIdentity_;
+	wvpData->viewProjectoionMat = Mat4x4::kIdentity_;
 
 
 	dirLig.shaderRegister = 1;
@@ -263,11 +263,10 @@ void Model::Update() {
 void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	assert(createGPFlg);
 	if (loadObjFlg) {
-		wvpData->worldMat.HoriAffin(scale, rotate, pos);
+		wvpData->worldMat.Affin(scale, rotate, pos);
 		if (parent) {
-			wvpData->worldMat *= MakeMatrixTransepose(parent->wvpData->worldMat);
+			wvpData->worldMat *= parent->wvpData->worldMat;
 		}
-		wvpData->worldMat.Transepose();
 		wvpData->viewProjectoionMat = viewProjectionMat;
 
 		*colorBuf = UintToVector4(color);

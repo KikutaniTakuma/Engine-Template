@@ -14,8 +14,8 @@ void Collider::UpdateCollision() {
 	max_ = Vector3::identity * 0.5f;
 	min_ = Vector3::identity * -0.5f;
 
-	max_ *= HoriMakeMatrixAffin(scale_, Vector3::zero, collisionPos_);
-	min_ *= HoriMakeMatrixAffin(scale_, Vector3::zero, collisionPos_);
+	max_ *= MakeMatrixAffin(scale_, Vector3::zero, collisionPos_);
+	min_ *= MakeMatrixAffin(scale_, Vector3::zero, collisionPos_);
 }
 
 

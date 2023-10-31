@@ -36,6 +36,10 @@ Vector4::Vector4(const Vector2& vec2, float z, float w) noexcept :
 	m{ vec2.x,vec2.y,z,w }
 {}
 
+Vector4::Vector4(uint32_t right) noexcept {
+	*this = right;
+}
+
 Vector4& Vector4::operator=(const Vector4& right) noexcept {
 	std::copy(right.m.begin(), right.m.end(), m.begin());
 
@@ -63,6 +67,11 @@ Vector4& Vector4::operator=(const Vector2& right) noexcept {
 Vector4& Vector4::operator=(Vector4&& right) noexcept {
 	m = std::move(right.m);
 
+	return *this;
+}
+
+Vector4& Vector4::operator=(uint32_t right) noexcept {
+	*this = UintToVector4(right);
 	return *this;
 }
 

@@ -2,7 +2,7 @@
 
 VertexOutput main(float4 pos : POSITION0, float4 color : COLOR0) {
     VertexOutput output;
-    output.pos = mul(mat, pos);
+    output.pos = mul(pos,mat);
     output.color = color;
 
     return output;

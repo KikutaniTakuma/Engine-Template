@@ -40,7 +40,7 @@ void Camera::Update(const Vector3& gazePoint) {
 	moveVec = Vector3();
 
 
-	view.VertAffin(scale, rotate, pos + gazePoint);
+	view.Affin(scale, rotate, pos + gazePoint);
 	worldPos = { view[0][3],view[1][3], view[2][3] };
 	view.Inverse();
 
@@ -51,25 +51,25 @@ void Camera::Update(const Vector3& gazePoint) {
 
 
 	fov = std::clamp(fov, 0.0f, 1.0f);
-	projection.VertPerspectiveFov(fov, aspect, kNearClip, farClip);
-	viewProjecction = projection * view;
+	projection.PerspectiveFov(fov, aspect, kNearClip, farClip);
+	viewProjecction = view * projection;
 
-	viewProjecctionVp = VertMakeMatrixViewPort(0.0f, 0.0f, windowSize.x, windowSize.y, 0.0f, 1.0f) * viewProjecction;
+	viewProjecctionVp = viewProjecction * MakeMatrixViewPort(0.0f, 0.0f, windowSize.x, windowSize.y, 0.0f, 1.0f);
 
-	othograohics.VertOrthographic(
+	othograohics.Orthographic(
 		-static_cast<float>(engine->clientWidth) * 0.5f * drawScale,
 		static_cast<float>(engine->clientHeight) * 0.5f * drawScale,
 		static_cast<float>(engine->clientWidth) * 0.5f * drawScale,
 		-static_cast<float>(engine->clientHeight) * 0.5f * drawScale,
 		kNearClip, farClip);
-	viewOthograohics = othograohics * view;
+	viewOthograohics = view * othograohics;
 
 
-	viewOthograohicsVp = VertMakeMatrixViewPort(0.0f, 0.0f, windowSize.x, windowSize.y, 0.0f, 1.0f) * viewOthograohics;
+	viewOthograohicsVp = viewOthograohics * MakeMatrixViewPort(0.0f, 0.0f, windowSize.x, windowSize.y, 0.0f, 1.0f);
 }
 
 void Camera::Update(const Mat4x4& worldMat) {
-	view.VertAffin(scale, rotate, pos);
+	view.Affin(scale, rotate, pos);
 	view = worldMat * view;
 	worldPos = { view[0][3],view[1][3], view[2][3] };
 	view.Inverse();
@@ -80,19 +80,19 @@ void Camera::Update(const Mat4x4& worldMat) {
 	const auto&& windowSize = WinApp::GetInstance()->GetWindowSize();
 
 	fov = std::clamp(fov, 0.0f, 1.0f);
-	projection.VertPerspectiveFov(fov, aspect, kNearClip, farClip);
-	viewProjecction = projection * view;
+	projection.PerspectiveFov(fov, aspect, kNearClip, farClip);
+	viewProjecction = view * projection;
 
-	viewProjecctionVp = VertMakeMatrixViewPort(0.0f, 0.0f, windowSize.x, windowSize.y, 0.0f, 1.0f) * viewProjecction;
+	viewProjecctionVp = viewProjecction * MakeMatrixViewPort(0.0f, 0.0f, windowSize.x, windowSize.y, 0.0f, 1.0f);
 
-	othograohics.VertOrthographic(
+	othograohics.Orthographic(
 		-static_cast<float>(engine->clientWidth) * 0.5f * drawScale,
 		static_cast<float>(engine->clientHeight) * 0.5f * drawScale,
 		static_cast<float>(engine->clientWidth) * 0.5f * drawScale,
 		-static_cast<float>(engine->clientHeight) * 0.5f * drawScale,
 		kNearClip, farClip);
-	viewOthograohics = othograohics * view;
+	viewOthograohics = view * othograohics;
 
 
-	viewOthograohicsVp = VertMakeMatrixViewPort(0.0f, 0.0f, windowSize.x, windowSize.y, 0.0f, 1.0f) * viewOthograohics;
+	viewOthograohicsVp = viewOthograohics * MakeMatrixViewPort(0.0f, 0.0f, windowSize.x, windowSize.y, 0.0f, 1.0f);
 }
