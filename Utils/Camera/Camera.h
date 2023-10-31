@@ -31,7 +31,7 @@ public:
 	/// 行列更新
 	/// </summary>
 	/// <param name="gazePoint">デバッグ時の起点</param>
-	void Update(const Vector3& gazePoint = {});
+	void Update(const Vector3& gazePoint = Vector3::zero);
 	/// <summary>
 	/// 行列更新
 	/// </summary>
@@ -42,7 +42,7 @@ public:
 	/// 透視投影行列を取得(TypeがOthographicの場合ゼロ行列が返る)
 	/// </summary>
 	/// <returns>透視投影行列</returns>
-	inline const Mat4x4& GetViewProjection() noexcept {
+	inline const Mat4x4& GetViewProjection() const noexcept {
 		return viewProjecction;
 	}
 	
@@ -50,7 +50,7 @@ public:
 	/// 平衡投影行列を取得(TypeがProjecctionの場合ゼロ行列が返る)
 	/// </summary>
 	/// <returns></returns>
-	inline const Mat4x4& GetViewOthographics() noexcept {
+	inline const Mat4x4& GetViewOthographics() const noexcept {
 		return viewOthograohics;
 	}
 
@@ -66,14 +66,14 @@ public:
 	/// 透視投影行列にビューポートをかけたものを取得(TypeがProjecctionの場合ゼロ行列が返る)
 	/// </summary>
 	/// <returns></returns>
-	inline const Mat4x4& GetViewProjectionVp() noexcept {
+	inline const Mat4x4& GetViewProjectionVp() const noexcept {
 		return viewProjecctionVp;
 	}
 	/// <summary>
 	/// 平衡投影行列ビューポートをかけたものを取得(TypeがProjecctionの場合ゼロ行列が返る)
 	/// </summary>
 	/// <returns></returns>
-	inline const Mat4x4& GetViewOthographicsVp() noexcept {
+	inline const Mat4x4& GetViewOthographicsVp() const noexcept {
 		return viewOthograohicsVp;
 	}
 

@@ -37,10 +37,11 @@ Camera::Camera(Camera&& right) noexcept
 }
 
 void Camera::Update(const Vector3& gazePoint) {
-	moveVec = Vector3();
+	moveVec = Vector3::zero;
 
+	Vector3 offset = gazePoint - pos;
 
-	view.Affin(scale, rotate, pos + gazePoint);
+	view.Affin(scale, rotate, offset);
 	worldPos = { view[0][3],view[1][3], view[2][3] };
 	view.Inverse();
 
