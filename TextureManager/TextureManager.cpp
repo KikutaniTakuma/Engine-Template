@@ -134,7 +134,7 @@ Texture* TextureManager::LoadTexture(const std::string& fileName) {
 			return nullptr;
 		}
 
-		tex->heapPos = srvHeap->CreateTxtureView(tex.get());
+		tex->srvHeapHandleUint = srvHeap->CreateTxtureView(tex.get());
 		
 		textures.insert(std::make_pair(fileName, std::move(tex)));
 
@@ -181,7 +181,7 @@ Texture* TextureManager::LoadTexture(const std::string& fileName) {
 				return nullptr;
 			}
 
-			tex->heapPos = srvHeap->CreateTxtureView(tex.get());
+			tex->srvHeapHandleUint = srvHeap->CreateTxtureView(tex.get());
 
 			textures.insert(std::make_pair(fileName, std::move(tex)));
 
@@ -200,7 +200,7 @@ Texture* TextureManager::LoadTexture(const std::string& fileName, ID3D12Graphics
 			return nullptr;
 		}
 
-		tex->heapPos = srvHeap->CreateTxtureView(tex.get());
+		tex->srvHeapHandleUint = srvHeap->CreateTxtureView(tex.get());
 
 		textures.insert(std::make_pair(fileName, std::move(tex)));
 
@@ -215,7 +215,7 @@ Texture* TextureManager::LoadTexture(const std::string& fileName, ID3D12Graphics
 				return nullptr;
 			}
 
-			tex->heapPos = srvHeap->CreateTxtureView(tex.get());
+			tex->srvHeapHandleUint = srvHeap->CreateTxtureView(tex.get());
 
 			textures.insert(std::make_pair(fileName, std::move(tex)));
 
@@ -302,7 +302,7 @@ void TextureManager::ResetCommandList() {
 	}
 }
 
-void TextureManager::Use(int32_t texIndex, UINT rootParam) {
+void TextureManager::Use(uint32_t texIndex, UINT rootParam) {
 	auto* const mainComlist = Direct12::GetInstance()->GetCommandList();
 	mainComlist->SetGraphicsRootDescriptorTable(
 		rootParam, srvHeap->GetSrvGpuHeapHandle(texIndex));

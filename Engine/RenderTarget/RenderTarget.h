@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/ConstBuffer/ConstBuffer.h"
+#include "TextureManager/Texture/Texture.h"
 
 class RenderTarget {
 public:
@@ -30,14 +31,20 @@ public:
 		return srvHeapHandleUint;
 	}
 
+	Texture* GetTex() const {
+		return tex_.get();
+	}
+
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> resource;
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> RTVHeap;
 
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHeapHandle;
 	UINT srvHeapHandleUint;
 
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	std::unique_ptr<Texture> tex_;
+
 
 	bool isResourceStateChange;
 

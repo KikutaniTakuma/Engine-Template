@@ -20,10 +20,12 @@ void GameScene::Initialize() {
 
 	pera_.Initialize(
 		"./Resources/Shaders/PostShader/Post.VS.hlsl",
-		"./Resources/Shaders/PostShader/PostEdge.PS .hlsl"
+		"./Resources/Shaders/PostShader/PostNone.PS.hlsl"
 	);
 
 	particle_.LoadSettingDirectory("enemy-generation-delete");
+
+	rabbit_.LoadObj("./Resources/Rabbit/player.obj");
 
 	peraCamera_.Update();
 	pera_.scale_ = { 1280.0f, 720.0f };
@@ -36,6 +38,12 @@ void GameScene::Finalize() {
 void GameScene::Update() {
 	//model_.rotate.y += rotateSpd_ * frameInfo_->GetDelta();
 	model_.Update();
+	rabbit_.Debug("rabbit_");
+
+	if (input_->GetKey()->Pushed(DIK_SPACE)) {
+		rabbit_.ChangeTexture("face", pera_.GetTex());
+	}
+	rabbit_.Update();
 	camera_.Debug("camera");
 
 	particle_.Debug("particle_");
@@ -51,5 +59,7 @@ void GameScene::Draw() {
 	//particle_.Draw(camera_.rotate, camera_.GetViewProjection());
 	pera_.PreDraw();
 	model_.Draw(camera_.GetViewProjection(), camera_.GetPos());
-	pera_.Draw(peraCamera_.GetOthographics(), Pipeline::Mul);
+	pera_.SetMainRenderTarget();
+
+	rabbit_.Draw(camera_.GetViewProjection(), camera_.GetPos());
 }

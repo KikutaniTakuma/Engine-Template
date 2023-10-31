@@ -152,6 +152,8 @@ void PeraRender::CreateGraphicsPipeline() {
 }
 
 void PeraRender::Update() {
+	isPreDraw_ = false;
+
 	static const std::array<Vector3, 4> pv{
 			Vector3{ -0.5f,  0.5f, 0.1f },
 			Vector3{  0.5f,  0.5f, 0.1f },

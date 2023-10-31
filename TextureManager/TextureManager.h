@@ -58,7 +58,7 @@ public:
 
 	void ResetCommandList();
 
-	void Use(int32_t texIndex, UINT rootParam);
+	void Use(uint32_t texIndex, UINT rootParam);
 
 
 private:

@@ -99,7 +99,11 @@ uint32_t ShaderResourceHeap::CreateTxtureView(Texture* tex) {
 
 	if (bookingHandle_.empty()) {
 		useHandle_.push_back(currentHandleIndex);
-		tex->CreateSRVView(heapHandles[currentHandleIndex].first);
+		tex->CreateSRVView(
+			heapHandles[currentHandleIndex].first,
+			heapHandles[currentHandleIndex].second,
+			currentHandleIndex
+			);
 		currentHandleIndex++;
 		return currentHandleIndex - 1u;
 	}
@@ -107,7 +111,11 @@ uint32_t ShaderResourceHeap::CreateTxtureView(Texture* tex) {
 	else {
 		uint32_t nowCreateViewHandle = bookingHandle_.front();
 		useHandle_.push_back(nowCreateViewHandle);
-		tex->CreateSRVView(heapHandles[nowCreateViewHandle].first);
+		tex->CreateSRVView(
+			heapHandles[nowCreateViewHandle].first,
+			heapHandles[nowCreateViewHandle].second,
+			nowCreateViewHandle
+		);
 		bookingHandle_.pop_front();
 		return nowCreateViewHandle;
 	}
@@ -121,7 +129,11 @@ void ShaderResourceHeap::CreateTxtureView(Texture* tex, uint32_t heapIndex) {
 		return;
 	}
 
-	tex->CreateSRVView(heapHandles[heapIndex].first);
+	tex->CreateSRVView(
+		heapHandles[heapIndex].first,
+		heapHandles[heapIndex].second,
+		heapIndex
+		);
 }
 
 uint32_t ShaderResourceHeap::CreatePerarenderView(RenderTarget& renderTarget) {

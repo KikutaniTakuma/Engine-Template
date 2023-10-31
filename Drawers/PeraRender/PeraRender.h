@@ -48,6 +48,17 @@ public:
 
 	void Draw(const Mat4x4& viewProjection, Pipeline::Blend blend, PeraRender* pera = nullptr);
 
+	Texture* GetTex() const {
+		return render_.GetTex();
+	}
+
+	void ChangeResourceState() {
+		render_.ChangeResourceState();
+	}
+
+	void SetMainRenderTarget() {
+		render_.SetMainRenderTarget();
+	}
 
 public:
 	Vector3 pos_;

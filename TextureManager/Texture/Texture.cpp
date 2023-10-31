@@ -7,6 +7,7 @@
 #include <filesystem>
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "TextureManager/TextureManager.h"
+#include "Engine/ShaderResource/ShaderResourceHeap.h"
 
 Texture::Texture():
 	textureResouce(nullptr),
@@ -16,7 +17,7 @@ Texture::Texture():
 	threadLoadFlg(false),
 	size(),
 	fileName(),
-	heapPos(0)
+	srvHeapHandleUint(0)
 {}
 
 Texture::~Texture() {
@@ -227,9 +228,16 @@ ID3D12Resource* Texture::UploadTextureData(ID3D12Resource* texture, const Direct
 
 
 
-void Texture::CreateSRVView(D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle) {
+void Texture::CreateSRVView(
+	D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle,
+	D3D12_GPU_DESCRIPTOR_HANDLE descHeapHandleGPU,
+	UINT descHeapHandleUINT
+) {
 	static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
 	device->CreateShaderResourceView(textureResouce.Get(), &srvDesc, descHeapHandle);
+
+	srvHeapHandle = descHeapHandleGPU;
+	srvHeapHandleUint = descHeapHandleUINT;
 }
 
 
@@ -243,5 +251,28 @@ void Texture::ReleaseIntermediateResource() {
 void Texture::Use(UINT rootParamator) {
 	static TextureManager* textureManager = TextureManager::GetInstance();
 	assert(textureManager);
-	textureManager->Use(heapPos, rootParamator);
+	textureManager->Use(srvHeapHandleUint, rootParamator);
+}
+
+void Texture::Set(
+	const Microsoft::WRL::ComPtr<ID3D12Resource>& resource,
+	D3D12_SHADER_RESOURCE_VIEW_DESC viewDesc,
+	D3D12_GPU_DESCRIPTOR_HANDLE handle,
+	UINT handleUINT
+) {
+	if (CanUse()) {
+		ShaderResourceHeap* srvHeap = ShaderResourceHeap::GetInstance();
+		srvHeap->ReleaseView(srvHeapHandleUint);
+		textureResouce->Release();
+		textureResouce.Reset();
+	}
+
+	resource->AddRef();
+	textureResouce = resource;
+	srvDesc = viewDesc;
+	srvHeapHandle = handle;
+	srvHeapHandleUint = handleUINT;
+
+	// load済み
+	isLoad = true;
 }

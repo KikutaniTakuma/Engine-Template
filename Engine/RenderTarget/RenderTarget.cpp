@@ -14,7 +14,8 @@ RenderTarget::RenderTarget():
 	isResourceStateChange(false),
 	width(Engine::GetInstance()->clientWidth),
 	height(Engine::GetInstance()->clientHeight),
-	srvDesc{}
+	srvDesc{},
+	srvHeapHandleUint()
 {
 	auto resDesc = Direct12::GetInstance()->GetSwapchainBufferDesc();
 
@@ -73,7 +74,8 @@ RenderTarget::RenderTarget(uint32_t width_, uint32_t height_) :
 	isResourceStateChange(false),
 	width(width_),
 	height(height_),
-	srvDesc{}
+	srvDesc{},
+	srvHeapHandleUint()
 {
 	auto resDesc = Direct12::GetInstance()->GetSwapchainBufferDesc();
 	resDesc.Width = width;
@@ -185,4 +187,14 @@ void RenderTarget::CreateView(D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle, D3D12_
 
 	srvHeapHandle = descHeapHandleGPU;
 	srvHeapHandleUint = descHeapHandleUINT;
+
+	tex_.reset();
+	tex_ = std::make_unique<Texture>();
+	assert(tex_);
+	tex_->Set(
+		resource,
+		srvDesc,
+		srvHeapHandle,
+		srvHeapHandleUint
+	);
 }

@@ -53,7 +53,11 @@ private:
 /// View作成関数
 /// </summary>
 public:
-	void CreateSRVView(D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle);
+	void CreateSRVView(
+		D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle,
+		D3D12_GPU_DESCRIPTOR_HANDLE descHeapHandleGPU, 
+		UINT descHeapHandleUINT
+	);
 
 /// <summary>
 /// CPU側のリソースを解放
@@ -69,6 +73,13 @@ public:
 public:
 	void Use(UINT rootParamator);
 
+	void Set(
+		const Microsoft::WRL::ComPtr<ID3D12Resource>& resource,
+		D3D12_SHADER_RESOURCE_VIEW_DESC viewDesc,
+		D3D12_GPU_DESCRIPTOR_HANDLE handle,
+		UINT handleUINT
+		);
+
 
 /// <summary>
 /// メンバ変数
@@ -79,10 +90,12 @@ private:
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
 
+	D3D12_GPU_DESCRIPTOR_HANDLE srvHeapHandle;
+	uint32_t srvHeapHandleUint;
+
 	bool isLoad;
 	bool threadLoadFlg;
 
-	int32_t heapPos;
 
 
 	Vector2 size;

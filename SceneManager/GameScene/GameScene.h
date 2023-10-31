@@ -32,6 +32,8 @@ public:
 public:
 	Model model_;
 
+	Model rabbit_;
+
 	//float rotateSpd_;
 
 	Particle particle_;
