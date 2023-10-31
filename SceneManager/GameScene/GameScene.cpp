@@ -7,8 +7,8 @@
 
 GameScene::GameScene():
 	BaseScene(BaseScene::ID::Game),
-	model_(),
-	rotateSpd_(std::numbers::pi_v<float> * 0.5f)
+	model_()/*,
+	rotateSpd_(std::numbers::pi_v<float> * 0.5f)*/
 {}
 
 void GameScene::Initialize() {
@@ -29,12 +29,13 @@ void GameScene::Finalize() {
 }
 
 void GameScene::Update() {
-	model_.rotate.y += rotateSpd_ * frameInfo_->GetDelta();
+	//model_.rotate.y += rotateSpd_ * frameInfo_->GetDelta();
 	model_.Update();
+	camera_.Debug("camera");
 }
 
 void GameScene::Draw() {
-	camera_.Update();
+	camera_.Update(Vector3::zero);
 	
 	model_.Draw(camera_.GetViewProjection(), camera_.GetPos());
 	pera_.PreDraw();

@@ -31,7 +31,7 @@ public:
 public:
 	Model model_;
 
-	float rotateSpd_;
+	//float rotateSpd_;
 
 	PeraRender pera_;
 };
