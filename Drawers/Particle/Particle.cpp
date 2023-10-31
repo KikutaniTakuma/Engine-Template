@@ -106,6 +106,8 @@ Particle::Particle() :
 	uvSize(Vector2::identity),
 	tex(nullptr),
 	isLoad(false),
+	isBillboard_(true),
+	isYBillboard_(false),
 	wvpMat(1),
 	colorBuf(1),
 	aniStartTime_(),
@@ -174,6 +176,8 @@ Particle::Particle(uint32_t indexNum) :
 	uvSize(Vector2::identity),
 	tex(nullptr),
 	isLoad(false),
+	isBillboard_(true),
+	isYBillboard_(false),
 	wvpMat(indexNum),
 	colorBuf(indexNum),
 	aniStartTime_(),
@@ -459,6 +463,20 @@ void Particle::LoadSettingDirectory(const std::string& directoryName) {
 			tex = TextureManager::GetInstance()->GetWhiteTex();
 			isLoad = true;
 		}
+		if (std::getline(file, lineBuf)) {
+			isBillboard_ = static_cast<bool>(std::atoi(lineBuf.c_str()));
+		}
+		else {
+			isBillboard_ = true;
+		}
+		if (std::getline(file, lineBuf)) {
+			isYBillboard_ = static_cast<bool>(std::atoi(lineBuf.c_str()));
+		}
+		else {
+			isYBillboard_ = false;
+		}
+
+
 		file.close();
 	}
 }
@@ -875,6 +893,7 @@ void Particle::Update() {
 }
 
 void Particle::Draw(
+	const Vector3& cameraRotate,
 	const Mat4x4& viewProjection,
 	Pipeline::Blend blend
 ) {
@@ -896,9 +915,22 @@ void Particle::Draw(
 
 		UINT drawCount = 0;
 		assert(wtfs.size() == wvpMat.Size());
+		Mat4x4 billboardMat;
+		if (isBillboard_) {
+			if (isYBillboard_) {
+				billboardMat = MakeMatrixRotateY(cameraRotate.y);
+			}
+			else {
+				billboardMat = MakeMatrixRotate(cameraRotate);
+			}
+		}
+		else {
+			billboardMat = Mat4x4::kIdentity_;
+		}
+
 		for (uint32_t i = 0; i < wvpMat.Size();i++) {
 			if (wtfs[i].isActive) {
-				wvpMat[drawCount] = MakeMatrixAffin(wtfs[i].scale, wtfs[i].rotate, wtfs[i].pos) * viewProjection;
+				wvpMat[drawCount] = MakeMatrixAffin(wtfs[i].scale, wtfs[i].rotate, wtfs[i].pos) * billboardMat * viewProjection;
 				colorBuf[drawCount] = UintToVector4(wtfs[i].color);
 				drawCount++;
 			}
@@ -1184,6 +1216,8 @@ void Particle::Debug(const std::string& guiName) {
 	}
 	ImGui::EndMenuBar();
 
+	ImGui::Checkbox("isBillboard", &isBillboard_);
+	ImGui::Checkbox("isYBillboard", &isYBillboard_);
 	ImGui::Checkbox("isLoop", isLoop_.Data());
 	if (ImGui::Button("all setting save")) {
 		for (auto i = 0llu; i < settings.size(); i++) {
@@ -1239,7 +1273,9 @@ void Particle::Debug(const std::string& guiName) {
 
 		if (!file.fail() && isLoad) {
 			file << static_cast<bool>(isLoop_) << std::endl
-				<< tex->GetFileName();
+				<< tex->GetFileName() << std::endl 
+				<< isBillboard_ << std::endl 
+				<< isYBillboard_;
 			file.close();
 			MessageBoxA(
 				WinApp::GetInstance()->GetHwnd(),

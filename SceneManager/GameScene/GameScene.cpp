@@ -16,12 +16,14 @@ void GameScene::Initialize() {
 	camera_.pos.z = -5.0f;
 	camera_.pos.y = 1.1f;
 	
-	model_.LoadObj("./Resources/Watame/Watame.obj");
+	//model_.LoadObj("./Resources/Watame/Watame.obj");
 
 	pera_.Initialize(
 		"./Resources/Shaders/PostShader/Post.VS.hlsl",
 		"./Resources/Shaders/PostShader/PostEdge.PS .hlsl"
 	);
+
+	particle_.LoadSettingDirectory("enemy-generation-delete");
 }
 
 void GameScene::Finalize() {
@@ -30,15 +32,19 @@ void GameScene::Finalize() {
 
 void GameScene::Update() {
 	//model_.rotate.y += rotateSpd_ * frameInfo_->GetDelta();
-	model_.Update();
+	//model_.Update();
 	camera_.Debug("camera");
+
+	particle_.Debug("particle_");
+	particle_.Update();
 }
 
 void GameScene::Draw() {
 	camera_.Update(Vector3::zero);
 	
+	/*model_.Draw(camera_.GetViewProjection(), camera_.GetPos());*/
+	particle_.Draw(camera_.rotate, camera_.GetViewProjection());
+	/*pera_.PreDraw();
 	model_.Draw(camera_.GetViewProjection(), camera_.GetPos());
-	pera_.PreDraw();
-	model_.Draw(camera_.GetViewProjection(), camera_.GetPos());
-	pera_.Draw(Pipeline::Mul);
+	pera_.Draw(Pipeline::Mul);*/
 }

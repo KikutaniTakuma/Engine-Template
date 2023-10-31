@@ -229,6 +229,7 @@ public:
 	/// <param name="viewProjection">カメラの行列/param>
 	/// <param name="blend">ブレンドモード</param>
 	void Draw(
+		const Vector3& cameraRotate,
 		const Mat4x4& viewProjection,
 		Pipeline::Blend blend = Pipeline::Blend::Normal
 	);
@@ -328,6 +329,9 @@ private:
 
 	Texture* tex;
 	bool isLoad;
+
+	bool isBillboard_;
+	bool isYBillboard_;
 
 	// アニメーション変数
 	std::chrono::steady_clock::time_point aniStartTime_;

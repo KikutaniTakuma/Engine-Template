@@ -45,6 +45,30 @@ public:
 	void Update(const Mat4x4& worldMat);
 
 	/// <summary>
+	/// ビュー行列取得
+	/// </summary>
+	/// <returns></returns>
+	const Mat4x4& GetView() const {
+		return view;
+	}
+
+	/// <summary>
+	/// プロジェクション行列取得
+	/// </summary>
+	/// <returns></returns>
+	const Mat4x4& GetProjection() const {
+		return projection;
+	}
+
+	/// <summary>
+	/// 平行投影
+	/// </summary>
+	/// <returns></returns>
+	const Mat4x4& GetOthographics() const {
+		return othograohics;
+	}
+
+	/// <summary>
 	/// 透視投影行列を取得(TypeがOthographicの場合ゼロ行列が返る)
 	/// </summary>
 	/// <returns>透視投影行列</returns>
