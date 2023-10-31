@@ -3,6 +3,7 @@
 #include "Utils/Math/Mat4x4.h"
 #include "Utils/Math/Vector2.h"
 #include "Utils/Math/Vector4.h"
+#include <string>
 
 class Camera {
 /// <summary>
@@ -28,10 +29,15 @@ public:
 /// </summary>
 public:
 	/// <summary>
+	/// 更新
+	/// </summary>
+	void Update();
+
+	/// <summary>
 	/// 行列更新
 	/// </summary>
 	/// <param name="gazePoint">デバッグ時の起点</param>
-	void Update(const Vector3& gazePoint = Vector3::zero);
+	void Update(const Vector3& gazePoint);
 	/// <summary>
 	/// 行列更新
 	/// </summary>
@@ -77,25 +83,18 @@ public:
 		return viewOthograohicsVp;
 	}
 
+	void Debug(const std::string& guiName);
+
 
 /// <summary>
 /// メンバ変数
 /// </summary>
-public:
-	bool isDebug;
-
 public:
 	Vector3 pos;
 	Vector3 scale;
 	Vector3 rotate;
 
 	float drawScale;
-
-	Vector3 moveVec;
-	float moveSpd;
-	float moveRotateSpd;
-	Vector2 gazePointRotate;
-	float gazePointRotateSpd;
 
 protected:
 	Vector3 worldPos;
