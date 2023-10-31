@@ -153,6 +153,8 @@ Mat4x4 MakeMatrixRotateY(float rad);
 
 Mat4x4 MakeMatrixRotateZ(float rad);
 
+Mat4x4 MakeMatrixRotate(const Vector3& rad);
+
 Mat4x4 MakeMatrixAffin(const Vector3& scale, const Vector3& rad, const Vector3& translate);
 
 Mat4x4 MakeMatrixInverse(Mat4x4 mat);

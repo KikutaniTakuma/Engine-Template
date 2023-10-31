@@ -378,6 +378,14 @@ Mat4x4 MakeMatrixRotateZ(float rad) {
 	return tmp;
 }
 
+Mat4x4 MakeMatrixRotate(const Vector3& rad) {
+	Mat4x4 tmp;
+
+	tmp.Affin(Vector3::identity, rad, Vector3::zero);
+
+	return tmp;
+}
+
 Mat4x4 MakeMatrixAffin(const Vector3& scale, const Vector3& rad, const Vector3& translate) {
 	Mat4x4 tmp;
 
