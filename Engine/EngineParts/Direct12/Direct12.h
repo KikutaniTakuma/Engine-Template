@@ -4,6 +4,8 @@
 #pragma comment(lib, "d3d12.lib")
 #include <dxgi1_6.h>
 #pragma comment(lib, "dxgi.lib")
+#undef max
+#undef min
 #include <vector>
 #include <cstdint>
 

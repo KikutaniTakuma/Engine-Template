@@ -9,6 +9,7 @@
 
 #include "Utils/Math/Vector3.h"
 #include "Utils/Math/Vector2.h"
+#include "Utils/Math/Mat4x4.h"
 
 class PeraRender {
 public:
@@ -41,16 +42,39 @@ private:
 	void CreateGraphicsPipeline();
 
 public:
+	void Update();
+
 	void PreDraw();
 
-	void Draw(Pipeline::Blend blend, PeraRender* pera = nullptr);
+	void Draw(const Mat4x4& viewProjection, Pipeline::Blend blend, PeraRender* pera = nullptr);
+
+
+public:
+	Vector3 pos_;
+	Vector3 rotate_;
+	Vector3 scale_;
+
+	Vector2 uvPibot_;
+	Vector2 uvSize_;
+
+	std::array<Vector3, 4> worldPos_;
+
+	uint32_t color_;
 
 private:
-	RenderTarget render;
+	RenderTarget render_;
 
-	D3D12_VERTEX_BUFFER_VIEW peraVertexView;
-	Microsoft::WRL::ComPtr<ID3D12Resource> peraVertexResource = nullptr;
-	Shader shader;
+	ConstBuffer<Mat4x4> wvpMat_;
+	ConstBuffer<Vector4> colorBuf_;
 
-	std::array<class Pipeline*, Pipeline::Blend::BlendTypeNum> piplines;
+	bool isPreDraw_;
+
+	D3D12_VERTEX_BUFFER_VIEW peraVertexView_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> peraVertexResource_ = nullptr;
+	Shader shader_;
+
+	D3D12_INDEX_BUFFER_VIEW indexView_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
+
+	std::array<class Pipeline*, Pipeline::Blend::BlendTypeNum> piplines_;
 };

@@ -37,4 +37,5 @@ public:
 	Particle particle_;
 
 	PeraRender pera_;
+	Camera peraCamera_;
 };
