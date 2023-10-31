@@ -1181,33 +1181,18 @@ void Particle::Debug(const std::string& guiName) {
 			);
 
 			if (id == IDOK) {
-				int32_t id2 = MessageBoxA(
+				BackUpSettingFile(groupName);
+
+				settings.erase(settings.begin() + i);
+				datas.erase(groupName);
+				ImGui::EndMenu();
+
+				MessageBoxA(
 					WinApp::GetInstance()->GetHwnd(),
-					"Really??? delete it???", "Particle",
-					MB_OKCANCEL | MB_ICONINFORMATION
+					"delete success", "Particle",
+					MB_OK | MB_ICONINFORMATION
 				);
-				if (id2 == IDOK) {
-					int32_t id3 = MessageBoxA(
-						WinApp::GetInstance()->GetHwnd(),
-						"Really????????????????????????", "Particle",
-						MB_OKCANCEL | MB_ICONINFORMATION
-					);
-
-					if (id3 == IDOK) {
-						BackUpSettingFile(groupName);
-
-						settings.erase(settings.begin() + i);
-						datas.erase(groupName);
-						ImGui::EndMenu();
-
-						MessageBoxA(
-							WinApp::GetInstance()->GetHwnd(),
-							"delete success", "Particle",
-							MB_OK | MB_ICONINFORMATION
-						);
-						break;
-					}
-				}
+				break;
 			}
 		}
 
