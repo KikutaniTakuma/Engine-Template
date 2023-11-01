@@ -20,9 +20,9 @@ void Collider::UpdateCollision() {
 
 
 bool Collider::IsCollision(const Vector3& pos) {
-	if (min_.x < pos.x && pos.x < max_.x) {
-		if (min_.y < pos.y && pos.y < max_.y) {
-			if (min_.z < pos.z && pos.z < max_.z) {
+	if (min_.x <= pos.x && pos.x <= max_.x) {
+		if (min_.y <= pos.y && pos.y <= max_.y) {
+			if (min_.z <= pos.z && pos.z <= max_.z) {
 				color_ = Vector4ToUint(Vector4::xIdy);
 				return true;
 			}
@@ -32,7 +32,7 @@ bool Collider::IsCollision(const Vector3& pos) {
 	return false;
 }
 
-void Collider::IsCollision(const Collider* other) {
+bool Collider::IsCollision(Collider* other) {
 	std::array<Vector3, 8> positions = {
 		Vector3(other->min_), // 左下手前
 		Vector3(other->min_.x, other->min_.y, other->max_.z), // 左下奥
@@ -48,7 +48,8 @@ void Collider::IsCollision(const Collider* other) {
 	for (auto& pos : positions) {
 		if (IsCollision(pos)) {
 			flg_ = true;
-			return;
+			other->flg_ = true;
+			return static_cast<bool>(flg_);
 		}
 		else {
 			flg_ = false;
@@ -56,6 +57,13 @@ void Collider::IsCollision(const Collider* other) {
 	}
 
 	color_ = Vector4ToUint(Vector4::identity);
+
+	// もし当たってなかったら自分が相手に当たってるかを確認
+	if (!flg_) {
+		flg_ = other->IsCollision(this);
+	}
+
+	return static_cast<bool>(flg_);
 }
 
 void Collider::DebugDraw(const Mat4x4& viewProjection) {

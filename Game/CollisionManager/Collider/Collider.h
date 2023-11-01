@@ -19,7 +19,7 @@ public:
 	void UpdateCollision();
 
 	bool IsCollision(const Vector3& pos);
-	void IsCollision(const Collider* other);
+	bool IsCollision(Collider* other);
 
 	void DebugDraw(const Mat4x4& viewProjection);
 

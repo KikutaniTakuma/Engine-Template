@@ -16,7 +16,7 @@
 #include "ErrorCheck/ErrorCheck.h"
 #include "FrameInfo/FrameInfo.h"
 #include "Utils/ConvertString/ConvertString.h"
-#include "Utils/Log/Log.h"
+#include "Utils/ExecutionLog/ExecutionLog.h"
 
 #include "Drawers/Texture2D/Texture2D.h"
 #include "Drawers/Model/Model.h"

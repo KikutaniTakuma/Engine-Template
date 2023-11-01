@@ -4,7 +4,7 @@
 #include <cassert>
 #include <format>
 #include "Engine/ErrorCheck/ErrorCheck.h"
-#include "Utils/Log/Log.h"
+#include "Utils/ExecutionLog/ExecutionLog.h"
 
 ShaderManager* ShaderManager::instance = nullptr;
 

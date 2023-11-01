@@ -4,6 +4,7 @@
 #include "Utils/Math/Vector3.h"
 #include <vector>
 #include <filesystem>
+#include <concepts>
 
 namespace UtilsLib {
 	int8_t Random(int8_t min, int8_t max);
@@ -45,17 +46,19 @@ namespace UtilsLib {
 			return flg_;
 		}
 
-		inline explicit operator int32_t() const {
-			return static_cast<int32_t>(flg_);
-		}
-
-		inline explicit operator uint32_t() const {
-			return static_cast<uint32_t>(flg_);
-		}
-
 		bool operator!() const {
 			return !flg_;
 		}
+
+		/// <summary>
+		/// 暗黙型定義(整数型)
+		/// </summary>
+		/// <typeparam name="T">整数型にのみ型制限</typeparam>
+		template<std::integral T>
+		inline explicit operator T() const {
+			return static_cast<T>(flg_);
+		}
+
 
 		inline bool operator==(const Flg& other) const {
 			return flg_ == other.flg_ && preFlg_ == other.preFlg_;

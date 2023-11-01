@@ -1,14 +1,16 @@
-#include "Log.h"
+#include "Utils/ExecutionLog/ExecutionLog.h"
 #include <fstream>
 #include <filesystem>
 #include <cassert>
+#include <chrono>
+#include <format>
 #include <Windows.h>
 #undef max
 #undef min
 
 namespace Log {
 	bool AddLog(const std::string& text) {
-		static const std::filesystem::path fileName = "./ExecutionLog/ExecutionLog.txt";
+		static const std::filesystem::path fileName = "./Log/Log.txt";
 		static bool isOpned = false;
 
 		if (!std::filesystem::exists(fileName.parent_path())) {
@@ -26,7 +28,7 @@ namespace Log {
 			return false;
 		}
 
-		file << text;
+		file << NowTime() << " : " << text;
 
 		isOpned = true;
 
@@ -35,5 +37,13 @@ namespace Log {
 
 	void DebugLog(const std::string& text) {
 		OutputDebugStringA(text.c_str());
+	}
+
+	std::string NowTime() {
+		auto now = std::chrono::system_clock::now();
+		auto nowSec = std::chrono::floor<std::chrono::seconds>(now);
+		std::chrono::zoned_time zt{ "Asia/Tokyo", nowSec };
+
+		return std::format("{:%Y/%m/%d %H:%M:%S}", zt);
 	}
 }

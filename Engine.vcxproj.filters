@@ -125,9 +125,6 @@
     <ClCompile Include="Input\Input.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\Log\Log.cpp">
-      <Filter>Utils\Log</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\ConvertString\ConvertString.cpp">
       <Filter>Utils\ConvertString</Filter>
     </ClCompile>
@@ -175,6 +172,9 @@
     </ClCompile>
     <ClCompile Include="Engine\EngineParts\Direct12\Direct12.cpp">
       <Filter>Engine\EngineParts\Direct12</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\ExecutionLog\ExecutionLog.cpp">
+      <Filter>Utils\ExecutionLog</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -280,9 +280,6 @@
     <Filter Include="Engine\FrameInfo">
       <UniqueIdentifier>{0b450b74-986a-4b3d-9a34-b57d457b62d0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Utils\Log">
-      <UniqueIdentifier>{50f0f596-926c-4b48-959c-d79c4f823f0f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Utils\ConvertString">
       <UniqueIdentifier>{5a7a3057-cf34-4af9-a2fc-9484d57e4dd8}</UniqueIdentifier>
     </Filter>
@@ -345,6 +342,9 @@
     </Filter>
     <Filter Include="Engine\EngineParts\Direct12">
       <UniqueIdentifier>{bc6d847e-8d29-46e3-885f-56b456010f29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\ExecutionLog">
+      <UniqueIdentifier>{68109607-fdfe-4fef-9345-8ea31bbf59bd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -477,9 +477,6 @@
     <ClInclude Include="Input\Input.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\Log\Log.h">
-      <Filter>Utils\Log</Filter>
-    </ClInclude>
     <ClInclude Include="Utils\ConvertString\ConvertString.h">
       <Filter>Utils\ConvertString</Filter>
     </ClInclude>
@@ -530,6 +527,9 @@
     </ClInclude>
     <ClInclude Include="Engine\EngineParts\Direct12\Direct12.h">
       <Filter>Engine\EngineParts\Direct12</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\ExecutionLog\ExecutionLog.h">
+      <Filter>Utils\ExecutionLog</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
