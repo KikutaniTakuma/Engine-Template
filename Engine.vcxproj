@@ -184,6 +184,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Game\CollisionManager\Collider\Collider.cpp" />
     <ClCompile Include="Game\CollisionManager\CollisionManager.cpp" />
+    <ClCompile Include="Game\CollisionManager\Obb\Obb.cpp" />
+    <ClCompile Include="Game\CollisionManager\Plane\Plane.cpp" />
     <ClCompile Include="Game\Enemy\Enemy.cpp" />
     <ClCompile Include="Game\Goal\Goal.cpp" />
     <ClCompile Include="Game\MoveFloor\MoveFloor.cpp" />
@@ -254,6 +256,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Game\CollisionManager\Collider\Collider.h" />
     <ClInclude Include="Game\CollisionManager\CollisionManager.h" />
+    <ClInclude Include="Game\CollisionManager\Obb\Obb.h" />
+    <ClInclude Include="Game\CollisionManager\Plane\Plane.h" />
     <ClInclude Include="Game\Enemy\Enemy.h" />
     <ClInclude Include="Game\Goal\Goal.h" />
     <ClInclude Include="Game\MoveFloor\MoveFloor.h" />

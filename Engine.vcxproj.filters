@@ -176,6 +176,12 @@
     <ClCompile Include="Utils\ExecutionLog\ExecutionLog.cpp">
       <Filter>Utils\ExecutionLog</Filter>
     </ClCompile>
+    <ClCompile Include="Game\CollisionManager\Obb\Obb.cpp">
+      <Filter>Game\CollisionManager\Obb</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\CollisionManager\Plane\Plane.cpp">
+      <Filter>Game\Plane</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -345,6 +351,12 @@
     </Filter>
     <Filter Include="Utils\ExecutionLog">
       <UniqueIdentifier>{68109607-fdfe-4fef-9345-8ea31bbf59bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\CollisionManager\Obb">
+      <UniqueIdentifier>{f1b87284-7f48-48e0-946d-317f4c3da22f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Plane">
+      <UniqueIdentifier>{268eefac-748b-4452-b6c2-10e06349215c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -530,6 +542,12 @@
     </ClInclude>
     <ClInclude Include="Utils\ExecutionLog\ExecutionLog.h">
       <Filter>Utils\ExecutionLog</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\CollisionManager\Obb\Obb.h">
+      <Filter>Game\CollisionManager\Obb</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\CollisionManager\Plane\Plane.h">
+      <Filter>Game\Plane</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

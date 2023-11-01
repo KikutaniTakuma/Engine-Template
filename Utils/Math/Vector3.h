@@ -48,6 +48,10 @@ public:
 	bool operator==(const Vector3& right) const noexcept;
 	bool operator!=(const Vector3& right) const noexcept;
 
+	// 
+	float& operator[](size_t index) noexcept;
+	const float& operator[](size_t index) const noexcept;
+
 
 /// <summary>
 /// メンバ関数
@@ -57,7 +61,6 @@ public:
 	Vector3 Cross(const Vector3& right) const noexcept;
 	float Length() const noexcept;
 	Vector3 Normalize() const noexcept;
-	Vector3 GetRad()const noexcept;
 
 /// <summary>
 /// 静的定数
@@ -99,3 +102,17 @@ public:
 public:
 	static Vector3 Lerp(const Vector3& start, const Vector3& end, float t);
 };
+
+struct Ray {
+	Vector3 origin;
+	Vector3 diff;
+};
+
+struct Segment {
+	Vector3 origin;
+	Vector3 diff;
+};
+
+Vector3 Project(const Vector3& vec1, const Vector3& vec2);
+
+Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
