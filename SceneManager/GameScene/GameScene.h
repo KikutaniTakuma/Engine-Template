@@ -33,5 +33,10 @@ public:
 
 	float rotateSpd_;
 
+	
+	UtilsLib::Flg isRotateModel_;
+	UtilsLib::Flg isOutLine_;
+	UtilsLib::Flg isDrawModel_;
+
 	PeraRender pera_;
 };

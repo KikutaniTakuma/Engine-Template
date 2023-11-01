@@ -5,10 +5,13 @@
 #include "Engine/FrameInfo/FrameInfo.h"
 #include <numbers>
 
-GameScene::GameScene():
+GameScene::GameScene() :
 	BaseScene(BaseScene::ID::Game),
 	model_(),
-	rotateSpd_(std::numbers::pi_v<float> * 0.5f)
+	rotateSpd_(std::numbers::pi_v<float> * 0.5f),
+	isOutLine_(true),
+	isRotateModel_(false),
+	isDrawModel_(true)
 {}
 
 void GameScene::Initialize() {
@@ -29,15 +32,32 @@ void GameScene::Finalize() {
 }
 
 void GameScene::Update() {
-	model_.rotate.y += rotateSpd_ * frameInfo_->GetDelta();
+	if (isRotateModel_) {
+		model_.rotate.y += rotateSpd_ * frameInfo_->GetDelta();
+	}
+	
 	model_.Update();
+
+	if (input_->GetKey()->Pushed(DIK_1)) {
+		isOutLine_ = !isOutLine_;
+	}
+	if (input_->GetKey()->Pushed(DIK_2)) {
+		isDrawModel_ = !isDrawModel_;
+	}
+	if (input_->GetKey()->Pushed(DIK_3)) {
+		isRotateModel_= !isRotateModel_;
+	}
 }
 
 void GameScene::Draw() {
 	camera_.Update();
 	
-	model_.Draw(camera_.GetViewProjection(), camera_.GetPos());
-	pera_.PreDraw();
-	model_.Draw(camera_.GetViewProjection(), camera_.GetPos());
-	pera_.Draw(Pipeline::Mul);
+	if (isDrawModel_) {
+		model_.Draw(camera_.GetViewProjection(), camera_.GetPos());
+	}
+	if (isOutLine_) {
+		pera_.PreDraw();
+		model_.Draw(camera_.GetViewProjection(), camera_.GetPos());
+		pera_.Draw(Pipeline::Mul);
+	}
 }
