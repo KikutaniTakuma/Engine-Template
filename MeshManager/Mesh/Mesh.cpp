@@ -47,6 +47,8 @@ void Mesh::LoadObj(const std::string& objFileName) {
 			std::string identifier;
 			std::istringstream line(lineBuf);
 			line >> identifier;
+
+			// 頂点
 			if (identifier == "v") {
 				Vector4 buf;
 				line >> buf.vec.x >> buf.vec.y >> buf.vec.z;
@@ -55,18 +57,21 @@ void Mesh::LoadObj(const std::string& objFileName) {
 
 				posDatas.push_back(buf);
 			}
+			// 法線
 			else if (identifier == "vn") {
 				Vector3 buf;
 				line >> buf.x >> buf.y >> buf.z;
 				buf.x *= -1.0f;
 				normalDatas.push_back(buf);
 			}
+			// uv情報
 			else if (identifier == "vt") {
 				Vector2 buf;
 				line >> buf.x >> buf.y;
 				buf.y = 1.0f - buf.y;
 				uvDatas.push_back(buf);
 			}
+			// index情報
 			else if (identifier == "f") {
 				std::string buf;
 				std::vector<float> posBuf(0);
@@ -135,10 +140,11 @@ void Mesh::LoadObj(const std::string& objFileName) {
 			meshs_[i.first].strideInBytes = sizeof(VertData);
 
 			for (int32_t j = 0; j < indexDatas[i.first].size(); j++) {
-				meshs_[i.first].vertices[j].position = posDatas[indexDatas[i.first][j].vertNum];
-				meshs_[i.first].vertices[j].normal = normalDatas[indexDatas[i.first][j].normalNum];
+				auto& index = indexDatas[i.first][j];
+				meshs_[i.first].vertices[j].position = posDatas[index.vertNum];
+				meshs_[i.first].vertices[j].normal = normalDatas[index.normalNum];
 				if (!uvDatas.empty()) {
-					meshs_[i.first].vertices[j].uv = uvDatas[indexDatas[i.first][j].uvNum];
+					meshs_[i.first].vertices[j].uv = uvDatas[index.uvNum];
 				}
 			}
 
