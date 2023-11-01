@@ -87,6 +87,8 @@ public:
 	void ChangeTexture(const std::string& useMtlName, const std::string& texName);
 	void ChangeTexture(const std::string& useMtlName, Texture* tex);
 
+	void RelaseCopyData();
+
 public:
 	Vector3 pos;
 	Vector3 rotate;
@@ -102,7 +104,7 @@ private:
 
 	std::unordered_map<std::string, Mesh::CopyData> data;
 
-	bool loadObjFlg;
+	bool isLoadObj;
 
 	ConstBuffer<MatrixData> wvpData;
 

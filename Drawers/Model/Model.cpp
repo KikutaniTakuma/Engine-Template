@@ -2,6 +2,7 @@
 #include <cassert>
 #include <climits>
 #include "Utils/ConvertString/ConvertString.h"
+#include "Utils/UtilsLib/UtilsLib.h"
 #include "Engine/ShaderResource/ShaderResourceHeap.h"
 #include "externals/imgui/imgui.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
@@ -99,7 +100,7 @@ Model::Model() :
 	parent(nullptr),
 	mesh(nullptr),
 	data(),
-	loadObjFlg(false),
+	isLoadObj(false),
 	wvpData(),
 	dirLig(),
 	colorBuf()
@@ -155,7 +156,7 @@ Model& Model::operator=(const Model& right) {
 	parent = right.parent;
 
 	// 自身がロード済みだったらResourceを解放する
-	if (loadObjFlg) {
+	if (isLoadObj) {
 		for (auto& i : data) {
 			if (i.second.resource.first) {
 				i.second.resource.first->Release();
@@ -166,7 +167,7 @@ Model& Model::operator=(const Model& right) {
 	}
 
 	// rightがロード済みだったら
-	if (right.loadObjFlg) {
+	if (right.isLoadObj) {
 		mesh = right.mesh;
 
 		if (!mesh) {
@@ -176,7 +177,7 @@ Model& Model::operator=(const Model& right) {
 
 		data = mesh->CreateResource();
 
-		loadObjFlg = true;
+		isLoadObj = true;
 	}
 
 	light = right.light;
@@ -197,7 +198,7 @@ Model& Model::operator=(Model&& right) noexcept {
 	parent = std::move(right.parent);
 
 	// 自身がロード済みだったらResourceを解放する
-	if (loadObjFlg) {
+	if (isLoadObj) {
 		for (auto& i : data) {
 			if (i.second.resource.first) {
 				i.second.resource.first->Release();
@@ -208,7 +209,7 @@ Model& Model::operator=(Model&& right) noexcept {
 	}
 
 	// rightがロード済みだったら
-	if (right.loadObjFlg) {
+	if (right.isLoadObj) {
 		mesh = right.mesh;
 
 		if (!mesh) {
@@ -218,7 +219,7 @@ Model& Model::operator=(Model&& right) noexcept {
 
 		data = mesh->CreateResource();
 
-		loadObjFlg = true;
+		isLoadObj = true;
 	}
 
 	light = std::move(right.light);
@@ -232,7 +233,8 @@ Model& Model::operator=(Model&& right) noexcept {
 }
 
 void Model::LoadObj(const std::string& fileName) {
-	if (!loadObjFlg) {
+	if (!isLoadObj) {
+		RelaseCopyData();
 		mesh = MeshManager::GetInstance()->LoadObj(fileName);
 
 		if (!mesh) {
@@ -242,7 +244,7 @@ void Model::LoadObj(const std::string& fileName) {
 
 		data = mesh->CreateResource();
 
-		loadObjFlg = true;
+		isLoadObj = true;
 	}
 }
 
@@ -262,7 +264,7 @@ void Model::Update() {
 
 void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	assert(createGPFlg);
-	if (loadObjFlg) {
+	if (isLoadObj) {
 		wvpData->worldMat.Affin(scale, rotate, pos);
 		if (parent) {
 			wvpData->worldMat *= parent->wvpData->worldMat;
@@ -293,7 +295,17 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	}
 }
 
+void Model::RelaseCopyData() {
+	isLoadObj = false;
+	for (auto& i : data) {
+		if (i.second.resource.first) {
+			i.second.resource.first->Release();
+		}
+	}
+}
+
 void Model::Debug(const std::string& guiName) {
+#ifdef _DEBUG
 	ImGui::Begin(guiName.c_str());
 	ImGui::DragFloat3("pos", &pos.x, 0.01f);
 	ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
@@ -305,13 +317,25 @@ void Model::Debug(const std::string& guiName) {
 	ImGui::DragFloat3("ptPos", &dirLig->ptPos.x, 0.01f);
 	ImGui::DragFloat3("ptColor", &dirLig->ptColor.x, 0.01f);
 	ImGui::DragFloat("ptRange", &dirLig->ptRange);
+
+
+	if (ImGui::TreeNode("LoadObj")) {
+		auto filePathes = UtilsLib::GetFilePathFormDir("./Resources/", ".obj");
+
+		for (auto& path : filePathes) {
+			if (ImGui::Button(path.string().c_str())) {
+				isLoadObj = false;
+				LoadObj(path.string());
+				break;
+			}
+		}
+
+		ImGui::TreePop();
+	}
 	ImGui::End();
+#endif // _DEBUG
 }
 
 Model::~Model() {
-	for (auto& i : data) {
-		if (i.second.resource.first) {
-			i.second.resource.first->Release();
-		}
-	}
+	RelaseCopyData();
 }
