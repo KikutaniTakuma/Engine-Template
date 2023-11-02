@@ -5,7 +5,7 @@
 #include "Engine/FrameInfo/FrameInfo.h"
 #include <numbers>
 
-GameScene::GameScene():
+GameScene::GameScene() :
 	BaseScene(BaseScene::ID::Game),
 	model_(),
 	tex2D_(),
@@ -17,17 +17,17 @@ void GameScene::Initialize() {
 	camera_.pos.z = -20.0f;
 	camera_.pos.y = 1.1f;
 	
-	// objファイル読み込み
+	// obj�t�@�C���ǂݍ���
 	model_.LoadObj("./Resources/Rabbit/Rabbit.obj");
 	model_.rotate.y = std::numbers::pi_v<float>;
 
-	// テクスチャ読み込み
+	// �e�N�X�`���ǂݍ���
 	tex2D_.LoadTexture("./Resources/uvChecker.png");
 	tex2D_.pos = Vector2{ 380.0f,  -80.0f };
 	tex2D_.isSameTexSize = true;
 	tex2D_.texScalar = 0.5f;
 
-	// テクスチャ単体でも読み込み出来る
+	// �e�N�X�`���P�̂ł�ǂݍ��ݏo����
 	texture_ =
 		textureManager_->LoadTexture("./Resources/Rabbit/Rabbit_face.png");
 }
