@@ -242,8 +242,6 @@ void Model::LoadObj(const std::string& fileName) {
 			return;
 		}
 
-		data = mesh->CopyBuffer();
-
 		isLoadObj = true;
 	}
 }
@@ -274,6 +272,10 @@ void Model::Update() {
 void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	assert(createGPFlg);
 	if (isLoadObj) {
+		if (data.empty()) {
+			data = mesh->CopyBuffer();
+		}
+
 		wvpData->worldMat.Affin(scale, rotate, pos);
 		if (parent) {
 			wvpData->worldMat *= parent->wvpData->worldMat;
@@ -317,7 +319,7 @@ void Model::InstancingDraw(const Mat4x4& viewProjectionMat, const Vector3& camer
 	}
 }
 
-void Model::Debug(const std::string& guiName) {
+void Model::Debug([[maybe_unused]]const std::string& guiName) {
 #ifdef _DEBUG
 	ImGui::Begin(guiName.c_str());
 	ImGui::DragFloat3("pos", &pos.x, 0.01f);

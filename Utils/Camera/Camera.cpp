@@ -121,7 +121,7 @@ void Camera::Update(const Mat4x4& worldMat) {
 	viewOthograohicsVp = viewOthograohics * MakeMatrixViewPort(0.0f, 0.0f, windowSize.x, windowSize.y, 0.0f, 1.0f);
 }
 
-void Camera::Debug(const std::string& guiName) {
+void Camera::Debug([[maybe_unused]] const std::string& guiName) {
 #ifdef _DEBUG
 	ImGui::Begin(guiName.c_str());
 	ImGui::DragFloat3("pos", &pos.x, 0.01f);
