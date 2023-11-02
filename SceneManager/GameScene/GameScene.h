@@ -9,7 +9,6 @@
 #include "Game/MoveFloor/MoveFloor.h"
 #include "Game/Goal/Goal.h"
 #include "Game/Enemy/Enemy.h"
-#include "Game/CollisionManager/Obb/Obb.h"
 
 class GameScene : public BaseScene {
 public:
@@ -31,9 +30,8 @@ public:
 	void Draw() override;
 
 public:
-	Obb obb_;
+	Model model_;
+	Texture2D tex2D_;
 
-
-	Model sphere_;
-	float radius_;
+	Texture* texture_;
 };
