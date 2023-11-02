@@ -346,7 +346,7 @@ Mat4x4 MakeMatrixTranslate(Vector3 vec) {
 	return mat;
 }
 
-Mat4x4 MatrixScalar(Vector3 vec) {
+Mat4x4 MakeMatrixScalar(Vector3 vec) {
 	Mat4x4 mat;
 
 	mat.Scalar(vec);

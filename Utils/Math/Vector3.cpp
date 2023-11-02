@@ -164,6 +164,18 @@ bool Vector3::operator!=(const Vector3& right) const noexcept {
 	return x != right.x || y != right.y || z != right.z;
 }
 
+float& Vector3::operator[](size_t index) noexcept {
+	assert(index < 3llu);
+	std::array<float*,3> tmp = { &x,&y,&z };
+	return *tmp[index];
+}
+
+const float& Vector3::operator[](size_t index) const noexcept {
+	assert(index < 3llu);
+	std::array<const float*, 3> tmp = { &x,&y,&z };
+	return *tmp[index];
+}
+
 float Vector3::Length() const noexcept {
 	return std::sqrt(x*x + y*y + z*z);
 }
@@ -190,18 +202,6 @@ Vector3 Vector3::Normalize() const noexcept {
 	return *this / this->Length();
 }
 
-Vector3 Vector3::GetRad() const noexcept {
-	if (*this == Vector3::zero) {
-		return Vector3::zero;
-	}
-
-	Vector3 result;
-	result.z = std::atan2(y, x);
-	result.y = std::atan2(x, z);
-	result.x = std::atan2(y, z);
-
-	return result;
-}
 
 Vector3 Vector3::Lerp(const Vector3& start, const Vector3& end, float t) {
 	Vector3 result;
@@ -211,4 +211,12 @@ Vector3 Vector3::Lerp(const Vector3& start, const Vector3& end, float t) {
 	result.z = std::lerp(start.z, end.z, t);
 
 	return result;
+}
+
+Vector3 Project(const Vector3& vec1, const Vector3& vec2) {
+	return vec2 * (vec1.Dot(vec2) / std::pow(vec2.Length(), 2.0f));
+}
+
+Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
+	return segment.origin + Project(point - segment.origin, segment.diff);
 }
