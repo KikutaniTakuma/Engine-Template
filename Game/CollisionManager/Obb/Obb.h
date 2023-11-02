@@ -23,6 +23,7 @@ public:
 	void Debug(const std::string& guiName);
 
 	bool IsCollision(Vector3 pos, float radius);
+	bool IsCollision(Obb& other);
 
 public:
 	Vector3 center_;

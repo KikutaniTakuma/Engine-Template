@@ -37,19 +37,6 @@ bool Obb::IsCollision(Vector3 pos, float radius) {
 
 	pos *= MakeMatrixInverse(MakeMatrixAffin(Vector3::identity, rotate_, center_));
 
-	//std::array<Plane, 6> planes = {
-	//	Plane{-orientations[1].Normalize(), (center_ - orientations[1]).Length()}, //底面
-	//	Plane{-orientations[0].Normalize(), (center_ - orientations[0]).Length()}, // 左面
-	//	Plane{-orientations[2].Normalize(), (center_ - orientations[2]).Length()}, // 最前面
-	//	Plane{+orientations[1].Normalize(), (center_ + orientations[1]).Length()}, //上面
-	//	Plane{+orientations[0].Normalize(), (center_ + orientations[0]).Length()}, // 右面
-	//	Plane{+orientations[2].Normalize(), (center_ + orientations[2]).Length()} // 最背面
-	//};
-
-	//for (auto& plane : planes) {
-
-	//}
-
 	Vector3 closestPoint = {
 		std::clamp(pos.x, positions[0].x,positions[1].x),
 		std::clamp(pos.y, positions[0].y,positions[1].y),
@@ -68,6 +55,82 @@ bool Obb::IsCollision(Vector3 pos, float radius) {
 		color_ = std::numeric_limits<uint32_t>::max();
 		return false;
 	}
+}
+
+bool Obb::IsCollision(Obb& other) {
+	std::array<Vector3, 8> positions = {
+		Vector3(-size_), // 左下手前
+		Vector3(-size_.x, -size_.y, +size_.z), // 左下奥
+		Vector3(+size_.x, -size_.y, -size_.z), // 右下手前
+		Vector3(+size_.x, -size_.y, +size_.z), // 右下奥
+
+		Vector3(-size_.x, +size_.y, -size_.z), // 左上手前
+		Vector3(-size_.x, +size_.y, +size_.z), // 左上奥
+		Vector3(+size_.x, +size_.y, -size_.z), // 右上手前
+		Vector3(+size_) // 右上奥
+	};
+
+	Mat4x4 worldmat = MakeMatrixAffin(scale_, rotate_, center_);
+	for (auto& pos : positions) {
+		pos *= worldmat;
+	}
+
+	std::array<Vector3, 8> otherPositions = {
+		Vector3(-size_), // 左下手前
+		Vector3(-size_.x, -size_.y, +size_.z), // 左下奥
+		Vector3(+size_.x, -size_.y, -size_.z), // 右下手前
+		Vector3(+size_.x, -size_.y, +size_.z), // 右下奥
+
+		Vector3(-size_.x, +size_.y, -size_.z), // 左上手前
+		Vector3(-size_.x, +size_.y, +size_.z), // 左上奥
+		Vector3(+size_.x, +size_.y, -size_.z), // 右上手前
+		Vector3(+size_) // 右上奥
+	};
+
+	Mat4x4 otherWorldMat = MakeMatrixAffin(other.scale_, other.rotate_, other.center_)
+		* MakeMatrixInverse(MakeMatrixAffin(Vector3::identity, rotate_, center_));
+	for (auto& pos : otherPositions) {
+		pos *= otherWorldMat;
+	}
+
+
+	// 分離軸(面法線)
+	std::array<Vector3, 3> orientations = {
+		orientations_[0] * MakeMatrixRotate(rotate_),
+		orientations_[1] * MakeMatrixRotate(rotate_),
+		orientations_[2] * MakeMatrixRotate(rotate_)
+	};
+	Mat4x4 inverceObbMat = MakeMatrixInverse(MakeMatrixRotate(rotate_));
+	std::array<Vector3, 3> otherOrientations = {
+		other.orientations_[0] * MakeMatrixRotate(other.rotate_) * inverceObbMat,
+		other.orientations_[1] * MakeMatrixRotate(other.rotate_) * inverceObbMat,
+		other.orientations_[2] * MakeMatrixRotate(other.rotate_) * inverceObbMat
+	};
+
+	// 分離軸に射影
+	std::array<Vector3, 8> projPos;
+	for (size_t i = 0; i < projPos.size(); i++) {
+		projPos[i] = Project(positions[i], orientations[0]);
+	}
+	
+
+
+
+	// 分離軸(各辺の組み合わせ)
+	std::array<Vector3, 9> line;
+	{
+		auto lineItr = line.begin();
+		for (size_t i = 0; i < orientations.size(); i++) {
+			for (size_t j = 0; j < otherOrientations.size(); j++) {
+				*lineItr = orientations[i].Cross(otherOrientations[j]);
+				lineItr++;
+			}
+		}
+	}
+
+
+
+	return false;
 }
 
 void Obb::Update() {

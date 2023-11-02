@@ -32,8 +32,5 @@ public:
 
 public:
 	Obb obb_;
-
-
-	Model sphere_;
-	float radius_;
+	Obb obb2_;
 };
