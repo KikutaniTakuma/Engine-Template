@@ -1,6 +1,7 @@
 #include "Mesh.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "TextureManager/TextureManager.h"
+#include "Engine/PipelineManager/PipelineManager.h"
 #include <fstream>
 #include <sstream>
 #include <cassert>
@@ -9,12 +10,23 @@
 #include <filesystem>
 
 Mesh::Mesh() :
-	meshs_(),
-	isLoad_(false)
-{}
+	meshs_{},
+	texs_{},
+	isLoad_(false),
+	wvpMats_{1u},
+	dirLig_{},
+	color_{},
+	drawCount_{0u}
+{
+	auto descriptorHeap = ShaderResourceHeap::GetInstance();
+	descriptorHeap->BookingHeapPos(3u);
+	descriptorHeap->CreateStructuredBufferView(wvpMats_);
+	descriptorHeap->CreateConstBufferView(dirLig_);
+	descriptorHeap->CreateConstBufferView(color_);
+}
 
 Mesh::~Mesh() {
-
+	ReleaseResource();
 }
 
 void Mesh::LoadObj(const std::string& objFileName) {
@@ -145,6 +157,8 @@ void Mesh::LoadObj(const std::string& objFileName) {
 
 			meshs_[i.first].vertNum = static_cast<uint32_t>(indexDatas[i.first].size());
 		}
+
+		CreateResource();
 		isLoad_ = true;
 	}
 }
@@ -185,36 +199,207 @@ void Mesh::LoadMtl(const std::string& fileName) {
 	}
 }
 
-std::unordered_map<std::string, Mesh::CopyData> Mesh::CreateResource() {
-	std::unordered_map<std::string, Mesh::CopyData> resource;
+void Mesh::CreateResource() {
+	ReleaseResource();
 
 	for (auto& mesh : meshs_) {
 		// コンテナに追加
-		resource[mesh.first];
+		resource_[mesh.first];
 		// resource生成
-		resource[mesh.first].resource.first = Direct3D::GetInstance()->CreateBufferResuorce(mesh.second.sizeInBytes);
+		resource_[mesh.first].resource.first = Direct3D::GetInstance()->CreateBufferResuorce(mesh.second.sizeInBytes);
 		// view情報追加
-		resource[mesh.first].resource.second.BufferLocation = resource[mesh.first].resource.first->GetGPUVirtualAddress();
-		resource[mesh.first].resource.second.SizeInBytes = mesh.second.sizeInBytes;
-		resource[mesh.first].resource.second.StrideInBytes = mesh.second.strideInBytes;
+		resource_[mesh.first].resource.second.BufferLocation = resource_[mesh.first].resource.first->GetGPUVirtualAddress();
+		resource_[mesh.first].resource.second.SizeInBytes = mesh.second.sizeInBytes;
+		resource_[mesh.first].resource.second.StrideInBytes = mesh.second.strideInBytes;
 		
 		// 頂点情報コピー
 		VertData* vertMap = nullptr;
-		resource[mesh.first].resource.first->Map(0, nullptr, reinterpret_cast<void**>(&vertMap));
+		resource_[mesh.first].resource.first->Map(0, nullptr, reinterpret_cast<void**>(&vertMap));
 
 		for (auto& vert : mesh.second.vertices) {
 			assert(vertMap);
 			vertMap[vert.first] = vert.second;
 		}
 
-		resource[mesh.first].resource.first->Unmap(0, nullptr);
+		resource_[mesh.first].resource.first->Unmap(0, nullptr);
 
 		// 頂点数追加
-		resource[mesh.first].vertNum = mesh.second.vertNum;
+		resource_[mesh.first].vertNum = mesh.second.vertNum;
 
 		// テクスチャ追加
-		resource[mesh.first].tex = texs_[mesh.first];
+		resource_[mesh.first].tex = texs_[mesh.first];
 	}
+}
 
-	return resource;
+void Mesh::ReleaseResource() {
+	for (auto& i : resource_) {
+		if (i.second.resource.first) {
+			i.second.resource.first->Release();
+		}
+	}
+}
+
+const std::unordered_map<std::string, Mesh::CopyData>& Mesh::CopyBuffer() {
+	return resource_;
+}
+
+void Mesh::ResetDrawCount() {
+	drawCount_ = 0u;
+}
+
+void Mesh::ResetBufferSize() {
+	wvpMats_.Resize(1u);
+}
+
+void Mesh::ResizeBuffers() {
+	if (wvpMats_.Size() <= drawCount_) {
+		uint32_t nextBufferSize = wvpMats_.Size() * 2u;
+		wvpMats_.Resize(nextBufferSize);
+	}
+}
+
+void Mesh::Use(
+	const Mat4x4& wvpMat,
+	const Mat4x4& viewOrojection,
+	const Mesh::DirectionLight& light,
+	const Vector4& color
+) {
+	ResizeBuffers();
+
+	wvpMats_[drawCount_].worldMat = wvpMat;
+	wvpMats_[drawCount_].viewProjectoionMat = viewOrojection;
+	*dirLig_ = light;
+	*color_ = color;
+
+	drawCount_++;
+}
+
+void Mesh::Draw() {
+	if (0u < drawCount_) {
+		auto commandList = Direct12::GetInstance()->GetCommandList();
+
+		if (!pipeline_) {
+			ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Mesh");
+			return;
+		}
+
+		for (auto& i : resource_) {
+			pipeline_->Use();
+			i.second.tex->Use(0);
+
+			commandList->SetGraphicsRootDescriptorTable(1, wvpMats_.GetViewHandle());
+			commandList->SetGraphicsRootDescriptorTable(2, dirLig_.GetViewHandle());
+
+			commandList->IASetVertexBuffers(0, 1, &i.second.resource.second);
+			commandList->DrawInstanced(i.second.vertNum, drawCount_, 0, 0);
+		}
+	}
+	else {
+		ResetBufferSize();
+	}
+}
+
+void Mesh::ChangeTexture(const std::string& useMtlName, const std::string& texName) {
+	resource_[useMtlName].tex = TextureManager::GetInstance()->LoadTexture(texName);
+	assert(resource_[useMtlName].tex->GetFileName() == texName);
+}
+
+void Mesh::ChangeTexture(const std::string& useMtlName, Texture* tex) {
+	assert(tex != nullptr);
+	resource_[useMtlName].tex = tex;
+}
+
+Shader Mesh::shader_ = {};
+
+Pipeline* Mesh::pipeline_ = {};
+bool Mesh::loadShaderFlg_ = false;
+bool Mesh::createGPFlg_ = false;
+
+void Mesh::Initialize(
+	const std::string& vertex,
+	const std::string& pixel,
+	const std::string& geometory,
+	const std::string& hull,
+	const std::string& domain
+) {
+	LoadShader(vertex, pixel, geometory, hull, domain);
+	CreateGraphicsPipeline();
+}
+
+void Mesh::LoadShader(
+	const std::string& vertex,
+	const std::string& pixel,
+	const std::string& geometory,
+	const std::string& hull,
+	const std::string& domain
+) {
+	if (!loadShaderFlg_) {
+		shader_.vertex = ShaderManager::LoadVertexShader(vertex);
+		shader_.pixel = ShaderManager::LoadPixelShader(pixel);
+		if (geometory.size() != 0LLU) {
+			shader_.geometory = ShaderManager::LoadGeometoryShader(geometory);
+		}
+		if (hull.size() != 0LLU && geometory.size() != 0LLU) {
+			shader_.hull = ShaderManager::LoadHullShader(hull);
+			shader_.domain = ShaderManager::LoadHullShader(domain);
+		}
+		loadShaderFlg_ = true;
+	}
+}
+
+void Mesh::CreateGraphicsPipeline() {
+	if (loadShaderFlg_) {
+		std::array<D3D12_DESCRIPTOR_RANGE, 1> rangeTex = {};
+		rangeTex[0].NumDescriptors = 1;
+		rangeTex[0].BaseShaderRegister = 0;
+		rangeTex[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		rangeTex[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+
+		std::array<D3D12_DESCRIPTOR_RANGE, 1> rangeWvp = {};
+		rangeWvp[0].NumDescriptors = 1;
+		rangeWvp[0].BaseShaderRegister = 1;
+		rangeWvp[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		rangeWvp[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+
+		std::array<D3D12_DESCRIPTOR_RANGE, 1> rangeCBV = {};
+		rangeCBV[0].NumDescriptors = 2;
+		rangeCBV[0].BaseShaderRegister = 0;
+		rangeCBV[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		rangeCBV[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+
+
+		std::array<D3D12_ROOT_PARAMETER, 3> paramates = {};
+		paramates[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+		paramates[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		paramates[0].DescriptorTable.pDescriptorRanges = rangeTex.data();
+		paramates[0].DescriptorTable.NumDescriptorRanges = UINT(rangeTex.size());
+
+		paramates[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+		paramates[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		paramates[1].DescriptorTable.pDescriptorRanges = rangeWvp.data();
+		paramates[1].DescriptorTable.NumDescriptorRanges = UINT(rangeWvp.size());
+
+		paramates[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+		paramates[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		paramates[2].DescriptorTable.pDescriptorRanges = rangeCBV.data();
+		paramates[2].DescriptorTable.NumDescriptorRanges = UINT(rangeCBV.size());
+
+		PipelineManager::CreateRootSgnature(paramates.data(), paramates.size(), true);
+
+		PipelineManager::SetShader(shader_);
+
+		PipelineManager::SetVertexInput("POSITION", 0u, DXGI_FORMAT_R32G32B32A32_FLOAT);
+		PipelineManager::SetVertexInput("NORMAL", 0u, DXGI_FORMAT_R32G32B32_FLOAT);
+		PipelineManager::SetVertexInput("TEXCOORD", 0u, DXGI_FORMAT_R32G32_FLOAT);
+
+		PipelineManager::IsDepth();
+
+		PipelineManager::SetState(Pipeline::Blend::None, Pipeline::SolidState::Solid);
+
+		pipeline_ = PipelineManager::Create();
+
+		PipelineManager::StateReset();
+
+		createGPFlg_ = true;
+	}
 }

@@ -1,4 +1,4 @@
-﻿#include "GameScene.h"
+#include "GameScene.h"
 #include "MeshManager/MeshManager.h"
 #include "TextureManager/TextureManager.h"
 #include "AudioManager/AudioManager.h"
@@ -37,6 +37,10 @@ void GameScene::Finalize() {
 }
 
 void GameScene::Update() {
+	meshManager_->ResetDrawCount();
+
+	camera_.Debug("camera_");
+
 	model_.Debug("model");
 	model_.Update();
 
@@ -49,16 +53,25 @@ void GameScene::Update() {
 		model_.ChangeTexture("face", "./Resources/Rabbit/Rabbit_face_happy.png");
 	}
 
-	tex2D_.Debug("tex");
-	tex2D_.Update();
+	/*tex2D_.Debug("tex");
+	tex2D_.Update();*/
 }
 
 void GameScene::Draw() {
 	camera_.Update(Vector3::zero);
 
 	// 投資投影で描画
-	model_.Draw(camera_.GetViewProjection(), camera_.GetPos());
+	Vector3 pos = model_.pos;
+	for (size_t i = 0llu; i < 100; i++) {
+		model_.pos.x = static_cast<float>(i);
+		model_.InstancingDraw(camera_.GetViewProjection(), camera_.GetPos());
+	}
+
+	model_.pos = pos;
+
 
 	// 平行投影で描画
-	tex2D_.Draw(camera_.GetOthographics(), Pipeline::Normal, true);
+	//tex2D_.Draw(camera_.GetOthographics(), Pipeline::Normal, true);
+
+	meshManager_->Draw();
 }

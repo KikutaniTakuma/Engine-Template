@@ -126,6 +126,7 @@ Model::Model() :
 	*colorBuf = UintToVector4(color);
 
 	auto descriptorHeap = ShaderResourceHeap::GetInstance();
+	descriptorHeap->BookingHeapPos(3u);
 	descriptorHeap->CreateConstBufferView(wvpData);
 	descriptorHeap->CreateConstBufferView(dirLig);
 	descriptorHeap->CreateConstBufferView(colorBuf);
@@ -175,7 +176,7 @@ Model& Model::operator=(const Model& right) {
 			return *this;
 		}
 
-		data = mesh->CreateResource();
+		data = mesh->CopyBuffer();
 
 		isLoadObj = true;
 	}
@@ -217,7 +218,7 @@ Model& Model::operator=(Model&& right) noexcept {
 			return *this;
 		}
 
-		data = mesh->CreateResource();
+		data = mesh->CopyBuffer();
 
 		isLoadObj = true;
 	}
@@ -234,7 +235,6 @@ Model& Model::operator=(Model&& right) noexcept {
 
 void Model::LoadObj(const std::string& fileName) {
 	if (!isLoadObj) {
-		RelaseCopyData();
 		mesh = MeshManager::GetInstance()->LoadObj(fileName);
 
 		if (!mesh) {
@@ -242,7 +242,7 @@ void Model::LoadObj(const std::string& fileName) {
 			return;
 		}
 
-		data = mesh->CreateResource();
+		data = mesh->CopyBuffer();
 
 		isLoadObj = true;
 	}
@@ -256,6 +256,15 @@ void Model::ChangeTexture(const std::string& useMtlName, const std::string& texN
 void Model::ChangeTexture(const std::string& useMtlName, Texture* tex) {
 	assert(tex != nullptr);
 	data[useMtlName].tex = tex;
+}
+
+void Model::MeshChangeTexture(const std::string& useMtlName, const std::string& texName) {
+	mesh->ChangeTexture(useMtlName, texName);
+}
+
+void Model::MeshChangeTexture(const std::string& useMtlName, Texture* tex) {
+	assert(tex != nullptr);
+	mesh->ChangeTexture(useMtlName, tex);
 }
 
 void Model::Update() {
@@ -295,12 +304,16 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	}
 }
 
-void Model::RelaseCopyData() {
-	isLoadObj = false;
-	for (auto& i : data) {
-		if (i.second.resource.first) {
-			i.second.resource.first->Release();
-		}
+void Model::InstancingDraw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
+	if (isLoadObj) {
+		light.eyePos = cameraPos;
+
+		mesh->Use(
+			MakeMatrixAffin(scale, rotate, pos),
+			viewProjectionMat,
+			light,
+			UintToVector4(color)
+			);
 	}
 }
 
@@ -337,5 +350,5 @@ void Model::Debug(const std::string& guiName) {
 }
 
 Model::~Model() {
-	RelaseCopyData();
+	
 }

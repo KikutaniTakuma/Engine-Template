@@ -17,3 +17,15 @@ Mesh* MeshManager::LoadObj(const std::string& objFileName) {
 
 	return meshs_[objFileName].get();
 }
+
+void MeshManager::ResetDrawCount() {
+	for (auto& i : meshs_) {
+		i.second->ResetDrawCount();
+	}
+}
+
+void MeshManager::Draw() {
+	for (auto& i : meshs_) {
+		i.second->Draw();
+	}
+}

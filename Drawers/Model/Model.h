@@ -13,26 +13,6 @@ class Pipeline;
 
 class Model {
 public:
-	struct DirectionLight {
-		Vector3 ligDirection;
-		float pad0;
-		Vector3 ligColor;
-		float pad1;
-		Vector3 eyePos;
-		float pad2;
-		Vector3 ptPos;
-		float pad3;
-		Vector3 ptColor;
-		float ptRange;
-	};
-
-private:
-	struct MatrixData {
-		Mat4x4 worldMat;
-		Mat4x4 viewProjectoionMat;
-	};
-
-public:
 	Model();
 	Model(const std::string& fileName);
 	Model(const Model& right);
@@ -77,6 +57,8 @@ public:
 
 	void Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos);
 
+	void InstancingDraw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos);
+
 
 	void Debug(const std::string& guiName);
 
@@ -87,7 +69,8 @@ public:
 	void ChangeTexture(const std::string& useMtlName, const std::string& texName);
 	void ChangeTexture(const std::string& useMtlName, Texture* tex);
 
-	void RelaseCopyData();
+	void MeshChangeTexture(const std::string& useMtlName, const std::string& texName);
+	void MeshChangeTexture(const std::string& useMtlName, Texture* tex);
 
 public:
 	Vector3 pos;
@@ -97,7 +80,7 @@ public:
 	uint32_t color;
 	Model* parent;
 
-	DirectionLight light;
+	Mesh::DirectionLight light;
 
 private:
 	Mesh* mesh;
@@ -106,9 +89,9 @@ private:
 
 	bool isLoadObj;
 
-	ConstBuffer<MatrixData> wvpData;
+	ConstBuffer<Mesh::MatrixData> wvpData;
 
-	ConstBuffer<DirectionLight> dirLig;
+	ConstBuffer<Mesh::DirectionLight> dirLig;
 
 	ConstBuffer<Vector4> colorBuf;
 };

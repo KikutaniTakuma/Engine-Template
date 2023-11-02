@@ -122,6 +122,7 @@ bool Engine::Initialize(const std::string& windowName, const Vector2& windowSize
 	PipelineManager::Initialize();
 
 	Texture2D::Initialize();
+	Mesh::Initialize();
 	Model::Initialize();
 	Line::Initialize();
 	Particle::Initialize();

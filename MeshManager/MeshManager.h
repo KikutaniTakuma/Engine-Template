@@ -19,6 +19,10 @@ public:
 public:
 	Mesh* LoadObj(const std::string& objFileName);
 
+	void ResetDrawCount();
+
+	void Draw();
+
 private:
 	std::unordered_map<std::string, std::unique_ptr<Mesh>> meshs_;
 };

@@ -9,6 +9,9 @@
 #include "Utils/Math/Vector4.h"
 
 #include "Engine/ShaderResource/ShaderResourceHeap.h"
+#include "Engine/ShaderManager/ShaderManager.h"
+
+#include "Engine/StructuredBuffer/StructuredBuffer.h"
 
 /// <summary>
 /// 基本的にポインタ型で使う
@@ -19,6 +22,24 @@ public:
 		std::pair<ID3D12Resource*, D3D12_VERTEX_BUFFER_VIEW> resource;
 		uint32_t vertNum;
 		Texture* tex;
+	};
+
+	struct MatrixData {
+		Mat4x4 worldMat;
+		Mat4x4 viewProjectoionMat;
+	};
+
+	struct DirectionLight {
+		Vector3 ligDirection;
+		float pad0;
+		Vector3 ligColor;
+		float pad1;
+		Vector3 eyePos;
+		float pad2;
+		Vector3 ptPos;
+		float pad3;
+		Vector3 ptColor;
+		float ptRange;
 	};
 
 private:
@@ -73,16 +94,72 @@ public:
 public:
 	void LoadObj(const std::string& objfileName);
 
-	std::unordered_map<std::string, CopyData> CreateResource();
+
+	const std::unordered_map<std::string, Mesh::CopyData>& CopyBuffer();
+
 private:
 	void LoadMtl(const std::string& fileName);
+	void CreateResource();
+	void ReleaseResource();
+
+public:
+	void ResetDrawCount();
+
+	void Use(
+		const Mat4x4& wvpMat,
+		const Mat4x4& viewOrojection,
+		const DirectionLight& light,
+		const Vector4& color
+		);
+
+	void Draw();
+
+	void ChangeTexture(const std::string& useMtlName, const std::string& texName);
+	void ChangeTexture(const std::string& useMtlName, Texture* tex);
 
 private:
-	
+	void ResizeBuffers();
+	void ResetBufferSize();
 
+private:
 	std::unordered_map<std::string, MeshData> meshs_;
 
 	std::unordered_map<std::string, Texture*> texs_;
 
 	bool isLoad_;
+
+	StructuredBuffer<MatrixData> wvpMats_;
+	ConstBuffer<DirectionLight> dirLig_;
+	ConstBuffer<Vector4> color_;
+
+	uint32_t drawCount_;
+
+	std::unordered_map<std::string, Mesh::CopyData> resource_;
+
+public:
+	static void Initialize(
+		const std::string& vertex = "./Resources/Shaders/ModelInstancingShader/ModelInstancing.VS.hlsl",
+		const std::string& pixel = "./Resources/Shaders/ModelInstancingShader/ModelInstancing.PS.hlsl",
+		const std::string& geometory = "./Resources/Shaders/ModelInstancingShader/ModelInstancing.GS.hlsl",
+		const std::string& hull = {},
+		const std::string& domain = {}
+	);
+
+private:
+	static void LoadShader(
+		const std::string& vertex,
+		const std::string& pixel,
+		const std::string& geometory,
+		const std::string& hull,
+		const std::string& domain
+	);
+	static void CreateGraphicsPipeline();
+
+public:
+	static Shader shader_;
+
+	static class Pipeline* pipeline_;
+
+	static bool loadShaderFlg_;
+	static bool createGPFlg_;
 };

@@ -5,6 +5,7 @@
 #include <wrl.h>
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include <type_traits>
+#include <concepts>
 
 template<class T>
 concept IsNotPtrSB = !std::is_pointer_v<T>;
@@ -14,85 +15,85 @@ template<IsNotPtrSB T>
 class StructuredBuffer {
 public:
 	StructuredBuffer() noexcept :
-		bufferResource(),
-		srvDesc(),
-		data(nullptr),
-		isWright(true),
-		isCreateView(false),
-		range(),
-		roootParamater(),
-		instanceNum(1u)
+		bufferResource_(),
+		srvDesc_(),
+		data_(nullptr),
+		isWright_(true),
+		isCreateView_(false),
+		range_(),
+		roootParamater_(),
+		instanceNum_(1u)
 	{
-		bufferResource = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(T) * 1u);
-		srvDesc = {};
-		srvDesc.Format = DXGI_FORMAT_UNKNOWN;
-		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-		srvDesc.Buffer.FirstElement = 0;
-		srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-		srvDesc.Buffer.NumElements = UINT(instanceNum);
-		srvDesc.Buffer.StructureByteStride = sizeof(T);
+		bufferResource_ = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(T) * 1u);
+		srvDesc_ = {};
+		srvDesc_.Format = DXGI_FORMAT_UNKNOWN;
+		srvDesc_.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		srvDesc_.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+		srvDesc_.Buffer.FirstElement = 0;
+		srvDesc_.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+		srvDesc_.Buffer.NumElements = UINT(instanceNum_);
+		srvDesc_.Buffer.StructureByteStride = sizeof(T);
 
-		if (isWright) {
-			bufferResource->Map(0, nullptr, reinterpret_cast<void**>(&data));
+		if (isWright_) {
+			bufferResource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));
 		}
 
-		range = {};
-		range.BaseShaderRegister = 1;
-		range.NumDescriptors = 1;
-		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		range_ = {};
+		range_.BaseShaderRegister = 1;
+		range_.NumDescriptors = 1;
+		range_.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		range_.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 
-		roootParamater = {};
-		roootParamater.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-		roootParamater.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-		roootParamater.DescriptorTable.pDescriptorRanges = &range;
-		roootParamater.DescriptorTable.NumDescriptorRanges = 1;
+		roootParamater_ = {};
+		roootParamater_.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		roootParamater_.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+		roootParamater_.DescriptorTable.pDescriptorRanges = &range_;
+		roootParamater_.DescriptorTable.NumDescriptorRanges = 1;
 	}
 
 	inline StructuredBuffer(uint32_t instanceNum) noexcept :
-		bufferResource(),
-		srvDesc(),
-		data(nullptr),
-		isWright(true),
-		isCreateView(false),
-		range(),
-		roootParamater(),
-		instanceNum(instanceNum)
+		bufferResource_(),
+		srvDesc_(),
+		data_(nullptr),
+		isWright_(true),
+		isCreateView_(false),
+		range_(),
+		roootParamater_(),
+		instanceNum_(instanceNum)
 	{
-		bufferResource = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(T) * instanceNum);
-		srvDesc = {};
-		srvDesc.Format = DXGI_FORMAT_UNKNOWN;
-		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-		srvDesc.Buffer.FirstElement = 0;
-		srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-		srvDesc.Buffer.NumElements = UINT(instanceNum);
-		srvDesc.Buffer.StructureByteStride = sizeof(T);
+		bufferResource_ = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(T) * instanceNum);
+		srvDesc_ = {};
+		srvDesc_.Format = DXGI_FORMAT_UNKNOWN;
+		srvDesc_.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		srvDesc_.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+		srvDesc_.Buffer.FirstElement = 0;
+		srvDesc_.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+		srvDesc_.Buffer.NumElements = UINT(instanceNum);
+		srvDesc_.Buffer.StructureByteStride = sizeof(T);
 
-		if (isWright) {
-			bufferResource->Map(0, nullptr, reinterpret_cast<void**>(&data));
+		if (isWright_) {
+			bufferResource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));
 		}
 
-		range = {};
-		range.BaseShaderRegister = 1;
-		range.NumDescriptors = 1;
-		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		range_ = {};
+		range_.BaseShaderRegister = 1;
+		range_.NumDescriptors = 1;
+		range_.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		range_.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 
-		roootParamater = {};
-		roootParamater.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-		roootParamater.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-		roootParamater.DescriptorTable.pDescriptorRanges = &range;
-		roootParamater.DescriptorTable.NumDescriptorRanges = 1;
+		roootParamater_ = {};
+		roootParamater_.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		roootParamater_.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+		roootParamater_.DescriptorTable.pDescriptorRanges = &range_;
+		roootParamater_.DescriptorTable.NumDescriptorRanges = 1;
 	}
 
 	inline ~StructuredBuffer() noexcept {
-		if (bufferResource) {
-			bufferResource->Release();
-			bufferResource.Reset();
+		if (bufferResource_) {
+			bufferResource_->Release();
+			bufferResource_.Reset();
 		}
 	}
 
@@ -104,82 +105,101 @@ public:
 
 public:
 	void OnWright() noexcept {
-		if (!isWright) {
-			bufferResource->Map(0, nullptr, reinterpret_cast<void**>(&data));
-			isWright = !isWright;
+		if (!isWright_) {
+			bufferResource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));
+			isWright_ = !isWright_;
 		}
 	}
 
 	void OffWright() noexcept {
-		if (isWright) {
-			bufferResource->Unmap(0, nullptr);
-			isWright = !isWright;
+		if (isWright_) {
+			bufferResource_->Unmap(0, nullptr);
+			isWright_ = !isWright_;
 		}
 	}
 
-	T& operator[](uint32_t index) {
-		assert(index < instanceNum);
-		return data[index];
+	template<std::integral IsInt>
+	T& operator[](IsInt index) {
+		assert(static_cast<uint32_t>(index) < instanceNum_);
+		return data_[index];
 	}
 
-	const T& operator[](uint32_t index) const {
-		assert(index < instanceNum);
-		return data[index];
+	template<std::integral IsInt>
+	const T& operator[](IsInt index) const {
+		assert(static_cast<uint32_t>(index) < instanceNum_);
+		return data_[index];
 	}
 
 	void Resize(uint32_t indexNum) {
 		assert(0 < indexNum);
+		if (indexNum == instanceNum_) {
+			return;
+		}
+
 		if (indexNum < 1) {
 			ErrorCheck::GetInstance()->ErrorTextBox("Resize : Index must be greater than or equal to 1 ->" + std::to_string(indexNum), "StructuredBuffer");
 			return;
 		}
 
-		OffWright();
-
-		if (bufferResource) {
-			bufferResource->Release();
-			bufferResource.Reset();
+		std::vector<T> tmp;
+		for (uint32_t i = 0; i < instanceNum_; i++) {
+			tmp.push_back(data_[i]);
 		}
 
-		instanceNum = indexNum;
-		
-		bufferResource = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(T) * instanceNum);
-		srvDesc = {};
-		srvDesc.Format = DXGI_FORMAT_UNKNOWN;
-		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-		srvDesc.Buffer.FirstElement = 0;
-		srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-		srvDesc.Buffer.NumElements = UINT(instanceNum);
-		srvDesc.Buffer.StructureByteStride = sizeof(T);
+		OffWright();
 
-		isCreateView = false;
+		if (bufferResource_) {
+			bufferResource_->Release();
+			bufferResource_.Reset();
+		}
+
+		instanceNum_ = indexNum;
+		
+		bufferResource_ = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(T) * instanceNum_);
+		srvDesc_ = {};
+		srvDesc_.Format = DXGI_FORMAT_UNKNOWN;
+		srvDesc_.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		srvDesc_.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+		srvDesc_.Buffer.FirstElement = 0;
+		srvDesc_.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+		srvDesc_.Buffer.NumElements = UINT(instanceNum_);
+		srvDesc_.Buffer.StructureByteStride = sizeof(T);
+
+		CrerateView(descriptorHandleCPU_, descriptorHandleGPU_, dsecIndex_);
 
 		OnWright();
+
+		for (uint32_t i = 0; i < instanceNum_; i++) {
+			if (tmp.size() <= i) {
+				break;
+			}
+			data_[i] = tmp[i];
+		}
 	}
 
 	uint32_t Size() const {
-		return instanceNum;
+		return instanceNum_;
 	}
 
 	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVtlAdrs() const noexcept {
-		return bufferResource->GetGPUVirtualAddress();
+		return bufferResource_->GetGPUVirtualAddress();
 	}
 
 	const D3D12_ROOT_PARAMETER& GetRoootParamater() noexcept {
-		return roootParamater;
+		return roootParamater_;
 	}
 
 	void CrerateView(D3D12_CPU_DESCRIPTOR_HANDLE descHandle, D3D12_GPU_DESCRIPTOR_HANDLE descHandleGPU, UINT dsecIndex) noexcept {
 		static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
-		device->CreateShaderResourceView(bufferResource.Get(), &srvDesc, descHandle);
-		isCreateView = true;
-		descriptorHandle_ = descHandleGPU;
+		device->CreateShaderResourceView(bufferResource_.Get(), &srvDesc_, descHandle);
+		descriptorHandleCPU_ = descHandle;
+		isCreateView_ = true;
+		descriptorHandleGPU_ = descHandleGPU;
 		dsecIndex_ = dsecIndex;
 	}
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetViewHandle() const noexcept {
-		return descriptorHandle_;
+		return descriptorHandleGPU_;
 	}
 
 	UINT GetViewHandleUINT() const noexcept {
@@ -187,22 +207,23 @@ public:
 	}
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12Resource> bufferResource;
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	Microsoft::WRL::ComPtr<ID3D12Resource> bufferResource_;
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc_;
 
-	D3D12_DESCRIPTOR_RANGE range;
-	D3D12_ROOT_PARAMETER roootParamater;
+	D3D12_DESCRIPTOR_RANGE range_;
+	D3D12_ROOT_PARAMETER roootParamater_;
 
-	T* data;
+	T* data_;
 
-	bool isWright;
+	bool isWright_;
 
-	bool isCreateView;
+	bool isCreateView_;
 
 
-	uint32_t instanceNum;
+	uint32_t instanceNum_;
 
-	D3D12_GPU_DESCRIPTOR_HANDLE descriptorHandle_;
+	D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandleCPU_;
+	D3D12_GPU_DESCRIPTOR_HANDLE descriptorHandleGPU_;
 
 	UINT dsecIndex_;
 };
