@@ -20,7 +20,11 @@ D3D12_INDEX_BUFFER_VIEW Particle::indexView = {};
 Microsoft::WRL::ComPtr<ID3D12Resource> Particle::indexResource = nullptr;
 
 void Particle::Initialize(const std::string& vsFileName, const std::string& psFileName) {
-	if (indexResource) { indexResource->Release(); }
+	if (indexResource) {
+		indexResource->Release();
+		indexResource.Reset();
+		indexResource = nullptr;
+	}
 
 	LoadShader(vsFileName, psFileName);
 
@@ -45,6 +49,7 @@ void Particle::Finalize() {
 	if (indexResource) {
 		indexResource->Release();
 		indexResource.Reset();
+		indexResource = nullptr;
 	}
 }
 
@@ -131,7 +136,11 @@ Particle::Particle() :
 		colorBuf[i] = Vector4::identity;
 	}
 
-	if (vertexResource) { vertexResource->Release(); }
+	if (vertexResource) { 
+		vertexResource->Release(); 
+		vertexResource.Reset();
+		vertexResource = nullptr;
+	}
 
 	vertexResource = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * 4);
 
@@ -202,7 +211,11 @@ Particle::Particle(uint32_t indexNum) :
 		colorBuf[i] = Vector4::identity;
 	}
 
-	if (vertexResource) { vertexResource->Release(); }
+	if (vertexResource) {
+		vertexResource->Release();
+		vertexResource.Reset();
+		vertexResource = nullptr;
+	}
 
 	vertexResource = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * 4);
 
@@ -402,6 +415,7 @@ Particle::~Particle() {
 	if (vertexResource) {
 		vertexResource->Release();
 		vertexResource.Reset();
+		vertexResource = nullptr;
 	}
 }
 

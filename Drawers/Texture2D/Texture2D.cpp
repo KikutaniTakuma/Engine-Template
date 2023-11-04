@@ -37,7 +37,11 @@ Texture2D::Texture2D() :
 	*wvpMat = Mat4x4::kIdentity_;
 	*colorBuf = Vector4::identity;
 
-	if (vertexResource) { vertexResource->Release(); }
+	if (vertexResource) {
+		vertexResource->Release();
+		vertexResource.Reset();
+		vertexResource = nullptr;
+	}
 
 	vertexResource =Direct3D::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * 4);
 
@@ -142,6 +146,7 @@ Texture2D::~Texture2D() {
 	if (vertexResource) {
 		vertexResource->Release();
 		vertexResource.Reset();
+		vertexResource = nullptr;
 	}
 }
 
@@ -149,6 +154,7 @@ void Texture2D::Initialize(const std::string& vsFileName, const std::string& psF
 	if (indexResource) { 
 		indexResource->Release();
 		indexResource.Reset();
+		indexResource = nullptr;
 	}
 	
 	LoadShader(vsFileName, psFileName);
@@ -172,8 +178,9 @@ void Texture2D::Initialize(const std::string& vsFileName, const std::string& psF
 
 void Texture2D::Finalize() {
 	if (indexResource) { 
-		indexResource->Release(); 
+		indexResource->Release();
 		indexResource.Reset();
+		indexResource = nullptr;
 	}
 }
 

@@ -235,6 +235,7 @@ void Mesh::ReleaseResource() {
 	for (auto& i : resource_) {
 		if (i.second.resource.first) {
 			i.second.resource.first->Release();
+			i.second.resource.first = nullptr;
 		}
 	}
 }
