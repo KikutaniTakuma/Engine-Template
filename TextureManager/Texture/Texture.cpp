@@ -17,7 +17,8 @@ Texture::Texture():
 	threadLoadFlg(false),
 	size(),
 	fileName(),
-	srvHeapHandleUint(0)
+	srvHeapHandleUint(0),
+	srvHeapHandle{}
 {}
 
 Texture::~Texture() {
