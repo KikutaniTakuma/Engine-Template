@@ -59,6 +59,22 @@ void MeshManager::ThreadLoad() {
 				threadMeshBuff_.pop();
 			}
 
+			bool isTextureLoadFinish = false;
+			while (!isTextureLoadFinish) {
+				for (auto& i : meshs_) {
+					i.second->CheckModelTextureLoadFinish();
+				}
+				for (auto& i : meshs_) {
+					if (!i.second->isLoad_) {
+						isTextureLoadFinish = false;
+						break;
+					}
+					else {
+						isTextureLoadFinish = true;
+					}
+				}
+			}
+
 			isThreadFinish_ = true;
 			};
 
@@ -68,10 +84,6 @@ void MeshManager::ThreadLoad() {
 
 void MeshManager::CheckLoadFinish() {
 	if (isThreadFinish_) {
-		for (auto& i : meshs_) {
-			i.second->CheckModelTextureLoadFinish();
-		}
-
 		for (auto& i : meshs_) {
 			if (!i.second->isLoad_) {
 				return;
