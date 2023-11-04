@@ -227,10 +227,6 @@ Texture* TextureManager::LoadTexture(const std::string& fileName, ID3D12Graphics
 }
 
 void TextureManager::LoadTexture(const std::string& fileName, Texture** texPtr) {
-	if (load.joinable() && threadTextureBuff.empty()) {
-		load.join();
-	}
-	
 	// コンテナに追加
 	threadTextureBuff.push({ fileName, texPtr });
 }
@@ -284,7 +280,9 @@ void TextureManager::ResetCommandList() {
 			WaitForSingleObject(fenceEvent, INFINITE);
 		}
 
-		load.join();
+		if (load.joinable()) {
+			load.join();
+		}
 
 		// 次フレーム用のコマンドリストを準備
 		auto hr = commandAllocator->Reset();
