@@ -10,7 +10,7 @@ struct PixelShaderOutPut {
 Texture2D<float4> tex : register(t0);
 SamplerState smp : register(s0);
 
-PixelShaderOutPut main(GeometoryOutPut input)
+PixelShaderOutPut main(VertexShaderOutput input)
 {
     PixelShaderOutPut output;
     output.color = tex.Sample(smp, input.uv);

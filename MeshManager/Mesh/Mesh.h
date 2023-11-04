@@ -17,6 +17,8 @@
 /// 基本的にポインタ型で使う
 /// </summary>
 class Mesh {
+	friend class MeshManager;
+
 public:
 	struct ResourceData {
 		std::pair<ID3D12Resource*, D3D12_VERTEX_BUFFER_VIEW> resource;
@@ -106,14 +108,40 @@ public:
 	Mesh& operator=(Mesh&&) = delete;
 
 public:
-	void LoadObj(const std::string& objfileName);
-
-
 	std::unordered_map<std::string, Mesh::CopyData> CopyBuffer() const;
 
+	inline bool GetIsLoad() const {
+		return isLoad_;
+	}
+
 private:
+	void LoadObj(const std::string& objFileName);
 	void LoadMtl(const std::string& fileName);
+
+	/// <summary>
+	/// 非同期読み込み用(この中では非同期では読み込まない)
+	/// </summary>
+	/// <param name="objFileName"></param>
+	void ThreadLoadObj(const std::string& objFileName);
+	/// <summary>
+	/// 非同期読み込み用
+	/// </summary>
+	/// <param name="fileName"></param>
+	void ThreadLoadMtl(const std::string& fileName);
+
+	/// <summary>
+	/// テクスチャをロード出来ているかのチェック
+	/// </summary>
+	void CheckModelTextureLoadFinish();
+
+	/// <summary>
+	/// 頂点リソースを作成
+	/// </summary>
 	void CreateResource();
+
+	/// <summary>
+	/// 頂点リソースを解放
+	/// </summary>
 	void ReleaseResource();
 
 public:
@@ -141,6 +169,7 @@ private:
 	std::unordered_map<std::string, Texture*> texs_;
 
 	bool isLoad_;
+	bool isObjLoad_;
 
 	StructuredBuffer<MatrixData> wvpMats_;
 	ConstBuffer<DirectionLight> dirLig_;
@@ -150,11 +179,13 @@ private:
 
 	std::unordered_map<std::string, Mesh::ResourceData> resource_;
 
+	std::string objFileName_;
+
 public:
 	static void Initialize(
 		const std::string& vertex = "./Resources/Shaders/ModelInstancingShader/ModelInstancing.VS.hlsl",
 		const std::string& pixel = "./Resources/Shaders/ModelInstancingShader/ModelInstancing.PS.hlsl",
-		const std::string& geometory = "./Resources/Shaders/ModelInstancingShader/ModelInstancing.GS.hlsl",
+		const std::string& geometory = {},
 		const std::string& hull = {},
 		const std::string& domain = {}
 	);

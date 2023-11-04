@@ -14,12 +14,12 @@ GameScene::GameScene() :
 
 void GameScene::Initialize() {
 	camera_.farClip = 3000.0f;
-	camera_.pos.z = -20.0f;
+	camera_.pos.z = -5.0f;
 	camera_.pos.y = 1.1f;
 
 	// objファイル読み込み
-	model_.LoadObj("./Resources/Rabbit/Rabbit.obj");
-	model_.rotate.y = std::numbers::pi_v<float>;
+	model_.ThreadLoadObj("./Resources/Watame/Watame.obj");
+	//model_.rotate.y = std::numbers::pi_v<float>;
 
 	// テクスチャ読み込み
 	tex2D_.LoadTexture("./Resources/uvChecker.png");
@@ -53,8 +53,8 @@ void GameScene::Update() {
 		model_.ChangeTexture("face", "./Resources/Rabbit/Rabbit_face_happy.png");
 	}
 
-	/*tex2D_.Debug("tex");
-	tex2D_.Update();*/
+	tex2D_.Debug("tex");
+	tex2D_.Update();
 }
 
 void GameScene::Draw() {
@@ -63,9 +63,8 @@ void GameScene::Draw() {
 	// 投資投影で描画
 	model_.Draw(camera_.GetViewProjection(), camera_.GetPos());
 
-
 	// 平行投影で描画
-	//tex2D_.Draw(camera_.GetOthographics(), Pipeline::Normal, true);
+	tex2D_.Draw(camera_.GetOthographics(), Pipeline::Normal, true);
 
 	meshManager_->Draw();
 }

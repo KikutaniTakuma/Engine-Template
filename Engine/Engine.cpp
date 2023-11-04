@@ -11,6 +11,7 @@
 #include "TextureManager/TextureManager.h"
 #include "AudioManager/AudioManager.h"
 #include "PipelineManager/PipelineManager.h"
+#include "MeshManager/MeshManager.h"
 
 #include "Input/Input.h"
 #include "ErrorCheck/ErrorCheck.h"
@@ -368,6 +369,12 @@ void Engine::FrameEnd() {
 	
 	TextureManager::GetInstance()->ThreadLoadTexture();
 	TextureManager::GetInstance()->ResetCommandList();
+
+	auto meshManager = MeshManager::GetInstance();
+
+	meshManager->ThreadLoad();
+	meshManager->JoinThread();
+	meshManager->CheckLoadFinish();
 	
 
 	// このフレームで画像読み込みが発生していたら開放する

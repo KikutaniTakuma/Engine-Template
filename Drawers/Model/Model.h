@@ -25,11 +25,13 @@ public:
 public:
 	void LoadObj(const std::string& fileName);
 
+	void ThreadLoadObj(const std::string& fileName);
+
 public:
 	static void Initialize(
 		const std::string& vertex = "./Resources/Shaders/ModelShader/Model.VS.hlsl",
 		const std::string& pixel = "./Resources/Shaders/ModelShader/Model.PS.hlsl",
-		const std::string& geometory = "./Resources/Shaders/ModelShader/ModelNone.GS.hlsl",
+		const std::string& geometory = {},
 		const std::string& hull = {},
 		const std::string& domain = {}
 	);

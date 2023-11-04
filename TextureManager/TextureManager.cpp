@@ -239,7 +239,7 @@ void TextureManager::ThreadLoadTexture() {
 	if (!load.joinable() && !threadTextureBuff.empty()) {
 		auto loadProc = [this]() {
 			while (!threadTextureBuff.empty()) {
-				auto&& front = threadTextureBuff.front();
+				auto& front = threadTextureBuff.front();
 				*front.second = LoadTexture(front.first, commandList.Get());
 				threadTextureBuff.pop();
 			}

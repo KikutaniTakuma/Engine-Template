@@ -234,6 +234,12 @@ void Model::LoadObj(const std::string& fileName) {
 	}
 }
 
+void Model::ThreadLoadObj(const std::string& fileName) {
+	if (!isLoadObj) {
+		MeshManager::GetInstance()->LoadObj(fileName, &mesh);
+	}
+}
+
 void Model::ChangeTexture(const std::string& useMtlName, const std::string& texName) {
 	data[useMtlName].tex = TextureManager::GetInstance()->LoadTexture(texName);
 	assert(data[useMtlName].tex->GetFileName() == texName);
@@ -255,6 +261,10 @@ void Model::MeshChangeTexture(const std::string& useMtlName, Texture* tex) {
 
 void Model::Update() {
 	*dirLig = light;
+
+	if (!isLoadObj && mesh && mesh->GetIsLoad()) {
+		isLoadObj = true;
+	}
 }
 
 void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
@@ -328,7 +338,9 @@ void Model::Debug([[maybe_unused]]const std::string& guiName) {
 		for (auto& path : filePathes) {
 			if (ImGui::Button(path.string().c_str())) {
 				isLoadObj = false;
-				LoadObj(path.string());
+				mesh = nullptr;
+				data.clear();
+				ThreadLoadObj(path.string());
 				break;
 			}
 		}
