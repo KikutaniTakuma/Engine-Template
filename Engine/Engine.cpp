@@ -101,7 +101,7 @@ bool Engine::Initialize(const std::string& windowName, const Vector2& windowSize
 	engine->InitializeDirect3D();
 
 	// ディスクリプタヒープ初期化
-	ShaderResourceHeap::Initialize(524288);
+	ShaderResourceHeap::Initialize(4096);
 
 	// DirectX12生成
 	engine->InitializeDirect12();
