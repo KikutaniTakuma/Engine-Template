@@ -367,19 +367,25 @@ void Engine::FrameEnd() {
 
 	engine->direct12_->ResetCommandlist();
 	
-	TextureManager::GetInstance()->ThreadLoadTexture();
-	TextureManager::GetInstance()->ResetCommandList();
+	// テクスチャの非同期読み込み
+	auto textureManager = TextureManager::GetInstance();
+	textureManager->ThreadLoadTexture();
+	textureManager->ResetCommandList();
 
+	// このフレームで画像読み込みが発生していたら開放する
+	// またUnloadされていたらそれをコンテナから削除する
+	textureManager->ReleaseIntermediateResource();
+
+	// メッシュの非同期読み込み
 	auto meshManager = MeshManager::GetInstance();
-
 	meshManager->ThreadLoad();
 	meshManager->JoinThread();
 	meshManager->CheckLoadFinish();
 	
-
-	// このフレームで画像読み込みが発生していたら開放する
-	// またUnloadされていたらそれをコンテナから削除する
-	TextureManager::GetInstance()->ReleaseIntermediateResource();
+	// 音の非同期読み込み
+	auto audioManager = AudioManager::GetInstance();
+	audioManager->ThreadLoad();
+	audioManager->CheckThreadLoadFinish();
 
 	static FrameInfo* const frameInfo = FrameInfo::GetInstance();
 	frameInfo->End();

@@ -1,31 +1,48 @@
 #include <fstream>
+#include <filesystem>
 #include "AudioManager/AudioManager.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "externals/imgui/imgui.h"
 
 Audio::Audio():
-	wfet(),
-	pBuffer(nullptr),
-	bufferSize(0u),
-	pSourceVoice(nullptr),
-	loopFlg(false),
-	isStart(false),
-	volume_(1.0f)
+	wfet_(),
+	pBuffer_(nullptr),
+	bufferSize_(0u),
+	pSourceVoice_(nullptr),
+	loopFlg_(false),
+	isStart_(false),
+	volume_(1.0f),
+	isLoad_{false},
+	fileName_{}
 {}
 
 Audio::~Audio() {
-	delete[] pBuffer;
+	delete[] pBuffer_;
 
-	pBuffer = nullptr;
-	bufferSize = 0;
-	wfet = {};
+	pBuffer_ = nullptr;
+	bufferSize_ = 0;
+	wfet_ = {};
 }
 
-void Audio::Load(const std::string& fileName, bool loopFlg_) {
-	std::ifstream file(fileName, std::ios::binary);
-	if (!file) {
-		ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found file", "Audio");
+void Audio::Load(const std::string& fileName, bool loopFlg) {
+	if (std::filesystem::path{fileName}.extension() != ".wav") {
+		ErrorCheck::GetInstance()->ErrorTextBox(("Load() : This file is not wav -> " + fileName), "Audio");
+		return;
 	}
+
+	if (!std::filesystem::exists(std::filesystem::path{ fileName })) {
+		ErrorCheck::GetInstance()->ErrorTextBox(("Load() : This file is not found -> " + fileName), "Audio");
+		return;
+	}
+
+	std::ifstream file(fileName, std::ios::binary);
+	if (file.fail()) {
+		ErrorCheck::GetInstance()->ErrorTextBox(("Load() : File open failed -> " + fileName), "Audio");
+		return;
+	}
+
+	fileName_ = fileName;
+	loopFlg_ = loopFlg;
 
 	RiffHeader riff;
 	file.read((char*)&riff, sizeof(riff));
@@ -83,83 +100,96 @@ void Audio::Load(const std::string& fileName, bool loopFlg_) {
 
 	file.close();
 
-	wfet = format.fmt;
-	pBuffer = reinterpret_cast<BYTE*>(pBufferLocal);
-	bufferSize = data.size;
+	wfet_ = format.fmt;
+	pBuffer_ = reinterpret_cast<BYTE*>(pBufferLocal);
+	bufferSize_ = data.size;
 
-	HRESULT hr = AudioManager::GetInstance()->xAudio2->CreateSourceVoice(&pSourceVoice, &wfet);
+	HRESULT hr = AudioManager::GetInstance()->xAudio2_->CreateSourceVoice(&pSourceVoice_, &wfet_);
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Load() : CreateSourceVoice() failed", "Audio");
 	}
 
 	XAUDIO2_BUFFER buf{};
-	buf.pAudioData = pBuffer;
-	buf.AudioBytes = bufferSize;
+	buf.pAudioData = pBuffer_;
+	buf.AudioBytes = bufferSize_;
 	buf.Flags = XAUDIO2_END_OF_STREAM;
 	buf.LoopCount = loopFlg_ ? XAUDIO2_LOOP_INFINITE : 0;
 
-	hr = pSourceVoice->SubmitSourceBuffer(&buf);
+	hr = pSourceVoice_->SubmitSourceBuffer(&buf);
 
-	loopFlg = loopFlg_;
+	isLoad_ = true;
 }
 
 
 void Audio::Start(float volume) {
+	if (!isLoad_) {
+		return;
+	}
+
 	HRESULT hr;
 	volume_ = volume;
 
 	Stop();
-	if (!pSourceVoice) {
-		hr = AudioManager::GetInstance()->xAudio2->CreateSourceVoice(&pSourceVoice, &wfet);
+	if (!pSourceVoice_) {
+		hr = AudioManager::GetInstance()->xAudio2_->CreateSourceVoice(&pSourceVoice_, &wfet_);
 		XAUDIO2_BUFFER buf{};
-		buf.pAudioData = pBuffer;
-		buf.AudioBytes = bufferSize;
+		buf.pAudioData = pBuffer_;
+		buf.AudioBytes = bufferSize_;
 		buf.Flags = XAUDIO2_END_OF_STREAM;
-		buf.LoopCount = loopFlg ? XAUDIO2_LOOP_INFINITE : 0;
+		buf.LoopCount = loopFlg_ ? XAUDIO2_LOOP_INFINITE : 0;
 
 		if (!SUCCEEDED(hr)) {
 			ErrorCheck::GetInstance()->ErrorTextBox("Start() : SubmitSourceBuffer() failed", "Audio");
 			return;
 		}
-		hr = pSourceVoice->SubmitSourceBuffer(&buf);
+		hr = pSourceVoice_->SubmitSourceBuffer(&buf);
 	}
-	hr = pSourceVoice->Start();
+	hr = pSourceVoice_->Start();
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Start() : Start() failed", "Audio");
 		return;
 	}
-	pSourceVoice->SetVolume(volume_);
+	pSourceVoice_->SetVolume(volume_);
 
-	isStart = true;
+	isStart_ = true;
 }
 
 void Audio::Pause() {
-	if (pSourceVoice) {
-		pSourceVoice->Stop();
-		isStart = false;
+	if (!isLoad_) {
+		return;
+	}
+	if (pSourceVoice_) {
+		pSourceVoice_->Stop();
+		isStart_ = false;
 	}
 }
 
 void Audio::ReStart() {
-	if (pSourceVoice) {
-		pSourceVoice->Start();
-		isStart = true;
+	if (!isLoad_) {
+		return;
+	}
+	if (pSourceVoice_) {
+		pSourceVoice_->Start();
+		isStart_ = true;
 	}
 }
 
 void Audio::Stop() {
-	if (pSourceVoice) {
-		pSourceVoice->DestroyVoice();
+	if (!isLoad_) {
+		return;
 	}
-	pSourceVoice = nullptr;
+	if (pSourceVoice_) {
+		pSourceVoice_->DestroyVoice();
+	}
+	pSourceVoice_ = nullptr;
 
-	isStart = false;
+	isStart_ = false;
 }
 
 void Audio::SetAudio(float volume) {
 	volume_ = volume;
-	if (pSourceVoice && isStart) {
-		pSourceVoice->SetVolume(volume_);
+	if (pSourceVoice_ && isStart_) {
+		pSourceVoice_->SetVolume(volume_);
 	}
 }
 
@@ -169,7 +199,7 @@ void Audio::Debug([[maybe_unused]]const std::string& guiName) {
 	ImGui::DragFloat("volume", &volume_, 0.001f, 0.0f, 1.0f);
 	SetAudio(volume_);
 	
-	ImGui::Checkbox("isLoop", &loopFlg);
+	ImGui::Checkbox("isLoop", &loopFlg_);
 	if (ImGui::Button("Start")) {
 		Start(volume_);
 	}

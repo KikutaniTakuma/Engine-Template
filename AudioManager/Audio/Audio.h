@@ -25,7 +25,12 @@ private:
 
 public:
 	Audio();
+	Audio(const Audio&) = delete;
+	Audio(Audio&&) = delete;
 	~Audio();
+
+	Audio& operator=(const Audio&) = delete;
+	Audio& operator=(Audio&&) = delete;
 
 public:
 	void Start(float volume);
@@ -37,7 +42,7 @@ public:
 	void Stop();
 
 	bool IsStart() const {
-		return isStart;
+		return isStart_;
 	}
 
 	void SetAudio(float volume);
@@ -48,11 +53,14 @@ private:
 	void Load(const std::string& fileName, bool loopFlg_);
 
 private:
-	WAVEFORMATEX wfet;
-	BYTE* pBuffer;
-	uint32_t bufferSize;
-	IXAudio2SourceVoice* pSourceVoice;
-	bool loopFlg;
-	bool isStart;
+	WAVEFORMATEX wfet_;
+	BYTE* pBuffer_;
+	uint32_t bufferSize_;
+	IXAudio2SourceVoice* pSourceVoice_;
+	bool loopFlg_;
+	bool isStart_;
 	float volume_;
+
+	bool isLoad_;
+	std::string fileName_;
 };
