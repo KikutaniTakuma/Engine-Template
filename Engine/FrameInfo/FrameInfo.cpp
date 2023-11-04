@@ -25,9 +25,13 @@ FrameInfo::FrameInfo() :
 	minFps_(0.0),
 	frameCount_(0),
 	fpsLimit_(0.0),
-	minTime(),
-	minCheckTime(),
-	gameSpeedSccale_(1.0)
+	minTime_(),
+	minCheckTime_(),
+	gameSpeedSccale_(1.0),
+	frameDatas_(),
+	frameDataDuration_(1),
+	frameDataDurationStartTime_{},
+	avgProcDuration_{600llu}
 {
 	//画面情報構造体
 	DEVMODE mode{};
@@ -40,8 +44,10 @@ FrameInfo::FrameInfo() :
 	minFps_ = maxFps_ = fps_;
 	deltaTime_ = 1.0f / fps_;
 
-	gameStartTime_ = std::chrono::steady_clock::now();
-	reference_ = std::chrono::steady_clock::now();
+	auto nowTime = std::chrono::steady_clock::now();
+	gameStartTime_ = nowTime;
+	reference_ = nowTime;
+	frameDataDurationStartTime_ = nowTime;
 
 	maxFpsLimit_ = fps_;
 
@@ -60,12 +66,20 @@ FrameInfo::~FrameInfo() {
 	auto playtime =
 		std::chrono::duration_cast<std::chrono::milliseconds>(end - gameStartTime_);
 
-	double theoreticalFrameCount = (static_cast<double>(playtime.count()) / 1000.0) * static_cast<double>(mode.dmDisplayFrequency);
-
 	maxFps_ = std::clamp(maxFps_, 0.0, static_cast<double>(mode.dmDisplayFrequency));
 	minFps_ = std::clamp(minFps_, 0.0, static_cast<double>(mode.dmDisplayFrequency));
 
-	Log::AddLog(std::format("Average Fps : {:.2f}\n", static_cast<double>(mode.dmDisplayFrequency) * (static_cast<double>(frameCount_) / theoreticalFrameCount)));
+	double avgFps = 0.0;
+	double size = static_cast<double>(frameDatas_.size());
+	while (!frameDatas_.empty()) {
+		avgFps += frameDatas_.front();
+
+		frameDatas_.pop();
+	}
+
+	avgFps /= size;
+
+	Log::AddLog(std::format("Average Fps : {:.2f}\n", avgFps));
 	if (std::chrono::duration_cast<std::chrono::seconds>(end - gameStartTime_) > std::chrono::seconds(1)) {
 		Log::AddLog(std::format("Max Fps : {:.2f}\n", maxFps_));
 		Log::AddLog(std::format("Min Fps : {:.2f}\n", minFps_));
@@ -92,8 +106,8 @@ void FrameInfo::End() {
 	auto elapsed =
 		std::chrono::duration_cast<std::chrono::microseconds>(end - reference_);
 
-	if (elapsed < minTime) {
-		while (std::chrono::steady_clock::now() - reference_ < minTime) {
+	if (elapsed < minTime_) {
+		while (std::chrono::steady_clock::now() - reference_ < minTime_) {
 			std::this_thread::sleep_for(std::chrono::microseconds(1));
 		}
 	}
@@ -102,7 +116,7 @@ void FrameInfo::End() {
 	auto frameTime = std::chrono::duration_cast<std::chrono::microseconds>(end - frameStartTime_);
 
 	deltaTime_ = static_cast<double>(frameTime.count()) * unitAdjustment;
-	fps_ = 1.0f / deltaTime_;
+	fps_ = 1.0 / deltaTime_;
 
 
 	if (std::chrono::duration_cast<std::chrono::seconds>(end - gameStartTime_) > std::chrono::seconds(1)) {
@@ -111,14 +125,33 @@ void FrameInfo::End() {
 	}
 
 	frameCount_++;
-	reference_ = std::chrono::steady_clock::now();
+	auto nowTime = std::chrono::steady_clock::now();
+	reference_ = nowTime;
+
+	if (std::chrono::duration_cast<std::chrono::seconds>(frameDataDurationStartTime_ - nowTime) < frameDataDuration_) {
+		frameDataDurationStartTime_ = nowTime;
+		frameDatas_.push(fps_);
+
+		if (avgProcDuration_ < frameDatas_.size()) {
+			double avgFps = 0.0;
+			double size = static_cast<double>(frameDatas_.size());
+			while (!frameDatas_.empty()) {
+				avgFps += frameDatas_.front();
+
+				frameDatas_.pop();
+			}
+
+			avgFps /= size;
+			frameDatas_.push(avgFps);
+		}
+	}
 }
 
 void FrameInfo::SetFpsLimit(double fpsLimit) {
 	fpsLimit_ = std::clamp(fpsLimit, 10.0, maxFpsLimit_);
 	           
-	minTime = std::chrono::microseconds(uint64_t(1000000.0 / fpsLimit_));
-	minCheckTime = std::chrono::microseconds(uint64_t(1000000.0 / fpsLimit_) - 1282LLU);
+	minTime_ = std::chrono::microseconds(uint64_t(1000000.0 / fpsLimit_));
+	minCheckTime_ = std::chrono::microseconds(uint64_t(1000000.0 / fpsLimit_) - 1282LLU);
 }
 
 void FrameInfo::Debug() {

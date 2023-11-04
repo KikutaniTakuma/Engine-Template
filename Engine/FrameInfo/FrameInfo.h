@@ -1,5 +1,6 @@
 #pragma once
 #include <chrono>
+#include <queue>
 
 class FrameInfo {
 /// <summary>
@@ -132,10 +133,16 @@ private:
 	double fpsLimit_;
 	double maxFpsLimit_;
 
-	std::chrono::microseconds minTime;
-	std::chrono::microseconds minCheckTime;
+	std::chrono::microseconds minTime_;
+	std::chrono::microseconds minCheckTime_;
 
 	double gameSpeedSccale_;
+
+	std::queue<double> frameDatas_;
+	std::chrono::seconds frameDataDuration_;
+	std::chrono::steady_clock::time_point frameDataDurationStartTime_;
+	size_t avgProcDuration_;
+	
 
 #ifdef _DEBUG
 	bool isDebugStopGame_;
