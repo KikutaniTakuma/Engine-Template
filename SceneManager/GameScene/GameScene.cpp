@@ -61,13 +61,7 @@ void GameScene::Draw() {
 	camera_.Update(Vector3::zero);
 
 	// 投資投影で描画
-	Vector3 pos = model_.pos;
-	for (size_t i = 0llu; i < 100; i++) {
-		model_.pos.x = static_cast<float>(i);
-		model_.InstancingDraw(camera_.GetViewProjection(), camera_.GetPos());
-	}
-
-	model_.pos = pos;
+	model_.Draw(camera_.GetViewProjection(), camera_.GetPos());
 
 
 	// 平行投影で描画

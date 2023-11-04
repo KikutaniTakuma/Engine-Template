@@ -239,8 +239,13 @@ void Mesh::ReleaseResource() {
 	}
 }
 
-const std::unordered_map<std::string, Mesh::CopyData>& Mesh::CopyBuffer() {
-	return resource_;
+std::unordered_map<std::string, Mesh::CopyData> Mesh::CopyBuffer() const {
+	std::unordered_map<std::string, Mesh::CopyData> copyData;
+	for (auto& i : resource_) {
+		copyData[i.first];
+		copyData[i.first] = i.second;
+	}
+	return copyData;
 }
 
 void Mesh::ResetDrawCount() {

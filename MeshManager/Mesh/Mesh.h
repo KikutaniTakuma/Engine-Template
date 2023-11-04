@@ -18,10 +18,24 @@
 /// </summary>
 class Mesh {
 public:
-	struct CopyData {
+	struct ResourceData {
 		std::pair<ID3D12Resource*, D3D12_VERTEX_BUFFER_VIEW> resource;
 		uint32_t vertNum;
 		Texture* tex;
+	};
+
+	struct CopyData {
+		D3D12_VERTEX_BUFFER_VIEW view;
+		uint32_t vertNum;
+		Texture* tex;
+
+		CopyData& operator=(const ResourceData& other) {
+			view = other.resource.second;
+			vertNum = other.vertNum;
+			tex = other.tex;
+
+			return *this;
+		}
 	};
 
 	struct MatrixData {
@@ -95,7 +109,7 @@ public:
 	void LoadObj(const std::string& objfileName);
 
 
-	const std::unordered_map<std::string, Mesh::CopyData>& CopyBuffer();
+	std::unordered_map<std::string, Mesh::CopyData> CopyBuffer() const;
 
 private:
 	void LoadMtl(const std::string& fileName);
@@ -134,7 +148,7 @@ private:
 
 	uint32_t drawCount_;
 
-	std::unordered_map<std::string, Mesh::CopyData> resource_;
+	std::unordered_map<std::string, Mesh::ResourceData> resource_;
 
 public:
 	static void Initialize(

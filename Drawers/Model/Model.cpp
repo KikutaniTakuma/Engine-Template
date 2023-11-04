@@ -158,12 +158,6 @@ Model& Model::operator=(const Model& right) {
 
 	// 自身がロード済みだったらResourceを解放する
 	if (isLoadObj) {
-		for (auto& i : data) {
-			if (i.second.resource.first) {
-				i.second.resource.first->Release();
-			}
-		}
-
 		data.clear();
 	}
 
@@ -200,12 +194,6 @@ Model& Model::operator=(Model&& right) noexcept {
 
 	// 自身がロード済みだったらResourceを解放する
 	if (isLoadObj) {
-		for (auto& i : data) {
-			if (i.second.resource.first) {
-				i.second.resource.first->Release();
-			}
-		}
-
 		data.clear();
 	}
 
@@ -300,7 +288,7 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 
 			commandlist->SetGraphicsRootDescriptorTable(1, wvpData.GetViewHandle());
 
-			commandlist->IASetVertexBuffers(0, 1, &i.second.resource.second);
+			commandlist->IASetVertexBuffers(0, 1, &i.second.view);
 			commandlist->DrawInstanced(i.second.vertNum, 1, 0, 0);
 		}
 	}
