@@ -119,7 +119,7 @@ private:
 	void LoadMtl(const std::string& fileName);
 
 	/// <summary>
-	/// 非同期読み込み用(この中では非同期では読み込まない)
+	/// 非同期読み込み用(この関数単体では非同期では読み込まない)
 	/// </summary>
 	/// <param name="objFileName"></param>
 	void ThreadLoadObj(const std::string& objFileName);
