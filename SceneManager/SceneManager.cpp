@@ -143,6 +143,12 @@ void SceneManager::Game(std::optional<BaseScene::ID> finishID) {
 
 void SceneManager::Finalize() {
 	fade_.reset();
+	if (scene_) {
+		scene_->Finalize();
+	}
 	scene_.reset();
+	if (next_) {
+		next_->Finalize();
+	}
 	next_.reset();
 }
