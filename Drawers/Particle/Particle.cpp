@@ -952,7 +952,7 @@ void Particle::Draw(
 
 
 		if (0 < drawCount) {
-			auto commandlist = Direct12::GetInstance()->GetCommandList();
+			auto commandlist = DirectXCommon::GetInstance()->GetCommandList();
 			// 各種描画コマンドを積む
 			graphicsPipelineState[blend]->Use();
 			tex->Use(0);

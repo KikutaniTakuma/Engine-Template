@@ -5,7 +5,7 @@
 
 #include "WinApp/WinApp.h"
 #include "EngineParts/Direct3D/Direct3D.h"
-#include "EngineParts/Direct12/Direct12.h"
+#include "EngineParts/DirectXCommon/DirectXCommon.h"
 
 #include "ShaderManager/ShaderManager.h"
 #include "TextureManager/TextureManager.h"
@@ -171,8 +171,8 @@ void Engine::InitializeDirect3D() {
 /// 
 
 void Engine::InitializeDirect12() {
-	Direct12::Initialize();
-	direct12_ = Direct12::GetInstance();
+	DirectXCommon::Initialize();
+	direct12_ = DirectXCommon::GetInstance();
 }
 
 
@@ -404,6 +404,6 @@ Engine::~Engine() {
 	}
 	depthStencilResource->Release();
 
-	Direct12::Finalize();
+	DirectXCommon::Finalize();
 	Direct3D::Finalize();
 }

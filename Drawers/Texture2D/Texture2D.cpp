@@ -327,7 +327,7 @@ void Texture2D::Draw(
 
 		*wvpMat = viewProjection;
 
-		auto commandlist = Direct12::GetInstance()->GetCommandList();
+		auto commandlist = DirectXCommon::GetInstance()->GetCommandList();
 
 
 		// 各種描画コマンドを積む

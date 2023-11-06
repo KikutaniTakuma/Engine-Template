@@ -1,4 +1,4 @@
-#include "Direct12.h"
+#include "DirectXCommon.h"
 #include "Engine/Engine.h"
 #include "Engine/WinApp/WinApp.h"
 #include "Engine/EngineParts/Direct3D/Direct3D.h"
@@ -17,22 +17,22 @@
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wPram, LPARAM lPram);
 #endif // _DEBUG
 
-Direct12* Direct12::instance_ = nullptr;
+DirectXCommon* DirectXCommon::instance_ = nullptr;
 
-Direct12* Direct12::GetInstance() {
+DirectXCommon* DirectXCommon::GetInstance() {
 	assert(instance_);
 	return instance_;
 }
 
-void Direct12::Initialize() {
-	instance_ = new Direct12{};
+void DirectXCommon::Initialize() {
+	instance_ = new DirectXCommon{};
 }
-void Direct12::Finalize() {
+void DirectXCommon::Finalize() {
 	delete instance_;
 	instance_ = nullptr;
 }
 
-Direct12::Direct12():
+DirectXCommon::DirectXCommon():
 	commandQueue_{},
 	commandAllocator_{},
 	commandList_{},
@@ -172,7 +172,7 @@ Direct12::Direct12():
 	}
 }
 
-Direct12::~Direct12() {
+DirectXCommon::~DirectXCommon() {
 #ifdef _DEBUG
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
@@ -182,7 +182,7 @@ Direct12::~Direct12() {
 	rtvDescriptorHeap_->Release();
 }
 
-void Direct12::WaitForFinishCommnadlist() {
+void DirectXCommon::WaitForFinishCommnadlist() {
 	// Fenceの値を更新
 	fenceVal_++;
 	// GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
@@ -198,7 +198,7 @@ void Direct12::WaitForFinishCommnadlist() {
 	}
 }
 
-void Direct12::SetViewPort(uint32_t width, uint32_t height) {
+void DirectXCommon::SetViewPort(uint32_t width, uint32_t height) {
 	// ビューポート
 	D3D12_VIEWPORT viewport{};
 	// クライアント領域のサイズと一緒にして画面全体に表示
@@ -220,7 +220,7 @@ void Direct12::SetViewPort(uint32_t width, uint32_t height) {
 	commandList_->RSSetScissorRects(1, &scissorRect);
 }
 
-void Direct12::Barrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after, UINT subResource) {
+void DirectXCommon::Barrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after, UINT subResource) {
 	// TransitionBarrierの設定
 	D3D12_RESOURCE_BARRIER barrier{};
 	// 今回のバリアはTransition
@@ -239,14 +239,14 @@ void Direct12::Barrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D
 	commandList_->ResourceBarrier(1, &barrier);
 }
 
-void Direct12::SetMainRenderTarget() {
+void DirectXCommon::SetMainRenderTarget() {
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 	// 描画先をRTVを設定する
 	auto dsvH = Engine::GetDsvHandle();
 	commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex], false, &dsvH);
 }
 
-void Direct12::ClearBackBuffer() {
+void DirectXCommon::ClearBackBuffer() {
 	auto dsvH = Engine::GetDsvHandle();
 	commandList_->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
@@ -257,7 +257,7 @@ void Direct12::ClearBackBuffer() {
 	commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearColor.m.data(), 0, nullptr);
 }
 
-void Direct12::ChangeBackBufferState() {
+void DirectXCommon::ChangeBackBufferState() {
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 	if (isRenderState_) {
 		Barrier(
@@ -277,7 +277,7 @@ void Direct12::ChangeBackBufferState() {
 	}
 }
 
-void Direct12::CloseCommandlist() {
+void DirectXCommon::CloseCommandlist() {
 	// コマンドリストを確定させる
 	HRESULT hr = commandList_->Close();
 	isCommandListClose_ = true;
@@ -287,17 +287,17 @@ void Direct12::CloseCommandlist() {
 	}
 }
 
-void Direct12::ExecuteCommandLists() {
+void DirectXCommon::ExecuteCommandLists() {
 	ID3D12CommandList* commandLists[] = { commandList_.Get() };
 	commandQueue_->ExecuteCommandLists(_countof(commandLists), commandLists);
 }
 
-void Direct12::SwapChainPresent() {
+void DirectXCommon::SwapChainPresent() {
 	// GPUとOSに画面の交換を行うように通知する
 	swapChain_->Present(1, 0);
 }
 
-void Direct12::ResetCommandlist() {
+void DirectXCommon::ResetCommandlist() {
 	// 次フレーム用のコマンドリストを準備
 	HRESULT hr = commandAllocator_->Reset();
 	assert(SUCCEEDED(hr));

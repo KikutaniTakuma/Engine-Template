@@ -9,25 +9,25 @@
 #include <vector>
 #include <cstdint>
 
-class Direct12 {
+class DirectXCommon {
 private:
-	Direct12();
-	Direct12(const Direct12&) = delete;
-	Direct12(Direct12&&) = delete;
-	~Direct12();
+	DirectXCommon();
+	DirectXCommon(const DirectXCommon&) = delete;
+	DirectXCommon(DirectXCommon&&) = delete;
+	~DirectXCommon();
 
 public:
-	Direct12& operator=(const Direct12&) = delete;
-	Direct12& operator=(Direct12&&) = delete;
+	DirectXCommon& operator=(const DirectXCommon&) = delete;
+	DirectXCommon& operator=(DirectXCommon&&) = delete;
 
 public:
-	static Direct12* GetInstance();
+	static DirectXCommon* GetInstance();
 
 	static void Initialize();
 	static void Finalize();
 
 private:
-	static Direct12* instance_;
+	static DirectXCommon* instance_;
 
 public:
 	/// <summary>

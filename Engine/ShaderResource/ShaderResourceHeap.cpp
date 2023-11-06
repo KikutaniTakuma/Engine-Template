@@ -2,7 +2,7 @@
 #include "Utils/ConvertString/ConvertString.h"
 #include "Engine/WinApp/WinApp.h"
 #include "Engine/EngineParts/Direct3D/Direct3D.h"
-#include "Engine/EngineParts/Direct12/Direct12.h"
+#include "Engine/EngineParts/DirectXCommon/DirectXCommon.h"
 #include <cassert>
 #include <cmath>
 #include <algorithm>
@@ -65,17 +65,17 @@ ShaderResourceHeap::~ShaderResourceHeap() {
 }
 
 void ShaderResourceHeap::SetHeap() {
-	static auto commandlist = Direct12::GetInstance()->GetCommandList();
+	static auto commandlist = DirectXCommon::GetInstance()->GetCommandList();
 	commandlist->SetDescriptorHeaps(1, SRVHeap.GetAddressOf());
 }
 
 void ShaderResourceHeap::Use(D3D12_GPU_DESCRIPTOR_HANDLE handle, UINT rootParmIndex) {
-	static auto commandlist = Direct12::GetInstance()->GetCommandList();
+	static auto commandlist = DirectXCommon::GetInstance()->GetCommandList();
 	commandlist->SetGraphicsRootDescriptorTable(rootParmIndex, handle);
 }
 
 void ShaderResourceHeap::Use(uint32_t handleIndex, UINT rootParmIndex) {
-	auto commandlist = Direct12::GetInstance()->GetCommandList();
+	auto commandlist = DirectXCommon::GetInstance()->GetCommandList();
 	commandlist->SetGraphicsRootDescriptorTable(rootParmIndex, heapHandles[handleIndex].second);
 }
 

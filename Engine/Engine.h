@@ -132,7 +132,7 @@ private:
 	void InitializeDirect12();
 
 private:
-	class Direct12* direct12_ = nullptr;
+	class DirectXCommon* direct12_ = nullptr;
 	
 
 

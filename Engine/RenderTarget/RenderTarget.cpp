@@ -1,7 +1,7 @@
 #include "RenderTarget.h"
 #include "Engine/Engine.h"
 #include "Engine/EngineParts/Direct3D/Direct3D.h"
-#include "Engine/EngineParts/Direct12/Direct12.h"
+#include "Engine/EngineParts/DirectXCommon/DirectXCommon.h"
 #include "Utils/ConvertString/ConvertString.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include <cassert>
@@ -17,7 +17,7 @@ RenderTarget::RenderTarget():
 	srvDesc{},
 	srvHeapHandleUint()
 {
-	auto resDesc = Direct12::GetInstance()->GetSwapchainBufferDesc();
+	auto resDesc = DirectXCommon::GetInstance()->GetSwapchainBufferDesc();
 
 	// Resourceを生成する
 	// リソース用のヒープの設定
@@ -77,7 +77,7 @@ RenderTarget::RenderTarget(uint32_t width_, uint32_t height_) :
 	srvDesc{},
 	srvHeapHandleUint()
 {
-	auto resDesc = Direct12::GetInstance()->GetSwapchainBufferDesc();
+	auto resDesc = DirectXCommon::GetInstance()->GetSwapchainBufferDesc();
 	resDesc.Width = width;
 	resDesc.Height = height;
 
@@ -139,7 +139,7 @@ RenderTarget::~RenderTarget() {
 void RenderTarget::SetThisRenderTarget() {
 	isResourceStateChange = false;
 
-	Direct12::GetInstance()->Barrier(
+	DirectXCommon::GetInstance()->Barrier(
 		resource.Get(),
 		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 		D3D12_RESOURCE_STATE_RENDER_TARGET
@@ -147,16 +147,16 @@ void RenderTarget::SetThisRenderTarget() {
 
 	auto rtvHeapHandle = RTVHeap->GetCPUDescriptorHandleForHeapStart();
 	auto dsvH = Engine::GetDsvHandle();
-	Direct12::GetInstance()->GetCommandList()->OMSetRenderTargets(1, &rtvHeapHandle, false, &dsvH);
+	DirectXCommon::GetInstance()->GetCommandList()->OMSetRenderTargets(1, &rtvHeapHandle, false, &dsvH);
 
 	Vector4 clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-	Direct12::GetInstance()->GetCommandList()->ClearRenderTargetView(rtvHeapHandle, clearColor.m.data(), 0, nullptr);
+	DirectXCommon::GetInstance()->GetCommandList()->ClearRenderTargetView(rtvHeapHandle, clearColor.m.data(), 0, nullptr);
 	//Engine::SetViewPort(width, height);
 }
 
 void RenderTarget::ChangeResourceState() {
 	if (!isResourceStateChange) {
-		Direct12::GetInstance()->Barrier(
+		DirectXCommon::GetInstance()->Barrier(
 			resource.Get(),
 			D3D12_RESOURCE_STATE_RENDER_TARGET,
 			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
@@ -168,11 +168,11 @@ void RenderTarget::ChangeResourceState() {
 void RenderTarget::SetMainRenderTarget() {
 	ChangeResourceState();
 	
-	Direct12::GetInstance()->SetMainRenderTarget();
+	DirectXCommon::GetInstance()->SetMainRenderTarget();
 }
 
 void RenderTarget::UseThisRenderTargetShaderResource() {
-	static auto mainComList = Direct12::GetInstance()->GetCommandList();
+	static auto mainComList = DirectXCommon::GetInstance()->GetCommandList();
 	mainComList->SetGraphicsRootDescriptorTable(0, srvHeapHandle);
 }
 

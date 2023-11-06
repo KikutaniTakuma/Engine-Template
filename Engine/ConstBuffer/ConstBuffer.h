@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/EngineParts/Direct3D/Direct3D.h"
-#include "Engine/EngineParts/Direct12/Direct12.h"
+#include "Engine/EngineParts/DirectXCommon/DirectXCommon.h"
 #include <cassert>
 #include <wrl.h>
 #include "Engine/ErrorCheck/ErrorCheck.h"

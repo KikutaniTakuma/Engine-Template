@@ -285,7 +285,7 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 		light.eyePos = cameraPos;
 		dirLig->eyePos = cameraPos;
 
-		auto commandlist = Direct12::GetInstance()->GetCommandList();
+		auto commandlist = DirectXCommon::GetInstance()->GetCommandList();
 
 		if (!pipeline) {
 			ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Model");

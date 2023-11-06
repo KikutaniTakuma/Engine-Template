@@ -1,5 +1,5 @@
 #include "StringOut.h"
-#include "Engine/EngineParts/Direct12/Direct12.h"
+#include "Engine/EngineParts/DirectXCommon/DirectXCommon.h"
 #include "Engine/Engine.h"
 #include "externals/imgui/imgui.h"
 
@@ -76,7 +76,7 @@ StringOut& StringOut::operator=(StringOut && right) noexcept{
 }
 
 void StringOut::Draw() {
-	ID3D12GraphicsCommandList* commandList = Direct12::GetInstance()->GetCommandList();
+	ID3D12GraphicsCommandList* commandList = DirectXCommon::GetInstance()->GetCommandList();
 	commandList->SetDescriptorHeaps(1, Engine::GetFontHeap(format).GetAddressOf());
 
 	Engine::GetBatch(format)->Begin(commandList);
