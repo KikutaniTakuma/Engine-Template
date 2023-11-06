@@ -107,7 +107,7 @@
     <ClCompile Include="Engine\RenderTarget\RenderTarget.cpp">
       <Filter>Engine\RenderTarget</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\ShaderResource\ShaderResourceHeap.cpp">
+    <ClCompile Include="Engine\ShaderResource\DescriptorHeap.cpp">
       <Filter>Engine\ShaderResource</Filter>
     </ClCompile>
     <ClCompile Include="MeshManager\MeshManager.cpp">
@@ -471,7 +471,7 @@
     <ClInclude Include="Engine\RenderTarget\RenderTarget.h">
       <Filter>Engine\RenderTarget</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\ShaderResource\ShaderResourceHeap.h">
+    <ClInclude Include="Engine\ShaderResource\DescriptorHeap.h">
       <Filter>Engine\ShaderResource</Filter>
     </ClInclude>
     <ClInclude Include="MeshManager\MeshManager.h">

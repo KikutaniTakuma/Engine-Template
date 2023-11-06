@@ -59,11 +59,11 @@ private:
 /// 静的メンバ変数
 /// </summary>
 private:
-	static std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum) * 2> graphicsPipelineState;
-	static Shader shader;
+	static std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum) * 2> graphicsPipelineState_;
+	static Shader shader_;
 
-	static D3D12_INDEX_BUFFER_VIEW indexView;
-	static Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
+	static D3D12_INDEX_BUFFER_VIEW indexView_;
+	static Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
 
 
 public:
@@ -85,8 +85,8 @@ public:
 	bool Collision(const Texture2D& tex2D) const;
 
 	Vector2 GetTexSize() const {
-		if (tex) {
-			return tex->getSize();
+		if (tex_) {
+			return tex_->getSize();
 		}
 		else {
 			return Vector2::zero;
@@ -127,31 +127,31 @@ public:
 	}
 
 public:
-	Vector2 scale;
-	Vector3 rotate;
-	Vector3 pos;
+	Vector2 scale_;
+	Vector3 rotate_;
+	Vector3 pos_;
 
-	Vector2 uvPibot;
-	Vector2 uvSize;
+	Vector2 uvPibot_;
+	Vector2 uvSize_;
 
-	std::array<Vector3, 4> worldPos;
+	std::array<Vector3, 4> worldPos_;
 
-	uint32_t color;
+	uint32_t color_;
 
-	UtilsLib::Flg isSameTexSize;
+	UtilsLib::Flg isSameTexSize_;
 
 	// テクスチャと同じスケールにしたときのスケール倍率
-	float texScalar;
+	float texScalar_;
 
 private:
-	D3D12_VERTEX_BUFFER_VIEW vertexView;
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
+	D3D12_VERTEX_BUFFER_VIEW vertexView_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 
-	ConstBuffer<Mat4x4> wvpMat;
-	ConstBuffer<Vector4> colorBuf;
+	ConstBuffer<Mat4x4> wvpMat_;
+	ConstBuffer<Vector4> colorBuf_;
 
-	Texture* tex;
-	bool isLoad;
+	Texture* tex_;
+	bool isLoad_;
 
 	// アニメーション変数
 	std::chrono::steady_clock::time_point aniStartTime_;

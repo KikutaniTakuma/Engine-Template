@@ -14,7 +14,7 @@ ErrorCheck* ErrorCheck::GetInstance() {
 }
 
 ErrorCheck::ErrorCheck() :
-	isError(false)
+	isError_(false)
 {
 }
 
@@ -38,7 +38,7 @@ void ErrorCheck::ErrorTextBox(const std::string& text, const std::string& boxNam
 			MB_OK | MB_SYSTEMMODAL| MB_ICONERROR
 		);
 	}
-	isError = true;
+	isError_ = true;
 }
 
 void ErrorCheck::ErrorLog(const std::string& text, const std::string& boxName) {

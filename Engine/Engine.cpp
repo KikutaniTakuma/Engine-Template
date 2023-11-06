@@ -101,7 +101,7 @@ bool Engine::Initialize(const std::string& windowName, const Vector2& windowSize
 	engine->InitializeDirect3D();
 
 	// ディスクリプタヒープ初期化
-	ShaderResourceHeap::Initialize(4096);
+	DescriptorHeap::Initialize(4096);
 
 	// DirectX12生成
 	engine->InitializeDirect12();
@@ -144,7 +144,7 @@ void Engine::Finalize() {
 	ShaderManager::Finalize();
 	Input::Finalize();
 
-	ShaderResourceHeap::Finalize();
+	DescriptorHeap::Finalize();
 
 	delete engine;
 	engine = nullptr;
@@ -336,7 +336,7 @@ void Engine::FrameStart() {
 	engine->direct12_->SetViewPort(engine->clientWidth, engine->clientHeight);
 
 	// SRV用のヒープ
-	static auto srvDescriptorHeap = ShaderResourceHeap::GetInstance();
+	static auto srvDescriptorHeap = DescriptorHeap::GetInstance();
 
 	srvDescriptorHeap->SetHeap();
 }

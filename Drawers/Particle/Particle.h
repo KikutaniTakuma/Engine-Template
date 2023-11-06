@@ -21,35 +21,35 @@ public:
 
 public:
 	struct MatrixData {
-		Mat4x4 wvpMat;
+		Mat4x4 wvpMat_;
 	};
 
 	struct VertexData {
-		Vector3 position;
-		Vector2 uv;
+		Vector3 position_;
+		Vector2 uv_;
 	};
 
 private:
 	struct WorldTransForm {
-		Vector2 scale;
-		Vector2 scaleStart;
-		Vector2 scaleSecond;
+		Vector2 scale_;
+		Vector2 scaleStart_;
+		Vector2 scaleSecond_;
 
-		Vector3 rotate;
-		Vector3 rotateStart;
-		Vector3 rotateSecond;
-		Vector3 pos;
-		uint32_t color;
+		Vector3 rotate_;
+		Vector3 rotateStart_;
+		Vector3 rotateSecond_;
+		Vector3 pos_;
+		uint32_t color_;
 		
-		Vector3 movePos;
-		Vector3 movePosSecond;
-		bool isActive;
+		Vector3 movePos_;
+		Vector3 movePosSecond_;
+		bool isActive_;
 
 		// スタートした時間
-		std::chrono::steady_clock::time_point startTime;
+		std::chrono::steady_clock::time_point startTime_;
 
 		// 消える時間
-		std::chrono::milliseconds deathTime;
+		std::chrono::milliseconds deathTime_;
 	};
 
 	enum class EmitterType {
@@ -59,91 +59,91 @@ private:
 
 	struct Emitter {
 		// エミッターの場所
-		Vector3 pos;
+		Vector3 pos_;
 
 		// エミッターの大きさ
-		Vector3 size;
+		Vector3 size_;
 
 		// エミッターのタイプ(立方体か球か)
-		EmitterType type;
+		EmitterType type_;
 
 		// 球のときの半径
-		float circleSize;
+		float circleSize_;
 
 		// 球のときのランダム範囲
-		std::pair<Vector3, Vector3> rotate;
+		std::pair<Vector3, Vector3> rotate_;
 
-		uint32_t particleMaxNum;
+		uint32_t particleMaxNum_;
 
 		// 有効時間
-		std::chrono::milliseconds validTime;
+		std::chrono::milliseconds validTime_;
 	};
 
 	struct Setting {
-		Emitter emitter;
+		Emitter emitter_;
 
 		///
 		/// 乱数の範囲
 		/// 
 
 		// 大きさ
-		std::pair<Vector2, Vector2> size;
-		std::pair<Vector2, Vector2> sizeSecond;
+		std::pair<Vector2, Vector2> size_;
+		std::pair<Vector2, Vector2> sizeSecond_;
 
 		// 大きさラープ
-		int32_t sizeEaseType;
-		std::function<float(float)> sizeEase;
+		int32_t sizeEaseType_;
+		std::function<float(float)> sizeEase_;
 
 		// 移動(速度)
-		std::pair<Vector3, Vector3> velocity;
-		std::pair<Vector3, Vector3> velocitySecond;
+		std::pair<Vector3, Vector3> velocity_;
+		std::pair<Vector3, Vector3> velocitySecond_;
 
 		// 移動ラープのタイプ
 		int32_t moveEaseType;
-		std::function<float(float)> moveEase;
+		std::function<float(float)> moveEase_;
 
 		// 移動方向
-		std::pair<Vector3, Vector3> moveRotate;
+		std::pair<Vector3, Vector3> moveRotate_;
 
 		// 回転
-		std::pair<Vector3, Vector3> rotate;
-		std::pair<Vector3, Vector3> rotateSecond;
+		std::pair<Vector3, Vector3> rotate_;
+		std::pair<Vector3, Vector3> rotateSecond_;
 		// 大きさラープ
-		int32_t rotateEaseType;
-		std::function<float(float)> rotateEase;
+		int32_t rotateEaseType_;
+		std::function<float(float)> rotateEase_;
 
 
 
 		// 一度にいくつ出すか(数)
-		std::pair<uint32_t, uint32_t> particleNum;
+		std::pair<uint32_t, uint32_t> particleNum_;
 
 		// 出す頻度(milliseconds)
-		std::pair<uint32_t, uint32_t> freq;
+		std::pair<uint32_t, uint32_t> freq_;
 
 		// 消える時間(milliseconds)
-		std::pair<uint32_t, uint32_t> death;
+		std::pair<uint32_t, uint32_t> death_;
 
 		// 色
-		std::pair<uint32_t, uint32_t> color;
-		int32_t colorEaseType;
-		std::function<float(float)> colorEase;
+		std::pair<uint32_t, uint32_t> color_;
+		int32_t colorEaseType_;
+		std::function<float(float)> colorEase_;
 
 		///
 		/// 
 		/// 
 		
 		// スタートした時間
-		std::chrono::steady_clock::time_point startTime;
+		std::chrono::steady_clock::time_point startTime_;
 
 		// 前に出した時間
-		std::chrono::steady_clock::time_point durationTime;
+		std::chrono::steady_clock::time_point durationTime_;
 
 		// 今有効か
-		UtilsLib::Flg isValid;
+		UtilsLib::Flg isValid_;
 
 
 		// 縦横の大きさを同じにするか
-		UtilsLib::Flg isSameHW;
+		UtilsLib::Flg isSameHW_;
 	};
 
 public:
@@ -158,11 +158,11 @@ public:
 	Particle& operator=(Particle&& right) noexcept;
 
 	inline WorldTransForm& operator[](size_t index) {
-		return wtfs[index];
+		return wtfs_[index];
 	}
 
 	inline const WorldTransForm& operator[](size_t index) const {
-		return wtfs[index];
+		return wtfs_[index];
 	}
 
 
@@ -186,11 +186,11 @@ private:
 	/// 静的メンバ変数
 	/// </summary>
 private:
-	static std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum)> graphicsPipelineState;
-	static Shader shader;
+	static std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum)> graphicsPipelineState_;
+	static Shader shader_;
 
-	static D3D12_INDEX_BUFFER_VIEW indexView;
-	static Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
+	static D3D12_INDEX_BUFFER_VIEW indexView_;
+	static Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
 
 public:
 	void LoadSettingDirectory(const std::string& directoryName);
@@ -201,8 +201,8 @@ private:
 
 	void BackUpSettingFile(const std::string& groupName);
 private:
-	std::unordered_map<std::string, Group> datas;
-	std::string dataDirectoryName;
+	std::unordered_map<std::string, Group> datas_;
+	std::string dataDirectoryName_;
 
 
 public:
@@ -248,8 +248,8 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	Vector2 GetTexSize() const {
-		if (tex) {
-			return tex->getSize();
+		if (tex_) {
+			return tex_->getSize();
 		}
 		else {
 			return Vector2::zero;
@@ -296,42 +296,42 @@ public:
 	void Resize(uint32_t index);
 
 	const UtilsLib::Flg& GetIsParticleStart() const {
-		if (settings.empty()) {
+		if (settings_.empty()) {
 			static UtilsLib::Flg result{false};
 			return result;
 		}
 
-		return settings.front().isValid;
+		return settings_.front().isValid_;
 	}
 
 public:
-	Vector2 uvPibot;
-	Vector2 uvSize;
+	Vector2 uvPibot_;
+	Vector2 uvSize_;
 
 	Vector3 emitterPos_;
 
 private:
-	std::deque<Setting> settings;
+	std::deque<Setting> settings_;
 
 	// ループするか
 	UtilsLib::Flg isLoop_;
 
-	uint32_t currentSettingIndex;
-	uint32_t currentParticleIndex;
+	uint32_t currentSettingIndex_;
+	uint32_t currentParticleIndex_;
 
-	std::vector<WorldTransForm> wtfs;
+	std::vector<WorldTransForm> wtfs_;
 
-	class ShaderResourceHeap* srvHeap;
+	class DescriptorHeap* srvHeap_;
 
 
-	D3D12_VERTEX_BUFFER_VIEW vertexView;
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
+	D3D12_VERTEX_BUFFER_VIEW vertexView_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 
-	StructuredBuffer<Mat4x4> wvpMat;
-	StructuredBuffer<Vector4> colorBuf;
+	StructuredBuffer<Mat4x4> wvpMat_;
+	StructuredBuffer<Vector4> colorBuf_;
 
-	Texture* tex;
-	bool isLoad;
+	Texture* tex_;
+	bool isLoad_;
 
 	bool isBillboard_;
 	bool isYBillboard_;

@@ -31,7 +31,7 @@ public:
 	void CreateView(D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle, D3D12_GPU_DESCRIPTOR_HANDLE descHeapHandleGPU, UINT descHeapHandleUINT);
 
 	UINT GetViewHandleUINT() const {
-		return srvHeapHandleUint;
+		return srvHeapHandleUint_;
 	}
 
 	Texture* GetTex() const {
@@ -39,17 +39,17 @@ public:
 	}
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12Resource> resource;
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> RTVHeap;
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource_;
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc_;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> RTVHeap_;
 
-	D3D12_GPU_DESCRIPTOR_HANDLE srvHeapHandle;
-	UINT srvHeapHandleUint;
+	D3D12_GPU_DESCRIPTOR_HANDLE srvHeapHandle_;
+	UINT srvHeapHandleUint_;
 
 	std::unique_ptr<Texture> tex_;
 
 
-	bool isResourceStateChange;
+	bool isResourceStateChange_;
 
-	uint32_t width, height;
+	uint32_t width_, height_;
 };

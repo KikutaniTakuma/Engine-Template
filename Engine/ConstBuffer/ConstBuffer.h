@@ -16,30 +16,30 @@ template<IsNotPtrCB T>
 class ConstBuffer {
 public:
 	inline ConstBuffer() noexcept:
-		bufferResource(),
-		cbvDesc(),
-		data(nullptr),
-		isWright(true),
-		isCreateView(false),
-		roootParamater(),
-		shaderVisibility(D3D12_SHADER_VISIBILITY_ALL),
-		shaderRegister(0)
+		bufferResource_(),
+		cbvDesc_(),
+		data_(nullptr),
+		isWright_(true),
+		isCreateView_(false),
+		roootParamater_(),
+		shaderVisibility_(D3D12_SHADER_VISIBILITY_ALL),
+		shaderRegister_(0)
 	{
 		// バイトサイズは256アライメントする(vramを効率的に使うための仕組み)
-		bufferResource = DirectXDevice::GetInstance()->CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
-		cbvDesc.BufferLocation = bufferResource->GetGPUVirtualAddress();
-		cbvDesc.SizeInBytes = UINT(bufferResource->GetDesc().Width);
+		bufferResource_ = DirectXDevice::GetInstance()->CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
+		cbvDesc_.BufferLocation = bufferResource_->GetGPUVirtualAddress();
+		cbvDesc_.SizeInBytes = UINT(bufferResource_->GetDesc().Width);
 
-		if (isWright) {
-			bufferResource->Map(0, nullptr, reinterpret_cast<void**>(&data));
+		if (isWright_) {
+			bufferResource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));
 		}
-		roootParamater.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+		roootParamater_.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	}
 
 	inline ~ConstBuffer() noexcept {
-		if(bufferResource){
-			bufferResource->Release();
-			bufferResource.Reset();
+		if(bufferResource_){
+			bufferResource_->Release();
+			bufferResource_.Reset();
 		}
 	}
 
@@ -51,47 +51,47 @@ public:
 
 public:
 	void OnWright() noexcept {
-		if (!isWright) {
-			bufferResource->Map(0, nullptr, reinterpret_cast<void**>(&data));
-			isWright = !isWright;
+		if (!isWright_) {
+			bufferResource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));
+			isWright_ = !isWright_;
 		}
 	}
 
 	void OffWright() noexcept {
-		if (isWright) {
-			bufferResource->Unmap(0, nullptr);
-			isWright = !isWright;
+		if (isWright_) {
+			bufferResource_->Unmap(0, nullptr);
+			isWright_ = !isWright_;
 		}
 	}
 
 	T& operator*() const noexcept {
-		return *data;
+		return *data_;
 	}
 
 	T* operator->() const noexcept {
-		return data;
+		return data_;
 	}
 
 	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVtlAdrs() const noexcept {
-		return bufferResource->GetGPUVirtualAddress();
+		return bufferResource_->GetGPUVirtualAddress();
 	}
 
 	const D3D12_ROOT_PARAMETER& GetRoootParamater() noexcept {
-		roootParamater.ShaderVisibility = shaderVisibility;
-		roootParamater.Descriptor.ShaderRegister = shaderRegister;
-		return roootParamater;
+		roootParamater_.ShaderVisibility = shaderVisibility_;
+		roootParamater_.Descriptor.ShaderRegister = shaderRegister_;
+		return roootParamater_;
 	}
 
 	void CrerateView(D3D12_CPU_DESCRIPTOR_HANDLE descHandle, D3D12_GPU_DESCRIPTOR_HANDLE descHandleGPU, UINT dsecIndex) noexcept {
 		static ID3D12Device* device = DirectXDevice::GetInstance()->GetDevice();
-		device->CreateConstantBufferView(&cbvDesc, descHandle);
-		descriptorHandle = descHandleGPU;
+		device->CreateConstantBufferView(&cbvDesc_, descHandle);
+		descriptorHandle_ = descHandleGPU;
 		dsecIndex_ = dsecIndex;
-		isCreateView = true;
+		isCreateView_ = true;
 	}
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetViewHandle() const noexcept {
-		return descriptorHandle;
+		return descriptorHandle_;
 	}
 
 	UINT GetViewHandleUINT() const noexcept {
@@ -99,21 +99,21 @@ public:
 	}
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12Resource> bufferResource;
-	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
+	Microsoft::WRL::ComPtr<ID3D12Resource> bufferResource_;
+	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc_;
 
-	T* data;
+	T* data_;
 
-	bool isWright;
+	bool isWright_;
 
-	bool isCreateView;
+	bool isCreateView_;
 
-	D3D12_GPU_DESCRIPTOR_HANDLE descriptorHandle;
+	D3D12_GPU_DESCRIPTOR_HANDLE descriptorHandle_;
 
 	UINT dsecIndex_;
 
-	D3D12_ROOT_PARAMETER roootParamater;
+	D3D12_ROOT_PARAMETER roootParamater_;
 public:
-	D3D12_SHADER_VISIBILITY shaderVisibility;
-	UINT shaderRegister;
+	D3D12_SHADER_VISIBILITY shaderVisibility_;
+	UINT shaderRegister_;
 };

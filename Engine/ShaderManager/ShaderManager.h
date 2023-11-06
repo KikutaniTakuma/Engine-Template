@@ -14,11 +14,11 @@
 /// シェーダーをまとめる構造体
 /// </summary>
 struct Shader {
-	IDxcBlob* vertex = nullptr;
-	IDxcBlob* hull = nullptr;
-	IDxcBlob* domain = nullptr;
-	IDxcBlob* geometory = nullptr;
-	IDxcBlob* pixel = nullptr;
+	IDxcBlob* vertex_ = nullptr;
+	IDxcBlob* hull_ = nullptr;
+	IDxcBlob* domain_ = nullptr;
+	IDxcBlob* geometory_ = nullptr;
+	IDxcBlob* pixel_ = nullptr;
 };
 
 /// <summary>
@@ -35,7 +35,7 @@ public:
 	static void Finalize();
 
 	static inline ShaderManager* GetInstance() {
-		return instance;
+		return instance_;
 	}
 
 public:
@@ -46,7 +46,7 @@ public:
 	static IDxcBlob* LoadPixelShader(const std::string& fileName);
 
 private:
-	static ShaderManager* instance;
+	static ShaderManager* instance_;
 
 private:
 	IDxcBlob* CompilerShader(
@@ -56,14 +56,14 @@ private:
 		const wchar_t* profile);
 
 private:
-	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils;
-	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler;
-	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler;
+	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;
+	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_;
+	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_;
 
 private:
-	std::unordered_map<std::string, Microsoft::WRL::ComPtr<IDxcBlob>> vertexShader;
-	std::unordered_map<std::string, Microsoft::WRL::ComPtr<IDxcBlob>> hullShader;
-	std::unordered_map<std::string, Microsoft::WRL::ComPtr<IDxcBlob>> domainShader;
-	std::unordered_map<std::string, Microsoft::WRL::ComPtr<IDxcBlob>> geometoryShader;
-	std::unordered_map<std::string, Microsoft::WRL::ComPtr<IDxcBlob>> pixelShader;
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<IDxcBlob>> vertexShader_;
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<IDxcBlob>> hullShader_;
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<IDxcBlob>> domainShader_;
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<IDxcBlob>> geometoryShader_;
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<IDxcBlob>> pixelShader_;
 };

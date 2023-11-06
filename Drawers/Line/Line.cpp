@@ -3,13 +3,13 @@
 #include "Engine/PipelineManager/PipelineManager.h"
 #include "Engine/ShaderResource/ShaderResourceHeap.h"
 
-Shader Line::shader = {};
+Shader Line::shader_ = {};
 
-Pipeline* Line::pipline = nullptr;
+Pipeline* Line::pipline_ = nullptr;
 
 void Line::Initialize() {
-	shader.vertex = ShaderManager::LoadVertexShader("./Resources/Shaders/LineShader/Line.VS.hlsl");
-	shader.pixel = ShaderManager::LoadPixelShader("./Resources/Shaders/LineShader/Line.PS.hlsl");
+	shader_.vertex_ = ShaderManager::LoadVertexShader("./Resources/Shaders/LineShader/Line.VS.hlsl");
+	shader_.pixel_ = ShaderManager::LoadPixelShader("./Resources/Shaders/LineShader/Line.PS.hlsl");
 
 	D3D12_DESCRIPTOR_RANGE range = {};
 	range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
@@ -26,31 +26,31 @@ void Line::Initialize() {
 	PipelineManager::CreateRootSgnature(&paramater, 1, false);
 	PipelineManager::SetVertexInput("POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	PipelineManager::SetVertexInput("COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
-	PipelineManager::SetShader(shader);
+	PipelineManager::SetShader(shader_);
 	PipelineManager::SetState(Pipeline::None, Pipeline::SolidState::Solid, Pipeline::CullMode::None, D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
-	pipline = PipelineManager::Create();
+	pipline_ = PipelineManager::Create();
 	PipelineManager::StateReset();
 }
 
 Line::Line() : 
-	vertexBuffer(),
-	vertexView{},
-	vertexMap(nullptr),
-	heap(),
-	wvpMat(),
-	start(),
-	end()
+	vertexBuffer_(),
+	vertexView_{},
+	vertexMap_(nullptr),
+	heap_(),
+	wvpMat_(),
+	start_(),
+	end_()
 {
-	vertexBuffer = DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * kVertexNum);
-	vertexView.BufferLocation = vertexBuffer->GetGPUVirtualAddress();
-	vertexView.SizeInBytes = sizeof(VertexData) * kVertexNum;
-	vertexView.StrideInBytes = sizeof(VertexData);
+	vertexBuffer_ = DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * kVertexNum);
+	vertexView_.BufferLocation = vertexBuffer_->GetGPUVirtualAddress();
+	vertexView_.SizeInBytes = sizeof(VertexData) * kVertexNum;
+	vertexView_.StrideInBytes = sizeof(VertexData);
 
-	vertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vertexMap));
+	vertexBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&vertexMap_));
 
-	heap = ShaderResourceHeap::GetInstance();
-	heap->BookingHeapPos(1);
-	heap->CreateConstBufferView(wvpMat);
+	heap_ = DescriptorHeap::GetInstance();
+	heap_->BookingHeapPos(1);
+	heap_->CreateConstBufferView(wvpMat_);
 }
 
 Line::Line(const Line& right):
@@ -65,36 +65,36 @@ Line::Line(Line&& right) noexcept :
 }
 
 Line& Line::operator=(const Line& right) {
-	start = right.start;
-	end = right.end;
+	start_ = right.start_;
+	end_ = right.end_;
 
 	return *this;
 }
 Line& Line::operator=(Line&& right)noexcept {
-	start = std::move(right.start);
-	end = std::move(right.end);
+	start_ = std::move(right.start_);
+	end_ = std::move(right.end_);
 
 	return *this;
 }
 
 Line::~Line() {
-	heap->ReleaseView(wvpMat.GetViewHandleUINT());
-	if (vertexBuffer) {
-		vertexBuffer->Release();
-		vertexBuffer.Reset();
+	heap_->ReleaseView(wvpMat_.GetViewHandleUINT());
+	if (vertexBuffer_) {
+		vertexBuffer_->Release();
+		vertexBuffer_.Reset();
 	}
 }
 
 void Line::Draw(const Mat4x4& viewProjection, uint32_t color) {
 	auto&& colorFloat = UintToVector4(color);
-	vertexMap[0] = { Vector4(start, 1.0f), colorFloat };
-	vertexMap[1] = { Vector4(end, 1.0f),   colorFloat };
+	vertexMap_[0] = { Vector4(start_, 1.0f), colorFloat };
+	vertexMap_[1] = { Vector4(end_, 1.0f),   colorFloat };
 
-	*wvpMat = viewProjection;
+	*wvpMat_ = viewProjection;
 
-	pipline->Use();
-	heap->Use(wvpMat.GetViewHandleUINT(), 0);
+	pipline_->Use();
+	heap_->Use(wvpMat_.GetViewHandleUINT(), 0);
 	auto commandList = DirectXCommon::GetInstance()->GetCommandList();
-	commandList->IASetVertexBuffers(0, 1, &vertexView);
+	commandList->IASetVertexBuffers(0, 1, &vertexView_);
 	commandList->DrawInstanced(kVertexNum, 1, 0, 0);
 }

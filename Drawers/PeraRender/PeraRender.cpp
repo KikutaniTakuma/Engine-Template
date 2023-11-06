@@ -26,8 +26,8 @@ PeraRender::PeraRender():
 	color_(std::numeric_limits<uint32_t>::max())
 {}
 
-PeraRender::PeraRender(uint32_t width_, uint32_t height_):
-	render_(width_, height_),
+PeraRender::PeraRender(uint32_t width, uint32_t height):
+	render_(width, height),
 	peraVertexResource_(nullptr),
 	peraVertexView_(),
 	indexView_{},
@@ -47,7 +47,7 @@ PeraRender::PeraRender(uint32_t width_, uint32_t height_):
 {}
 
 PeraRender::~PeraRender() {
-	static auto srvHeap = ShaderResourceHeap::GetInstance();
+	static auto srvHeap = DescriptorHeap::GetInstance();
 	srvHeap->ReleaseView(render_.GetViewHandleUINT());
 	if (peraVertexResource_) {
 		peraVertexResource_->Release();
@@ -96,7 +96,7 @@ void PeraRender::Initialize(const std::string& vsFileName, const std::string& ps
 	std::copy(pv.begin(), pv.end(), mappedData);
 	peraVertexResource_->Unmap(0, nullptr);
 
-	static auto srvHeap = ShaderResourceHeap::GetInstance();
+	static auto srvHeap = DescriptorHeap::GetInstance();
 	srvHeap->BookingHeapPos(3u);
 	srvHeap->CreatePerarenderView(render_);
 	srvHeap->CreateConstBufferView(wvpMat_);
@@ -104,10 +104,10 @@ void PeraRender::Initialize(const std::string& vsFileName, const std::string& ps
 }
 
 void PeraRender::CreateShader(const std::string& vsFileName, const std::string& psFileName) {
-	shader_.vertex = ShaderManager::LoadVertexShader(vsFileName);
-	assert(shader_.vertex);
-	shader_.pixel = ShaderManager::LoadPixelShader(psFileName);
-	assert(shader_.pixel);
+	shader_.vertex_ = ShaderManager::LoadVertexShader(vsFileName);
+	assert(shader_.vertex_);
+	shader_.pixel_ = ShaderManager::LoadPixelShader(psFileName);
+	assert(shader_.pixel_);
 }
 
 void PeraRender::CreateGraphicsPipeline() {

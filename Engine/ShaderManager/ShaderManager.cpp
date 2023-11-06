@@ -6,32 +6,32 @@
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Utils/ExecutionLog/ExecutionLog.h"
 
-ShaderManager* ShaderManager::instance = nullptr;
+ShaderManager* ShaderManager::instance_ = nullptr;
 
 ShaderManager::ShaderManager() {
-	vertexShader.reserve(0);
-	hullShader.reserve(0);
-	domainShader.reserve(0);
-	geometoryShader.reserve(0);
-	pixelShader.reserve(0);
+	vertexShader_.reserve(0);
+	hullShader_.reserve(0);
+	domainShader_.reserve(0);
+	geometoryShader_.reserve(0);
+	pixelShader_.reserve(0);
 
 	// dxcCompilerを初期化
-	dxcUtils = nullptr;
-	dxcCompiler = nullptr;
-	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(dxcUtils.GetAddressOf()));
+	dxcUtils_ = nullptr;
+	dxcCompiler_ = nullptr;
+	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(dxcUtils_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("DxcCreateInstance() dxcUtils failed","ShaderManager");
 	}
 
-	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(dxcCompiler.GetAddressOf()));
+	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(dxcCompiler_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("DxcCreateInstance() dxcCompiler failed", "ShaderManager");
 	}
 
-	includeHandler = nullptr;
-	hr = dxcUtils->CreateDefaultIncludeHandler(includeHandler.GetAddressOf());
+	includeHandler_ = nullptr;
+	hr = dxcUtils_->CreateDefaultIncludeHandler(includeHandler_.GetAddressOf());
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CreateDefaultIncludeHandler() failed", "ShaderManager");
@@ -42,16 +42,16 @@ ShaderManager::~ShaderManager() {
 }
 
 void ShaderManager::Initialize() {
-	instance = new ShaderManager();
-	assert(instance);
-	if (!instance) {
+	instance_ = new ShaderManager();
+	assert(instance_);
+	if (!instance_) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Instance failed", "ShaderManager");
 	}
 }
 
 void ShaderManager::Finalize() {
-	delete instance;
-	instance = nullptr;
+	delete instance_;
+	instance_ = nullptr;
 }
 
 IDxcBlob* ShaderManager::CompilerShader(
@@ -65,7 +65,7 @@ IDxcBlob* ShaderManager::CompilerShader(
 	Log::AddLog(ConvertString(std::format(L"Begin CompilerShader, path:{}, profile:{}\n", filePath, profile)));
 	// hlslファイルを読む
 	Microsoft::WRL::ComPtr<IDxcBlobEncoding> shaderSource;
-	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, shaderSource.GetAddressOf());
+	HRESULT hr = dxcUtils_->LoadFile(filePath.c_str(), nullptr, shaderSource.GetAddressOf());
 	// 読めなかったら止める
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
@@ -89,11 +89,11 @@ IDxcBlob* ShaderManager::CompilerShader(
 	};
 	// 実際にShaderをコンパイルする
 	Microsoft::WRL::ComPtr<IDxcResult> shaderResult;
-	hr = dxcCompiler->Compile(
+	hr = dxcCompiler_->Compile(
 		&shaderSourceBuffer, // 読みこんだファイル
 		arguments,           // コンパイルオプション
 		_countof(arguments), // コンパイルオプションの数
-		includeHandler.Get(),      // includeが含まれた諸々
+		includeHandler_.Get(),      // includeが含まれた諸々
 		IID_PPV_ARGS(shaderResult.GetAddressOf()) // コンパイル結果
 	);
 
@@ -125,83 +125,83 @@ IDxcBlob* ShaderManager::CompilerShader(
 }
 
 IDxcBlob* ShaderManager::LoadVertexShader(const std::string& fileName) {
-	if (instance->vertexShader.empty()) {
-		IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"vs_6_0");
+	if (instance_->vertexShader_.empty()) {
+		IDxcBlob* shader = instance_->CompilerShader(ConvertString(fileName), L"vs_6_0");
 		assert(shader);
-		instance->vertexShader.insert(std::make_pair(fileName, shader));
+		instance_->vertexShader_.insert(std::make_pair(fileName, shader));
 	}
 	else {
-		auto itr = instance->vertexShader.find(fileName);
-		if (itr == instance->vertexShader.end()) {
-			IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"vs_6_0");
+		auto itr = instance_->vertexShader_.find(fileName);
+		if (itr == instance_->vertexShader_.end()) {
+			IDxcBlob* shader = instance_->CompilerShader(ConvertString(fileName), L"vs_6_0");
 			assert(shader);
-			instance->vertexShader.insert(std::make_pair(fileName, shader));
+			instance_->vertexShader_.insert(std::make_pair(fileName, shader));
 		}
 	}
-	return instance->vertexShader[fileName].Get();
+	return instance_->vertexShader_[fileName].Get();
 }
 IDxcBlob* ShaderManager::LoadHullShader(const std::string& fileName) {
-	if (instance->hullShader.empty()) {
-		IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"hs_6_0");
+	if (instance_->hullShader_.empty()) {
+		IDxcBlob* shader = instance_->CompilerShader(ConvertString(fileName), L"hs_6_0");
 		assert(shader);
-		instance->hullShader.insert(std::make_pair(fileName, shader));
+		instance_->hullShader_.insert(std::make_pair(fileName, shader));
 	}
 	else {
-		auto itr = instance->hullShader.find(fileName);
-		if (itr == instance->hullShader.end()) {
-			IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"hs_6_0");
+		auto itr = instance_->hullShader_.find(fileName);
+		if (itr == instance_->hullShader_.end()) {
+			IDxcBlob* shader = instance_->CompilerShader(ConvertString(fileName), L"hs_6_0");
 			assert(shader);
-			instance->hullShader.insert(std::make_pair(fileName, shader));
+			instance_->hullShader_.insert(std::make_pair(fileName, shader));
 		}
 	}
 
-	return instance->hullShader[fileName].Get();
+	return instance_->hullShader_[fileName].Get();
 }
 IDxcBlob* ShaderManager::LoadDomainShader(const std::string& fileName) {
-	if (instance->domainShader.empty()) {
-		IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"ds_6_0");
+	if (instance_->domainShader_.empty()) {
+		IDxcBlob* shader = instance_->CompilerShader(ConvertString(fileName), L"ds_6_0");
 		assert(shader);
-		instance->domainShader.insert(std::make_pair(fileName, shader));
+		instance_->domainShader_.insert(std::make_pair(fileName, shader));
 	}
 	else {
-		auto itr = instance->domainShader.find(fileName);
-		if (itr == instance->domainShader.end()) {
-			IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"ds_6_0");
+		auto itr = instance_->domainShader_.find(fileName);
+		if (itr == instance_->domainShader_.end()) {
+			IDxcBlob* shader = instance_->CompilerShader(ConvertString(fileName), L"ds_6_0");
 			assert(shader);
-			instance->domainShader.insert(std::make_pair(fileName, shader));
+			instance_->domainShader_.insert(std::make_pair(fileName, shader));
 		}
 	}
-	return instance->domainShader[fileName].Get();
+	return instance_->domainShader_[fileName].Get();
 }
 IDxcBlob* ShaderManager::LoadGeometoryShader(const std::string& fileName) {
-	if (instance->geometoryShader.empty()) {
-		IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"gs_6_0");
+	if (instance_->geometoryShader_.empty()) {
+		IDxcBlob* shader = instance_->CompilerShader(ConvertString(fileName), L"gs_6_0");
 		assert(shader);
-		instance->geometoryShader.insert(std::make_pair(fileName, shader));
+		instance_->geometoryShader_.insert(std::make_pair(fileName, shader));
 	}
 	else {
-		auto itr = instance->geometoryShader.find(fileName);
-		if (itr == instance->geometoryShader.end()) {
-			IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"gs_6_0");
+		auto itr = instance_->geometoryShader_.find(fileName);
+		if (itr == instance_->geometoryShader_.end()) {
+			IDxcBlob* shader = instance_->CompilerShader(ConvertString(fileName), L"gs_6_0");
 			assert(shader);
-			instance->geometoryShader.insert(std::make_pair(fileName, shader));
+			instance_->geometoryShader_.insert(std::make_pair(fileName, shader));
 		}
 	}
-	return instance->geometoryShader[fileName].Get();
+	return instance_->geometoryShader_[fileName].Get();
 }
 IDxcBlob* ShaderManager::LoadPixelShader(const std::string& fileName) {
-	if (instance->pixelShader.empty()) {
-		IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"ps_6_0");
+	if (instance_->pixelShader_.empty()) {
+		IDxcBlob* shader = instance_->CompilerShader(ConvertString(fileName), L"ps_6_0");
 		assert(shader);
-		instance->pixelShader.insert(std::make_pair(fileName, shader));
+		instance_->pixelShader_.insert(std::make_pair(fileName, shader));
 	}
 	else {
-		auto itr = instance->pixelShader.find(fileName);
-		if (itr == instance->pixelShader.end()) {
-			IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"ps_6_0");
+		auto itr = instance_->pixelShader_.find(fileName);
+		if (itr == instance_->pixelShader_.end()) {
+			IDxcBlob* shader = instance_->CompilerShader(ConvertString(fileName), L"ps_6_0");
 			assert(shader);
-			instance->pixelShader.insert(std::make_pair(fileName, shader));
+			instance_->pixelShader_.insert(std::make_pair(fileName, shader));
 		}
 	}
-	return instance->pixelShader[fileName].Get();
+	return instance_->pixelShader_[fileName].Get();
 }

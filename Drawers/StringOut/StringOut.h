@@ -29,21 +29,21 @@ public:
 
 
 private:
-	std::string format;
+	std::string format_;
 public:
-	std::wstring str;
+	std::wstring str_;
 
-	Vector2 pos;
-	float rotation;
-	Vector2 scale;
-	uint32_t color;
-	bool isHorizontal;
+	Vector2 pos_;
+	float rotation_;
+	Vector2 scale_;
+	uint32_t color_;
+	bool isHorizontal_;
 
 public:
 	inline void SetFormat(const std::string& formatName) {
-		format = formatName;
+		format_ = formatName;
 	}
 	inline void SetFormat(const std::wstring& formatName) {
-		format = ConvertString(formatName);
+		format_ = ConvertString(formatName);
 	}
 };

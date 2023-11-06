@@ -1,4 +1,4 @@
-#include "ShaderResourceHeap.h"
+#include "DescriptorHeap.h"
 #include "Utils/ConvertString/ConvertString.h"
 #include "Engine/WinApp/WinApp.h"
 #include "Engine/EngineParts/DirectXDevice/DirectXDevice.h"
@@ -8,25 +8,25 @@
 #include <algorithm>
 #include <numeric>
 
-ShaderResourceHeap* ShaderResourceHeap::instance = nullptr;
+DescriptorHeap* DescriptorHeap::instance = nullptr;
 
-void ShaderResourceHeap::Initialize(UINT numDescriptor) {
+void DescriptorHeap::Initialize(UINT numDescriptor) {
 	// 1～(10^6-1)でクランプ
 	numDescriptor = std::clamp(numDescriptor, 1u, static_cast<UINT>(std::pow(10u, 6u)) - 1u);
 
-	instance = new ShaderResourceHeap{ numDescriptor };
+	instance = new DescriptorHeap{ numDescriptor };
 }
 
-void ShaderResourceHeap::Finalize() {
+void DescriptorHeap::Finalize() {
 	delete instance;
 	instance = nullptr;
 }
 
-ShaderResourceHeap* ShaderResourceHeap::GetInstance() {
+DescriptorHeap* DescriptorHeap::GetInstance() {
 	return instance;
 }
 
-ShaderResourceHeap::ShaderResourceHeap(UINT numDescriptor) :
+DescriptorHeap::DescriptorHeap(UINT numDescriptor) :
 	SRVHeap(),
 	heapSize(numDescriptor),
 #ifdef _DEBUG
@@ -60,33 +60,33 @@ ShaderResourceHeap::ShaderResourceHeap(UINT numDescriptor) :
 #endif // _DEBUG
 }
 
-ShaderResourceHeap::~ShaderResourceHeap() {
+DescriptorHeap::~DescriptorHeap() {
 	Reset();
 }
 
-void ShaderResourceHeap::SetHeap() {
+void DescriptorHeap::SetHeap() {
 	static auto commandlist = DirectXCommon::GetInstance()->GetCommandList();
 	commandlist->SetDescriptorHeaps(1, SRVHeap.GetAddressOf());
 }
 
-void ShaderResourceHeap::Use(D3D12_GPU_DESCRIPTOR_HANDLE handle, UINT rootParmIndex) {
+void DescriptorHeap::Use(D3D12_GPU_DESCRIPTOR_HANDLE handle, UINT rootParmIndex) {
 	static auto commandlist = DirectXCommon::GetInstance()->GetCommandList();
 	commandlist->SetGraphicsRootDescriptorTable(rootParmIndex, handle);
 }
 
-void ShaderResourceHeap::Use(uint32_t handleIndex, UINT rootParmIndex) {
+void DescriptorHeap::Use(uint32_t handleIndex, UINT rootParmIndex) {
 	auto commandlist = DirectXCommon::GetInstance()->GetCommandList();
 	commandlist->SetGraphicsRootDescriptorTable(rootParmIndex, heapHandles[handleIndex].second);
 }
 
-void ShaderResourceHeap::Reset() {
+void DescriptorHeap::Reset() {
 	if (SRVHeap) {
 		SRVHeap->Release();
 		SRVHeap.Reset();
 	}
 }
 
-uint32_t ShaderResourceHeap::CreateTxtureView(Texture* tex) {
+uint32_t DescriptorHeap::CreateTxtureView(Texture* tex) {
 	assert(tex != nullptr);
 	if (tex == nullptr || !*tex) {
 		return currentHandleIndex;
@@ -121,7 +121,7 @@ uint32_t ShaderResourceHeap::CreateTxtureView(Texture* tex) {
 	}
 }
 
-void ShaderResourceHeap::CreateTxtureView(Texture* tex, uint32_t heapIndex) {
+void DescriptorHeap::CreateTxtureView(Texture* tex, uint32_t heapIndex) {
 	assert(tex != nullptr);
 	assert(heapIndex < heapSize);
 	if (currentHandleIndex >= heapSize) {
@@ -136,7 +136,7 @@ void ShaderResourceHeap::CreateTxtureView(Texture* tex, uint32_t heapIndex) {
 		);
 }
 
-uint32_t ShaderResourceHeap::CreatePerarenderView(RenderTarget& renderTarget) {
+uint32_t DescriptorHeap::CreatePerarenderView(RenderTarget& renderTarget) {
 	assert(currentHandleIndex < heapSize);
 	if (currentHandleIndex >= heapSize) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CreatePerarenderView failed\nOver HeapSize", "ShaderResourceHeap");
@@ -158,7 +158,7 @@ uint32_t ShaderResourceHeap::CreatePerarenderView(RenderTarget& renderTarget) {
 	}
 }
 
-void ShaderResourceHeap::BookingHeapPos(UINT nextCreateViewNum) {
+void DescriptorHeap::BookingHeapPos(UINT nextCreateViewNum) {
 	// リリースハンドルがないなら予約しない
 	if (releaseHandle_.empty()) {
 		bookingHandle_.clear();
@@ -223,7 +223,7 @@ void ShaderResourceHeap::BookingHeapPos(UINT nextCreateViewNum) {
 }
 
 
-void ShaderResourceHeap::ReleaseView(UINT viewHandle) {
+void DescriptorHeap::ReleaseView(UINT viewHandle) {
 	if (!releaseHandle_.empty()) {
 		// リリースハンドルにすでに格納されているか
 		auto isReleased = std::find(releaseHandle_.begin(), releaseHandle_.end(), viewHandle);

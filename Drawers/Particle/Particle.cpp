@@ -13,17 +13,17 @@
 /// 静的変数のインスタンス化
 /// </summary>
 
-std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum)> Particle::graphicsPipelineState = {};
-Shader Particle::shader = {};
+std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum)> Particle::graphicsPipelineState_ = {};
+Shader Particle::shader_ = {};
 
-D3D12_INDEX_BUFFER_VIEW Particle::indexView = {};
-Microsoft::WRL::ComPtr<ID3D12Resource> Particle::indexResource = nullptr;
+D3D12_INDEX_BUFFER_VIEW Particle::indexView_ = {};
+Microsoft::WRL::ComPtr<ID3D12Resource> Particle::indexResource_ = nullptr;
 
 void Particle::Initialize(const std::string& vsFileName, const std::string& psFileName) {
-	if (indexResource) {
-		indexResource->Release();
-		indexResource.Reset();
-		indexResource = nullptr;
+	if (indexResource_) {
+		indexResource_->Release();
+		indexResource_.Reset();
+		indexResource_ = nullptr;
 	}
 
 	LoadShader(vsFileName, psFileName);
@@ -31,33 +31,33 @@ void Particle::Initialize(const std::string& vsFileName, const std::string& psFi
 	uint16_t indices[] = {
 			0,1,3, 1,2,3
 	};
-	indexResource = DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(indices));
-	indexView.BufferLocation = indexResource->GetGPUVirtualAddress();
-	indexView.SizeInBytes = sizeof(indices);
-	indexView.Format = DXGI_FORMAT_R16_UINT;
+	indexResource_ = DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(indices));
+	indexView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
+	indexView_.SizeInBytes = sizeof(indices);
+	indexView_.Format = DXGI_FORMAT_R16_UINT;
 	uint16_t* indexMap = nullptr;
-	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexMap));
+	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexMap));
 	for (int32_t i = 0; i < _countof(indices); i++) {
 		indexMap[i] = indices[i];
 	}
-	indexResource->Unmap(0, nullptr);
+	indexResource_->Unmap(0, nullptr);
 
 	CreateGraphicsPipeline();
 }
 
 void Particle::Finalize() {
-	if (indexResource) {
-		indexResource->Release();
-		indexResource.Reset();
-		indexResource = nullptr;
+	if (indexResource_) {
+		indexResource_->Release();
+		indexResource_.Reset();
+		indexResource_ = nullptr;
 	}
 }
 
 void Particle::LoadShader(const std::string& vsFileName, const std::string& psFileName) {
-	shader.vertex = ShaderManager::LoadVertexShader(vsFileName);
-	assert(shader.vertex);
-	shader.pixel = ShaderManager::LoadPixelShader(psFileName);
-	assert(shader.pixel);
+	shader_.vertex_ = ShaderManager::LoadVertexShader(vsFileName);
+	assert(shader_.vertex_);
+	shader_.pixel_ = ShaderManager::LoadPixelShader(psFileName);
+	assert(shader_.pixel_);
 }
 
 void Particle::CreateGraphicsPipeline() {
@@ -85,19 +85,19 @@ void Particle::CreateGraphicsPipeline() {
 	rootPrams[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 
 	PipelineManager::CreateRootSgnature(rootPrams.data(), rootPrams.size(), true);
-	PipelineManager::SetShader(shader);
+	PipelineManager::SetShader(shader_);
 	PipelineManager::SetVertexInput("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT);
 	PipelineManager::SetVertexInput("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT);
 	PipelineManager::IsDepth(false);
 
 	for (int32_t i = Pipeline::Blend::None; i < Pipeline::Blend::BlendTypeNum; i++) {
 		PipelineManager::SetState(Pipeline::Blend(i), Pipeline::SolidState::Solid);
-		graphicsPipelineState[i] = PipelineManager::Create();
+		graphicsPipelineState_[i] = PipelineManager::Create();
 	}
 
 	PipelineManager::StateReset();
 
-	for (auto& i : graphicsPipelineState) {
+	for (auto& i : graphicsPipelineState_) {
 		if (!i) {
 			ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Particle");
 			return;
@@ -106,55 +106,55 @@ void Particle::CreateGraphicsPipeline() {
 }
 
 Particle::Particle() :
-	wtfs(),
-	uvPibot(),
-	uvSize(Vector2::identity),
-	tex(nullptr),
-	isLoad(false),
+	wtfs_(),
+	uvPibot_(),
+	uvSize_(Vector2::identity),
+	tex_(nullptr),
+	isLoad_(false),
 	isBillboard_(true),
 	isYBillboard_(false),
-	wvpMat(1),
-	colorBuf(1),
+	wvpMat_(1),
+	colorBuf_(1),
 	aniStartTime_(),
 	aniCount_(0.0f),
 	uvPibotSpd_(0.0f),
 	isAnimation_(0.0f),
-	settings(),
-	currentSettingIndex(0u),
-	currentParticleIndex(0u),
-	srvHeap(nullptr)
+	settings_(),
+	currentSettingIndex_(0u),
+	currentParticleIndex_(0u),
+	srvHeap_(nullptr)
 {
-	srvHeap = ShaderResourceHeap::GetInstance();
-	srvHeap->BookingHeapPos(2u);
-	srvHeap->CreateStructuredBufferView<Mat4x4>(wvpMat);
-	srvHeap->CreateStructuredBufferView<Vector4>(colorBuf);
-	for (uint32_t i = 0; i < wvpMat.Size(); i++) {
-		wvpMat[i] = Mat4x4::kIdentity_;
+	srvHeap_ = DescriptorHeap::GetInstance();
+	srvHeap_->BookingHeapPos(2u);
+	srvHeap_->CreateStructuredBufferView<Mat4x4>(wvpMat_);
+	srvHeap_->CreateStructuredBufferView<Vector4>(colorBuf_);
+	for (uint32_t i = 0; i < wvpMat_.Size(); i++) {
+		wvpMat_[i] = Mat4x4::kIdentity_;
 	}
 
-	for (uint32_t i = 0; i < colorBuf.Size(); i++) {
-		colorBuf[i] = Vector4::identity;
+	for (uint32_t i = 0; i < colorBuf_.Size(); i++) {
+		colorBuf_[i] = Vector4::identity;
 	}
 
-	if (vertexResource) { 
-		vertexResource->Release(); 
-		vertexResource.Reset();
-		vertexResource = nullptr;
+	if (vertexResource_) { 
+		vertexResource_->Release(); 
+		vertexResource_.Reset();
+		vertexResource_ = nullptr;
 	}
 
-	vertexResource = DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * 4);
+	vertexResource_ = DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * 4);
 
-	vertexView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexView.SizeInBytes = sizeof(VertexData) * 4;
-	vertexView.StrideInBytes = sizeof(VertexData);
+	vertexView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+	vertexView_.SizeInBytes = sizeof(VertexData) * 4;
+	vertexView_.StrideInBytes = sizeof(VertexData);
 
-	wtfs.resize(1);
+	wtfs_.resize(1);
 
-	for (size_t i = 0; i < wtfs.size(); i++) {
-		wtfs[i].scale = Vector2::identity * 512.0f;
-		wtfs[i].pos.x = 10.0f * i;
-		wtfs[i].pos.y = 10.0f * i;
-		wtfs[i].pos.z += 0.3f;
+	for (size_t i = 0; i < wtfs_.size(); i++) {
+		wtfs_[i].scale_ = Vector2::identity * 512.0f;
+		wtfs_[i].pos_.x = 10.0f * i;
+		wtfs_[i].pos_.y = 10.0f * i;
+		wtfs_[i].pos_.z += 0.3f;
 	}
 
 	const std::filesystem::path kDirectoryPath = "./Resources/Datas/Particles/";
@@ -165,14 +165,14 @@ Particle::Particle() :
 
 	std::filesystem::directory_iterator dirItr(kDirectoryPath);
 
-	dataDirectoryName = "particle0";
+	dataDirectoryName_ = "particle0";
 
 	uint32_t dirCount = 0u;
 
 	// directory内のファイルをすべて読み込む
 	for (const auto& entry : dirItr) {
-		if (dataDirectoryName == entry.path().string()) {
-			dataDirectoryName = "particle" + std::to_string(dirCount);
+		if (dataDirectoryName_ == entry.path().string()) {
+			dataDirectoryName_ = "particle" + std::to_string(dirCount);
 		}
 		dirCount++;
 	}
@@ -180,56 +180,56 @@ Particle::Particle() :
 }
 
 Particle::Particle(uint32_t indexNum) :
-	wtfs(),
-	uvPibot(),
-	uvSize(Vector2::identity),
-	tex(nullptr),
-	isLoad(false),
+	wtfs_(),
+	uvPibot_(),
+	uvSize_(Vector2::identity),
+	tex_(nullptr),
+	isLoad_(false),
 	isBillboard_(true),
 	isYBillboard_(false),
-	wvpMat(indexNum),
-	colorBuf(indexNum),
+	wvpMat_(indexNum),
+	colorBuf_(indexNum),
 	aniStartTime_(),
 	aniCount_(0.0f),
 	uvPibotSpd_(0.0f),
 	isAnimation_(0.0f),
-	settings(),
-	currentSettingIndex(0u),
-	currentParticleIndex(0u),
-	srvHeap(nullptr)
+	settings_(),
+	currentSettingIndex_(0u),
+	currentParticleIndex_(0u),
+	srvHeap_(nullptr)
 {
-	srvHeap = ShaderResourceHeap::GetInstance();
-	srvHeap->BookingHeapPos(2u);
-	srvHeap->CreateStructuredBufferView<Mat4x4>(wvpMat);
-	srvHeap->CreateStructuredBufferView<Vector4>(colorBuf);
+	srvHeap_ = DescriptorHeap::GetInstance();
+	srvHeap_->BookingHeapPos(2u);
+	srvHeap_->CreateStructuredBufferView<Mat4x4>(wvpMat_);
+	srvHeap_->CreateStructuredBufferView<Vector4>(colorBuf_);
 
-	for (uint32_t i = 0; i < wvpMat.Size();i++) {
-		wvpMat[i] = Mat4x4::kIdentity_;
+	for (uint32_t i = 0; i < wvpMat_.Size();i++) {
+		wvpMat_[i] = Mat4x4::kIdentity_;
 	}
 	
-	for (uint32_t i = 0; i < colorBuf.Size(); i++) {
-		colorBuf[i] = Vector4::identity;
+	for (uint32_t i = 0; i < colorBuf_.Size(); i++) {
+		colorBuf_[i] = Vector4::identity;
 	}
 
-	if (vertexResource) {
-		vertexResource->Release();
-		vertexResource.Reset();
-		vertexResource = nullptr;
+	if (vertexResource_) {
+		vertexResource_->Release();
+		vertexResource_.Reset();
+		vertexResource_ = nullptr;
 	}
 
-	vertexResource = DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * 4);
+	vertexResource_ = DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * 4);
 
-	vertexView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexView.SizeInBytes = sizeof(VertexData) * 4;
-	vertexView.StrideInBytes = sizeof(VertexData);
+	vertexView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+	vertexView_.SizeInBytes = sizeof(VertexData) * 4;
+	vertexView_.StrideInBytes = sizeof(VertexData);
 
-	wtfs.resize(indexNum);
+	wtfs_.resize(indexNum);
 
-	for (size_t i = 0; i < wtfs.size();i++) {
-		wtfs[i].scale = Vector2::identity * 512.0f;
-		wtfs[i].pos.x = 10.0f * i;
-		wtfs[i].pos.y = 10.0f * i;
-		wtfs[i].pos.z += 0.3f;
+	for (size_t i = 0; i < wtfs_.size();i++) {
+		wtfs_[i].scale_ = Vector2::identity * 512.0f;
+		wtfs_[i].pos_.x = 10.0f * i;
+		wtfs_[i].pos_.y = 10.0f * i;
+		wtfs_[i].pos_.z += 0.3f;
 	}
 
 	const std::filesystem::path kDirectoryPath = "./Resources/Datas/Particles/";
@@ -240,47 +240,47 @@ Particle::Particle(uint32_t indexNum) :
 
 	std::filesystem::directory_iterator dirItr(kDirectoryPath);
 
-	dataDirectoryName = "particle0";
+	dataDirectoryName_ = "particle0";
 
 	uint32_t dirCount = 0u;
 
 	// directory内のファイルをすべて読み込む
 	for (const auto& entry : dirItr) {
-		if (dataDirectoryName == entry.path().string()) {
-			dataDirectoryName = "particle" + std::to_string(dirCount);
+		if (dataDirectoryName_ == entry.path().string()) {
+			dataDirectoryName_ = "particle" + std::to_string(dirCount);
 		}
 		dirCount++;
 	}
 }
 
 Particle::Particle(const Particle& right) :
-	Particle(right.wvpMat.Size())
+	Particle(right.wvpMat_.Size())
 {
 	*this = right;
 }
 Particle::Particle(Particle&& right) noexcept :
-	Particle(right.wvpMat.Size())
+	Particle(right.wvpMat_.Size())
 {
 	*this = std::move(right);
 }
 
 Particle& Particle::operator=(const Particle& right) {
-	assert(wvpMat.Size() == right.wvpMat.Size());
+	assert(wvpMat_.Size() == right.wvpMat_.Size());
 
-	wtfs = right.wtfs;
+	wtfs_ = right.wtfs_;
 
-	uvPibot = right.uvPibot;
-	uvSize = right.uvSize;
+	uvPibot_ = right.uvPibot_;
+	uvSize_ = right.uvSize_;
 
-	tex = right.tex;
-	isLoad = right.isLoad;
+	tex_ = right.tex_;
+	isLoad_ = right.isLoad_;
 
-	for (uint32_t i = 0; i < wvpMat.Size();i++) {
-		wvpMat[i] = right.wvpMat[i];
+	for (uint32_t i = 0; i < wvpMat_.Size();i++) {
+		wvpMat_[i] = right.wvpMat_[i];
 	}
 	
-	for (uint32_t i = 0; i < colorBuf.Size(); i++) {
-		colorBuf[i] = right.colorBuf[i];
+	for (uint32_t i = 0; i < colorBuf_.Size(); i++) {
+		colorBuf_[i] = right.colorBuf_[i];
 	}
 
 	aniStartTime_ = right.aniStartTime_;
@@ -290,33 +290,33 @@ Particle& Particle::operator=(const Particle& right) {
 
 	emitterPos_ = right.emitterPos_;
 
-	datas = right.datas;
-	dataDirectoryName = right.dataDirectoryName;
+	datas_ = right.datas_;
+	dataDirectoryName_ = right.dataDirectoryName_;
 
-	settings = right.settings;
+	settings_ = right.settings_;
 
 	isLoop_ = right.isLoop_;
 
-	currentSettingIndex = right.currentSettingIndex;
-	currentParticleIndex = right.currentParticleIndex;
+	currentSettingIndex_ = right.currentSettingIndex_;
+	currentParticleIndex_ = right.currentParticleIndex_;
 
 	return *this;
 }
 
 Particle& Particle::operator=(Particle&& right) noexcept {
-	wtfs = std::move(right.wtfs);
+	wtfs_ = std::move(right.wtfs_);
 
-	uvPibot = std::move(right.uvPibot);
-	uvSize = std::move(right.uvSize);
+	uvPibot_ = std::move(right.uvPibot_);
+	uvSize_ = std::move(right.uvSize_);
 
-	tex = std::move(right.tex);
-	isLoad = std::move(right.isLoad);
+	tex_ = std::move(right.tex_);
+	isLoad_ = std::move(right.isLoad_);
 
-	for (uint32_t i = 0; i < wvpMat.Size(); i++) {
-		wvpMat[i] = right.wvpMat[i];
+	for (uint32_t i = 0; i < wvpMat_.Size(); i++) {
+		wvpMat_[i] = right.wvpMat_[i];
 	}
-	for (uint32_t i = 0; i < colorBuf.Size(); i++) {
-		colorBuf[i] = right.colorBuf[i];
+	for (uint32_t i = 0; i < colorBuf_.Size(); i++) {
+		colorBuf_[i] = right.colorBuf_[i];
 	}
 
 	aniStartTime_ = std::move(right.aniStartTime_);
@@ -327,25 +327,25 @@ Particle& Particle::operator=(Particle&& right) noexcept {
 
 	emitterPos_ = std::move(right.emitterPos_);
 
-	datas = std::move(right.datas);
-	dataDirectoryName = std::move(right.dataDirectoryName);
+	datas_ = std::move(right.datas_);
+	dataDirectoryName_ = std::move(right.dataDirectoryName_);
 
-	settings = std::move(right.settings);
+	settings_ = std::move(right.settings_);
 
 	isLoop_ = std::move(right.isLoop_);
 
-	currentSettingIndex = std::move(right.currentSettingIndex);
-	currentParticleIndex = std::move(right.currentParticleIndex);
+	currentSettingIndex_ = std::move(right.currentSettingIndex_);
+	currentParticleIndex_ = std::move(right.currentParticleIndex_);
 
 	return *this;
 }
 
 void Particle::Resize(uint32_t index) {
-	wvpMat.Resize(index);
-	srvHeap->CreateStructuredBufferView<Mat4x4>(wvpMat, wvpMat.GetViewHandleUINT());
-	colorBuf.Resize(index);
-	srvHeap->CreateStructuredBufferView<Vector4>(colorBuf, colorBuf.GetViewHandleUINT());
-	wtfs.resize(index);
+	wvpMat_.Resize(index);
+	srvHeap_->CreateStructuredBufferView<Mat4x4>(wvpMat_, wvpMat_.GetViewHandleUINT());
+	colorBuf_.Resize(index);
+	srvHeap_->CreateStructuredBufferView<Vector4>(colorBuf_, colorBuf_.GetViewHandleUINT());
+	wtfs_.resize(index);
 }
 
 Particle::~Particle() {
@@ -409,35 +409,35 @@ Particle::~Particle() {
 //	}
 //#endif // _DEBUG
 
-	srvHeap->ReleaseView(wvpMat.GetViewHandleUINT());
-	srvHeap->ReleaseView(colorBuf.GetViewHandleUINT());
+	srvHeap_->ReleaseView(wvpMat_.GetViewHandleUINT());
+	srvHeap_->ReleaseView(colorBuf_.GetViewHandleUINT());
 
-	if (vertexResource) {
-		vertexResource->Release();
-		vertexResource.Reset();
-		vertexResource = nullptr;
+	if (vertexResource_) {
+		vertexResource_->Release();
+		vertexResource_.Reset();
+		vertexResource_ = nullptr;
 	}
 }
 
 
 void Particle::LoadTexture(const std::string& fileName) {
-	tex = TextureManager::GetInstance()->LoadTexture(fileName);
+	tex_ = TextureManager::GetInstance()->LoadTexture(fileName);
 
-	if (tex && !isLoad) {
-		isLoad = true;
+	if (tex_ && !isLoad_) {
+		isLoad_ = true;
 	}
 }
 
 void Particle::ThreadLoadTexture(const std::string& fileName) {
-	tex = nullptr;
-	TextureManager::GetInstance()->LoadTexture(fileName, &tex);
-	isLoad = false;
+	tex_ = nullptr;
+	TextureManager::GetInstance()->LoadTexture(fileName, &tex_);
+	isLoad_ = false;
 }
 
 
 void Particle::LoadSettingDirectory(const std::string& directoryName) {
 	const std::filesystem::path kDirectoryPath = "./Resources/Datas/Particles/" + directoryName + "/";
-	dataDirectoryName = kDirectoryPath.string();
+	dataDirectoryName_ = kDirectoryPath.string();
 
 	if (!std::filesystem::exists(kDirectoryPath)) {
 		std::filesystem::create_directories(kDirectoryPath);
@@ -459,7 +459,7 @@ void Particle::LoadSettingDirectory(const std::string& directoryName) {
 		LopadSettingFile(filePath.string());
 	}
 
-	std::ifstream file{ dataDirectoryName + "otherSetting.txt" };
+	std::ifstream file{ dataDirectoryName_ + "otherSetting.txt" };
 
 	if (!file.fail()) {
 		std::string lineBuf;
@@ -474,8 +474,8 @@ void Particle::LoadSettingDirectory(const std::string& directoryName) {
 			this->LoadTexture(lineBuf);
 		}
 		else {
-			tex = TextureManager::GetInstance()->GetWhiteTex();
-			isLoad = true;
+			tex_ = TextureManager::GetInstance()->GetWhiteTex();
+			isLoad_ = true;
 		}
 		if (std::getline(file, lineBuf)) {
 			isBillboard_ = static_cast<bool>(std::atoi(lineBuf.c_str()));
@@ -520,88 +520,88 @@ void Particle::LopadSettingFile(const std::string& jsonName) {
 
 		if (itemItr->is_number_integer()) {
 			uint32_t value = itemItr->get<uint32_t>();
-			auto& gruop = datas[groupName.string()];
+			auto& gruop = datas_[groupName.string()];
 			Item item = value;
 			gruop[itemName] = value;
 		}
 		else if (itemItr->is_number_float()) {
 			float value = itemItr->get<float>();
-			auto& gruop = datas[groupName.string()];
+			auto& gruop = datas_[groupName.string()];
 			Item item = value;
 			gruop[itemName] = value;
 		}
 		else if (itemItr->is_array() && itemItr->size() == 2) {
 			Vector2 value = { itemItr->at(0),itemItr->at(1) };
-			auto& gruop = datas[groupName.string()];
+			auto& gruop = datas_[groupName.string()];
 			Item item = value;
 			gruop[itemName] = value;
 		}
 		else if (itemItr->is_array() && itemItr->size() == 3) {
 			Vector3 value = { itemItr->at(0),itemItr->at(1),itemItr->at(2) };
-			auto& gruop = datas[groupName.string()];
+			auto& gruop = datas_[groupName.string()];
 			Item item = value;
 			gruop[itemName] = value;
 		}
 		else if (itemItr->is_string()) {
 			std::string value = itemItr->get<std::string>();
-			auto& gruop = datas[groupName.string()];
+			auto& gruop = datas_[groupName.string()];
 			Item item = value;
 			gruop[itemName] = value;
 		}
 	}
 
-	settings.push_back(Setting{});
-	auto& setting = settings.back();
+	settings_.push_back(Setting{});
+	auto& setting = settings_.back();
 
-	setting.emitter.pos = std::get<Vector3>(datas[groupName.string()]["Emitter_Pos"]);
-	setting.emitter.size = std::get<Vector3>(datas[groupName.string()]["Emitter_Size"]);
-	setting.emitter.type = static_cast<EmitterType>(std::get<uint32_t>(datas[groupName.string()]["Emitter_Type"]));
-	setting.emitter.circleSize = std::get<float>(datas[groupName.string()]["Emitter_CircleSize"]);
-	setting.emitter.rotate.first = std::get<Vector3>(datas[groupName.string()]["Emitter_RotateFirst"]);
-	setting.emitter.rotate.second = std::get<Vector3>(datas[groupName.string()]["Emitter_RotateSecond"]);
-	setting.emitter.particleMaxNum = std::get<uint32_t>(datas[groupName.string()]["Emitter_ParticleMaxNum"]);
-	setting.emitter.validTime = std::chrono::milliseconds(std::get<uint32_t>(datas[groupName.string()]["Emitter_vaildTime"]));
+	setting.emitter_.pos_ = std::get<Vector3>(datas_[groupName.string()]["Emitter_Pos"]);
+	setting.emitter_.size_ = std::get<Vector3>(datas_[groupName.string()]["Emitter_Size"]);
+	setting.emitter_.type_ = static_cast<EmitterType>(std::get<uint32_t>(datas_[groupName.string()]["Emitter_Type"]));
+	setting.emitter_.circleSize_ = std::get<float>(datas_[groupName.string()]["Emitter_CircleSize"]);
+	setting.emitter_.rotate_.first = std::get<Vector3>(datas_[groupName.string()]["Emitter_RotateFirst"]);
+	setting.emitter_.rotate_.second = std::get<Vector3>(datas_[groupName.string()]["Emitter_RotateSecond"]);
+	setting.emitter_.particleMaxNum_ = std::get<uint32_t>(datas_[groupName.string()]["Emitter_ParticleMaxNum"]);
+	setting.emitter_.validTime_ = std::chrono::milliseconds(std::get<uint32_t>(datas_[groupName.string()]["Emitter_vaildTime"]));
 
-	setting.isSameHW = static_cast<bool>(std::get<uint32_t>(datas[groupName.string()]["Particle_isSameHW"]));
-	setting.size.first = std::get<Vector2>(datas[groupName.string()]["Particle_size1"]);
-	setting.size.second = std::get<Vector2>(datas[groupName.string()]["Particle_size2"]);
-	setting.sizeSecond.first = std::get<Vector2>(datas[groupName.string()]["Particle_sizeSecond1"]);
-	setting.sizeSecond.second = std::get<Vector2>(datas[groupName.string()]["Particle_sizeSecond2"]);
-	setting.sizeEaseType = static_cast<int32_t>(std::get<uint32_t>(datas[groupName.string()]["Particle_sizeEase"]));
-	setting.sizeEase = Easeing::GetFunction(setting.sizeEaseType);
+	setting.isSameHW_ = static_cast<bool>(std::get<uint32_t>(datas_[groupName.string()]["Particle_isSameHW"]));
+	setting.size_.first = std::get<Vector2>(datas_[groupName.string()]["Particle_size1"]);
+	setting.size_.second = std::get<Vector2>(datas_[groupName.string()]["Particle_size2"]);
+	setting.sizeSecond_.first = std::get<Vector2>(datas_[groupName.string()]["Particle_sizeSecond1"]);
+	setting.sizeSecond_.second = std::get<Vector2>(datas_[groupName.string()]["Particle_sizeSecond2"]);
+	setting.sizeEaseType_ = static_cast<int32_t>(std::get<uint32_t>(datas_[groupName.string()]["Particle_sizeEase"]));
+	setting.sizeEase_ = Easeing::GetFunction(setting.sizeEaseType_);
 
-	setting.velocity.first = std::get<Vector3>(datas[groupName.string()]["Particle_velocity1"]);
-	setting.velocity.second = std::get<Vector3>(datas[groupName.string()]["Particle_velocity2"]);
-	setting.velocitySecond.first =std::get<Vector3>(datas[groupName.string()]["Particle_velocitySecond1"]);
-	setting.velocitySecond.second  =std::get<Vector3>(datas[groupName.string()]["Particle_velocitySecond2"]);
-	setting.moveRotate.first = std::get<Vector3>(datas[groupName.string()]["Particle_moveRotateFirst"]);
-	setting.moveRotate.second = std::get<Vector3>(datas[groupName.string()]["Particle_moveRotateSecond"]);
+	setting.velocity_.first = std::get<Vector3>(datas_[groupName.string()]["Particle_velocity1"]);
+	setting.velocity_.second = std::get<Vector3>(datas_[groupName.string()]["Particle_velocity2"]);
+	setting.velocitySecond_.first =std::get<Vector3>(datas_[groupName.string()]["Particle_velocitySecond1"]);
+	setting.velocitySecond_.second  =std::get<Vector3>(datas_[groupName.string()]["Particle_velocitySecond2"]);
+	setting.moveRotate_.first = std::get<Vector3>(datas_[groupName.string()]["Particle_moveRotateFirst"]);
+	setting.moveRotate_.second = std::get<Vector3>(datas_[groupName.string()]["Particle_moveRotateSecond"]);
 	
-	setting.rotate.first = std::get<Vector3>(datas[groupName.string()]["Particle_rotate1"]);
-	setting.rotate.second = std::get<Vector3>(datas[groupName.string()]["Particle_rotate2"]);
-	setting.rotateSecond.first = std::get<Vector3>(datas[groupName.string()]["Particle_rotateSecond1"]);
-	setting.rotateSecond.second = std::get<Vector3>(datas[groupName.string()]["Particle_rotateSecond2"]);
-	setting.rotateEaseType = static_cast<int32_t>(std::get<uint32_t>(datas[groupName.string()]["Particle_rotateEase"]));
-	setting.rotateEase = Easeing::GetFunction(setting.rotateEaseType);
+	setting.rotate_.first = std::get<Vector3>(datas_[groupName.string()]["Particle_rotate1"]);
+	setting.rotate_.second = std::get<Vector3>(datas_[groupName.string()]["Particle_rotate2"]);
+	setting.rotateSecond_.first = std::get<Vector3>(datas_[groupName.string()]["Particle_rotateSecond1"]);
+	setting.rotateSecond_.second = std::get<Vector3>(datas_[groupName.string()]["Particle_rotateSecond2"]);
+	setting.rotateEaseType_ = static_cast<int32_t>(std::get<uint32_t>(datas_[groupName.string()]["Particle_rotateEase"]));
+	setting.rotateEase_ = Easeing::GetFunction(setting.rotateEaseType_);
 
-	setting.particleNum.first = std::get<uint32_t>(datas[groupName.string()]["Particle_particleNumFirst"]);
-	setting.particleNum.second = std::get<uint32_t>(datas[groupName.string()]["Particle_particleNumSecond"]);
-	setting.freq.first = std::get<uint32_t>(datas[groupName.string()]["Particle_freqFirst"]);
-	setting.freq.second = std::get<uint32_t>(datas[groupName.string()]["Particle_freqSecond"]);
-	setting.death.first = std::get<uint32_t>(datas[groupName.string()]["Particle_deathFirst"]);
-	setting.death.second = std::get<uint32_t>(datas[groupName.string()]["Particle_deathSecond"]);
-	setting.color.first = std::get<uint32_t>(datas[groupName.string()]["Particle_colorFirst"]);
-	setting.color.second = std::get<uint32_t>(datas[groupName.string()]["Particle_colorSecond"]);
-	setting.colorEaseType = static_cast<int32_t>(std::get<uint32_t>(datas[groupName.string()]["Particle_colorEase"]));
-	setting.colorEase = Easeing::GetFunction(setting.colorEaseType);
+	setting.particleNum_.first = std::get<uint32_t>(datas_[groupName.string()]["Particle_particleNumFirst"]);
+	setting.particleNum_.second = std::get<uint32_t>(datas_[groupName.string()]["Particle_particleNumSecond"]);
+	setting.freq_.first = std::get<uint32_t>(datas_[groupName.string()]["Particle_freqFirst"]);
+	setting.freq_.second = std::get<uint32_t>(datas_[groupName.string()]["Particle_freqSecond"]);
+	setting.death_.first = std::get<uint32_t>(datas_[groupName.string()]["Particle_deathFirst"]);
+	setting.death_.second = std::get<uint32_t>(datas_[groupName.string()]["Particle_deathSecond"]);
+	setting.color_.first = std::get<uint32_t>(datas_[groupName.string()]["Particle_colorFirst"]);
+	setting.color_.second = std::get<uint32_t>(datas_[groupName.string()]["Particle_colorSecond"]);
+	setting.colorEaseType_ = static_cast<int32_t>(std::get<uint32_t>(datas_[groupName.string()]["Particle_colorEase"]));
+	setting.colorEase_ = Easeing::GetFunction(setting.colorEaseType_);
 
-	setting.moveEaseType = static_cast<int32_t>(std::get<uint32_t>(datas[groupName.string()]["Particle_ease"]));
-	setting.moveEase = Easeing::GetFunction(setting.moveEaseType);
+	setting.moveEaseType = static_cast<int32_t>(std::get<uint32_t>(datas_[groupName.string()]["Particle_ease"]));
+	setting.moveEase_ = Easeing::GetFunction(setting.moveEaseType);
 }
 
 void Particle::SaveSettingFile(const std::string& groupName) {
-	auto itrGroup = datas.find(groupName);
-	assert(itrGroup != datas.end());
+	auto itrGroup = datas_.find(groupName);
+	assert(itrGroup != datas_.end());
 
 	nlohmann::json root;
 
@@ -633,7 +633,7 @@ void Particle::SaveSettingFile(const std::string& groupName) {
 		}
 	}
 
-	const std::filesystem::path kDirectoryPath = dataDirectoryName;
+	const std::filesystem::path kDirectoryPath = dataDirectoryName_;
 
 	if (!std::filesystem::exists(kDirectoryPath)) {
 		std::filesystem::create_directory(kDirectoryPath);
@@ -661,8 +661,8 @@ void Particle::SaveSettingFile(const std::string& groupName) {
 }
 
 void Particle::BackUpSettingFile(const std::string& groupName) {
-	auto itrGroup = datas.find(groupName);
-	assert(itrGroup != datas.end());
+	auto itrGroup = datas_.find(groupName);
+	assert(itrGroup != datas_.end());
 
 	nlohmann::json root;
 
@@ -694,7 +694,7 @@ void Particle::BackUpSettingFile(const std::string& groupName) {
 		}
 	}
 
-	const std::filesystem::path kDirectoryPath = dataDirectoryName + "BackUp/";
+	const std::filesystem::path kDirectoryPath = dataDirectoryName_ + "BackUp/";
 
 	if (!std::filesystem::exists(kDirectoryPath)) {
 		std::filesystem::create_directory(kDirectoryPath);
@@ -722,80 +722,80 @@ void Particle::BackUpSettingFile(const std::string& groupName) {
 }
 
 void Particle::ParticleStart() {
-	if (!settings.empty()) {
-		currentParticleIndex = 0;
-		emitterPos_ = settings[currentParticleIndex].emitter.pos;
-		settings[currentSettingIndex].isValid = false;
-		settings[currentSettingIndex].isValid.Update();
-		settings[currentParticleIndex].isValid = true;
+	if (!settings_.empty()) {
+		currentParticleIndex_ = 0;
+		emitterPos_ = settings_[currentParticleIndex_].emitter_.pos_;
+		settings_[currentSettingIndex_].isValid_ = false;
+		settings_[currentSettingIndex_].isValid_.Update();
+		settings_[currentParticleIndex_].isValid_ = true;
 	}
 }
 
 void Particle::ParticleStart(const Vector3& emitterPos) {
-	if (!settings.empty()) {
-		currentParticleIndex = 0;
+	if (!settings_.empty()) {
+		currentParticleIndex_ = 0;
 		emitterPos_ = emitterPos;
-		settings[currentSettingIndex].isValid = false;
-		settings[currentSettingIndex].isValid.Update();
-		settings[currentParticleIndex].isValid = true;
+		settings_[currentSettingIndex_].isValid_ = false;
+		settings_[currentSettingIndex_].isValid_.Update();
+		settings_[currentParticleIndex_].isValid_ = true;
 	}
 }
 
 
 void Particle::Update() {
-	assert(wtfs.size() == wvpMat.Size());
+	assert(wtfs_.size() == wvpMat_.Size());
 
-	if (tex && tex->CanUse() && !isLoad) {
-		isLoad = true;
+	if (tex_ && tex_->CanUse() && !isLoad_) {
+		isLoad_ = true;
 	}
 
 	// currentSettingIndexがsettingの要素数を超えてたらassertで止める
-	if (currentSettingIndex >= settings.size() || settings.empty()) {
+	if (currentSettingIndex_ >= settings_.size() || settings_.empty()) {
 		return;
 	}
 	auto nowTime = std::chrono::steady_clock::now();
 
-	if (settings[currentSettingIndex].isValid) {
-		settings[currentSettingIndex].emitter.pos = emitterPos_;
+	if (settings_[currentSettingIndex_].isValid_) {
+		settings_[currentSettingIndex_].emitter_.pos_ = emitterPos_;
 	}
 
 	// 有効になった瞬間始めた瞬間を保存
-	if (settings[currentSettingIndex].isValid.OnEnter()) {
-		settings[currentSettingIndex].startTime = nowTime;
-		settings[currentSettingIndex].durationTime = nowTime;
+	if (settings_[currentSettingIndex_].isValid_.OnEnter()) {
+		settings_[currentSettingIndex_].startTime_ = nowTime;
+		settings_[currentSettingIndex_].durationTime_ = nowTime;
 		// パーティクルの最大数にリサイズ
-		this->Resize(settings[currentSettingIndex].emitter.particleMaxNum);
+		this->Resize(settings_[currentSettingIndex_].emitter_.particleMaxNum_);
 	}
 	// 有効中
-	else if (settings[currentSettingIndex].isValid.OnStay()) {
+	else if (settings_[currentSettingIndex_].isValid_.OnStay()) {
 		// 最後に出した時間からのmilliseconds
-		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - settings[currentSettingIndex].durationTime);
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - settings_[currentSettingIndex_].durationTime_);
 
 		// 出す頻度ランダム
-		auto freq = UtilsLib::Random(settings[currentSettingIndex].freq.first, settings[currentSettingIndex].freq.second);
+		auto freq = UtilsLib::Random(settings_[currentSettingIndex_].freq_.first, settings_[currentSettingIndex_].freq_.second);
 
 		// 頻度時間を超えてたら
 		if (duration > decltype(duration)(freq)) {
-			settings[currentSettingIndex].durationTime = nowTime;
+			settings_[currentSettingIndex_].durationTime_ = nowTime;
 
 			// パーティクルを出す数ランダム
-			auto particleNum = UtilsLib::Random(settings[currentSettingIndex].particleNum.first, settings[currentSettingIndex].particleNum.second);
+			auto particleNum = UtilsLib::Random(settings_[currentSettingIndex_].particleNum_.first, settings_[currentSettingIndex_].particleNum_.second);
 
 			// パーティクルの設定
-			for (uint32_t i = currentParticleIndex; i < currentParticleIndex + particleNum; i++) {
-				if (i >= wtfs.size()) {
-					currentParticleIndex = 0u;
+			for (uint32_t i = currentParticleIndex_; i < currentParticleIndex_ + particleNum; i++) {
+				if (i >= wtfs_.size()) {
+					currentParticleIndex_ = 0u;
 					break;
 				}
 
 				// ポジションランダム
-				Vector3 maxPos = settings[currentSettingIndex].emitter.pos + settings[currentSettingIndex].emitter.size;
-				Vector3 minPos = settings[currentSettingIndex].emitter.pos - settings[currentSettingIndex].emitter.size;
+				Vector3 maxPos = settings_[currentSettingIndex_].emitter_.pos_ + settings_[currentSettingIndex_].emitter_.size_;
+				Vector3 minPos = settings_[currentSettingIndex_].emitter_.pos_ - settings_[currentSettingIndex_].emitter_.size_;
 				[[maybe_unused]] Vector3 posRotate;
 				Vector3 pos;
 
 				// ポジションのランダム
-				switch (settings[currentSettingIndex].emitter.type)
+				switch (settings_[currentSettingIndex_].emitter_.type_)
 				{
 				case Particle::EmitterType::Cube:
 				default:
@@ -803,104 +803,104 @@ void Particle::Update() {
 					break;
 
 				case Particle::EmitterType::Circle:
-					maxPos.x += settings[currentSettingIndex].emitter.circleSize;
-					pos = UtilsLib::Random(settings[currentSettingIndex].emitter.pos, maxPos);
-					posRotate = UtilsLib::Random(settings[currentSettingIndex].emitter.rotate.first, settings[currentSettingIndex].emitter.rotate.second);
+					maxPos.x += settings_[currentSettingIndex_].emitter_.circleSize_;
+					pos = UtilsLib::Random(settings_[currentSettingIndex_].emitter_.pos_, maxPos);
+					posRotate = UtilsLib::Random(settings_[currentSettingIndex_].emitter_.rotate_.first, settings_[currentSettingIndex_].emitter_.rotate_.second);
 					pos *= MakeMatrixAffin(Vector3::identity, posRotate, Vector3::zero);
 					break;
 				}
 
 				// 大きさランダム
-				Vector2 size = UtilsLib::Random(settings[currentSettingIndex].size.first, settings[currentSettingIndex].size.second);
-				if (settings[currentSettingIndex].isSameHW) {
+				Vector2 size = UtilsLib::Random(settings_[currentSettingIndex_].size_.first, settings_[currentSettingIndex_].size_.second);
+				if (settings_[currentSettingIndex_].isSameHW_) {
 					size.y = size.x;
 				}
-				Vector2 sizeSecond = UtilsLib::Random(settings[currentSettingIndex].sizeSecond.first, settings[currentSettingIndex].sizeSecond.second);
-				if (settings[currentSettingIndex].isSameHW) {
+				Vector2 sizeSecond = UtilsLib::Random(settings_[currentSettingIndex_].sizeSecond_.first, settings_[currentSettingIndex_].sizeSecond_.second);
+				if (settings_[currentSettingIndex_].isSameHW_) {
 					sizeSecond.y = sizeSecond.x;
 				}
 
 				// 速度ランダム
-				Vector3 velocity = UtilsLib::Random(settings[currentSettingIndex].velocity.first, settings[currentSettingIndex].velocity.second);
-				Vector3 velocitySecond = UtilsLib::Random(settings[currentSettingIndex].velocitySecond.first, settings[currentSettingIndex].velocitySecond.second);
+				Vector3 velocity = UtilsLib::Random(settings_[currentSettingIndex_].velocity_.first, settings_[currentSettingIndex_].velocity_.second);
+				Vector3 velocitySecond = UtilsLib::Random(settings_[currentSettingIndex_].velocitySecond_.first, settings_[currentSettingIndex_].velocitySecond_.second);
 
 				// 移動方向ランダム
-				Vector3 moveRotate = UtilsLib::Random(settings[currentSettingIndex].moveRotate.first, settings[currentSettingIndex].moveRotate.second);
+				Vector3 moveRotate = UtilsLib::Random(settings_[currentSettingIndex_].moveRotate_.first, settings_[currentSettingIndex_].moveRotate_.second);
 
 				// 速度回転
 				velocity *= MakeMatrixAffin(Vector3::identity, moveRotate, Vector3::zero);
 
 				// 回転
-				Vector3 rotate = UtilsLib::Random(settings[currentSettingIndex].rotate.first, settings[currentSettingIndex].rotate.second);
-				Vector3 rotateSecond = UtilsLib::Random(settings[currentSettingIndex].rotateSecond.first, settings[currentSettingIndex].rotateSecond.second);
+				Vector3 rotate = UtilsLib::Random(settings_[currentSettingIndex_].rotate_.first, settings_[currentSettingIndex_].rotate_.second);
+				Vector3 rotateSecond = UtilsLib::Random(settings_[currentSettingIndex_].rotateSecond_.first, settings_[currentSettingIndex_].rotateSecond_.second);
 
 				// 死ぬ時間ランダム
-				uint32_t deathTime = UtilsLib::Random(settings[currentSettingIndex].death.first, settings[currentSettingIndex].death.second);
+				uint32_t deathTime = UtilsLib::Random(settings_[currentSettingIndex_].death_.first, settings_[currentSettingIndex_].death_.second);
 
 				// カラー
-				uint32_t color = settings[currentSettingIndex].color.first;
+				uint32_t color = settings_[currentSettingIndex_].color_.first;
 
 				// ステータスセット
-				wtfs[i].pos = pos;
-				wtfs[i].scale = size;
-				wtfs[i].scaleStart = size;
-				wtfs[i].scaleSecond = sizeSecond;
-				wtfs[i].rotate = rotate;
-				wtfs[i].rotateStart = rotate;
-				wtfs[i].rotateSecond = rotateSecond;
-				wtfs[i].movePos = velocity;
-				wtfs[i].movePosSecond = velocitySecond;
-				wtfs[i].deathTime = std::chrono::milliseconds(deathTime);
-				wtfs[i].startTime = nowTime;
-				wtfs[i].isActive = true;
-				wtfs[i].color = color;
+				wtfs_[i].pos_ = pos;
+				wtfs_[i].scale_ = size;
+				wtfs_[i].scaleStart_ = size;
+				wtfs_[i].scaleSecond_ = sizeSecond;
+				wtfs_[i].rotate_ = rotate;
+				wtfs_[i].rotateStart_ = rotate;
+				wtfs_[i].rotateSecond_ = rotateSecond;
+				wtfs_[i].movePos_ = velocity;
+				wtfs_[i].movePosSecond_ = velocitySecond;
+				wtfs_[i].deathTime_ = std::chrono::milliseconds(deathTime);
+				wtfs_[i].startTime_ = nowTime;
+				wtfs_[i].isActive_ = true;
+				wtfs_[i].color_ = color;
 			}
 
 			// インデックスを更新
-			currentParticleIndex = currentParticleIndex + particleNum;
-			if (currentParticleIndex >= wtfs.size()) {
-				currentParticleIndex = 0u;
+			currentParticleIndex_ = currentParticleIndex_ + particleNum;
+			if (currentParticleIndex_ >= wtfs_.size()) {
+				currentParticleIndex_ = 0u;
 			}
 		}
 	}
 
 
-	for (auto& wtf : wtfs) {
-		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - wtf.startTime);
-		if (wtf.isActive) {
-			if (duration > wtf.deathTime) {
-				wtf.isActive = false;
+	for (auto& wtf : wtfs_) {
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - wtf.startTime_);
+		if (wtf.isActive_) {
+			if (duration > wtf.deathTime_) {
+				wtf.isActive_ = false;
 			}
 			else {
-				float wtfT =static_cast<float>(duration.count()) / static_cast<float>(wtf.deathTime.count());
-				Vector3 moveVec = Vector3::Lerp(wtf.movePos, wtf.movePosSecond, settings[currentSettingIndex].moveEase(wtfT));
-				wtf.pos += moveVec * FrameInfo::GetInstance()->GetDelta();
-				wtf.color = ColorLerp(settings[currentSettingIndex].color.first, settings[currentSettingIndex].color.second, settings[currentSettingIndex].colorEase(wtfT));
+				float wtfT =static_cast<float>(duration.count()) / static_cast<float>(wtf.deathTime_.count());
+				Vector3 moveVec = Vector3::Lerp(wtf.movePos_, wtf.movePosSecond_, settings_[currentSettingIndex_].moveEase_(wtfT));
+				wtf.pos_ += moveVec * FrameInfo::GetInstance()->GetDelta();
+				wtf.color_ = ColorLerp(settings_[currentSettingIndex_].color_.first, settings_[currentSettingIndex_].color_.second, settings_[currentSettingIndex_].colorEase_(wtfT));
 			
-				wtf.scale = Vector2::Lerp(wtf.scaleStart, wtf.scaleSecond, settings[currentSettingIndex].sizeEase(wtfT));
+				wtf.scale_ = Vector2::Lerp(wtf.scaleStart_, wtf.scaleSecond_, settings_[currentSettingIndex_].sizeEase_(wtfT));
 				
-				wtf.rotate = Vector3::Lerp(wtf.rotateStart, wtf.rotateSecond, settings[currentSettingIndex].rotateEase(wtfT));
+				wtf.rotate_ = Vector3::Lerp(wtf.rotateStart_, wtf.rotateSecond_, settings_[currentSettingIndex_].rotateEase_(wtfT));
 			}
 		}
 
 	}
 
-	settings[currentSettingIndex].isValid.Update();
+	settings_[currentSettingIndex_].isValid_.Update();
 
 	// もし今の設定の有効時間を過ぎていたら終了
-	if (settings[currentSettingIndex].isValid && 
-		settings[currentSettingIndex].emitter.validTime <
+	if (settings_[currentSettingIndex_].isValid_ && 
+		settings_[currentSettingIndex_].emitter_.validTime_ <
 		std::chrono::duration_cast<std::chrono::milliseconds>(
-			nowTime - settings[currentSettingIndex].startTime
+			nowTime - settings_[currentSettingIndex_].startTime_
 		))
 	{
-		settings[currentSettingIndex].isValid = false;
+		settings_[currentSettingIndex_].isValid_ = false;
 
-		currentSettingIndex++;
-		if (currentSettingIndex >= settings.size()) {
-			currentSettingIndex = 0;
+		currentSettingIndex_++;
+		if (currentSettingIndex_ >= settings_.size()) {
+			currentSettingIndex_ = 0;
 			if (isLoop_) {
-				settings[currentSettingIndex].isValid = true;
+				settings_[currentSettingIndex_].isValid_ = true;
 			}
 		}
 	}
@@ -911,9 +911,9 @@ void Particle::Draw(
 	const Mat4x4& viewProjection,
 	Pipeline::Blend blend
 ) {
-	if (tex && isLoad && !settings.empty()) {
-		const Vector2& uv0 = { uvPibot.x, uvPibot.y + uvSize.y }; const Vector2& uv1 = uvSize + uvPibot;
-		const Vector2& uv2 = { uvPibot.x + uvSize.x, uvPibot.y }; const Vector2& uv3 = uvPibot;
+	if (tex_ && isLoad_ && !settings_.empty()) {
+		const Vector2& uv0 = { uvPibot_.x, uvPibot_.y + uvSize_.y }; const Vector2& uv1 = uvSize_ + uvPibot_;
+		const Vector2& uv2 = { uvPibot_.x + uvSize_.x, uvPibot_.y }; const Vector2& uv3 = uvPibot_;
 
 		std::array<VertexData, 4> pv = {
 			Vector3{ -0.5f,  0.5f, 0.1f }, uv3,
@@ -923,12 +923,12 @@ void Particle::Draw(
 		};
 
 		VertexData* mappedData = nullptr;
-		vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedData));
+		vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedData));
 		std::copy(pv.begin(), pv.end(), mappedData);
-		vertexResource->Unmap(0, nullptr);
+		vertexResource_->Unmap(0, nullptr);
 
 		UINT drawCount = 0;
-		assert(wtfs.size() == wvpMat.Size());
+		assert(wtfs_.size() == wvpMat_.Size());
 		Mat4x4 billboardMat;
 		if (isBillboard_) {
 			if (isYBillboard_) {
@@ -942,10 +942,10 @@ void Particle::Draw(
 			billboardMat = Mat4x4::kIdentity_;
 		}
 
-		for (uint32_t i = 0; i < wvpMat.Size();i++) {
-			if (wtfs[i].isActive) {
-				wvpMat[drawCount] = MakeMatrixAffin(wtfs[i].scale, wtfs[i].rotate, wtfs[i].pos) * billboardMat * viewProjection;
-				colorBuf[drawCount] = UintToVector4(wtfs[i].color);
+		for (uint32_t i = 0; i < wvpMat_.Size();i++) {
+			if (wtfs_[i].isActive_) {
+				wvpMat_[drawCount] = MakeMatrixAffin(wtfs_[i].scale_, wtfs_[i].rotate_, wtfs_[i].pos_) * billboardMat * viewProjection;
+				colorBuf_[drawCount] = UintToVector4(wtfs_[i].color_);
 				drawCount++;
 			}
 		}
@@ -954,11 +954,11 @@ void Particle::Draw(
 		if (0 < drawCount) {
 			auto commandlist = DirectXCommon::GetInstance()->GetCommandList();
 			// 各種描画コマンドを積む
-			graphicsPipelineState[blend]->Use();
-			tex->Use(0);
-			srvHeap->Use(wvpMat.GetViewHandleUINT(), 1);
-			commandlist->IASetVertexBuffers(0, 1, &vertexView);
-			commandlist->IASetIndexBuffer(&indexView);
+			graphicsPipelineState_[blend]->Use();
+			tex_->Use(0);
+			srvHeap_->Use(wvpMat_.GetViewHandleUINT(), 1);
+			commandlist->IASetVertexBuffers(0, 1, &vertexView_);
+			commandlist->IASetIndexBuffer(&indexView_);
 			commandlist->DrawIndexedInstanced(6, drawCount, 0, 0, 0);
 		}
 	}
@@ -989,8 +989,8 @@ void Particle::Debug(const std::string& guiName) {
 					);
 
 					if (id == IDOK) {
-						settings.clear();
-						datas.clear();
+						settings_.clear();
+						datas_.clear();
 						LoadSettingDirectory(entry.path().stem().string());
 						MessageBoxA(
 							WinApp::GetInstance()->GetHwnd(),
@@ -1005,35 +1005,35 @@ void Particle::Debug(const std::string& guiName) {
 		ImGui::EndMenu();
 	}
 	if (ImGui::Button("Setting Add")) {
-		settings.push_back(Setting{});
+		settings_.push_back(Setting{});
 
 	}
-	for (auto i = 0llu; i < settings.size(); i++) {
+	for (auto i = 0llu; i < settings_.size(); i++) {
 		if (!ImGui::BeginMenu(("setting" + std::to_string(i)).c_str())) {
 			continue;
 		}
 
 		// エミッターの設定
 		if (ImGui::TreeNode("Emitter")) {
-			ImGui::DragFloat3("pos", &settings[i].emitter.pos.x, 0.01f);
-			emitterPos_ = settings[i].emitter.pos;
-			ImGui::DragFloat3("size", &settings[i].emitter.size.x, 0.01f);
-			int32_t type = static_cast<int32_t>(settings[i].emitter.type);
+			ImGui::DragFloat3("pos", &settings_[i].emitter_.pos_.x, 0.01f);
+			emitterPos_ = settings_[i].emitter_.pos_;
+			ImGui::DragFloat3("size", &settings_[i].emitter_.size_.x, 0.01f);
+			int32_t type = static_cast<int32_t>(settings_[i].emitter_.type_);
 			ImGui::SliderInt("type", &type, 0, 1);
-			settings[i].emitter.type = static_cast<decltype(settings[i].emitter.type)>(type);
+			settings_[i].emitter_.type_ = static_cast<decltype(settings_[i].emitter_.type_)>(type);
 			if (type == 1) {
-				ImGui::DragFloat("circleSize", &settings[i].emitter.circleSize, 0.01f);
-				ImGui::DragFloat3("rotate first", &settings[i].emitter.rotate.first.x, 0.01f);
-				ImGui::DragFloat3("rotate second", &settings[i].emitter.rotate.second.x, 0.01f);
+				ImGui::DragFloat("circleSize", &settings_[i].emitter_.circleSize_, 0.01f);
+				ImGui::DragFloat3("rotate first", &settings_[i].emitter_.rotate_.first.x, 0.01f);
+				ImGui::DragFloat3("rotate second", &settings_[i].emitter_.rotate_.second.x, 0.01f);
 			}
-			int32_t particleMaxNum = static_cast<int32_t>(settings[i].emitter.particleMaxNum);
+			int32_t particleMaxNum = static_cast<int32_t>(settings_[i].emitter_.particleMaxNum_);
 			ImGui::DragInt("particleMaxNum", &particleMaxNum, 0.1f, 0);
-			settings[i].emitter.particleMaxNum = uint32_t(particleMaxNum);
-			settings[i].emitter.particleMaxNum = std::clamp(settings[i].emitter.particleMaxNum, 1u, std::numeric_limits<uint32_t>::max());
+			settings_[i].emitter_.particleMaxNum_ = uint32_t(particleMaxNum);
+			settings_[i].emitter_.particleMaxNum_ = std::clamp(settings_[i].emitter_.particleMaxNum_, 1u, std::numeric_limits<uint32_t>::max());
 
-			int32_t validTime = int32_t(settings[i].emitter.validTime.count());
+			int32_t validTime = int32_t(settings_[i].emitter_.validTime_.count());
 			ImGui::DragInt("vaild time(milliseconds)", &validTime, 1.0f, 0);
-			settings[i].emitter.validTime = std::chrono::milliseconds(validTime);
+			settings_[i].emitter_.validTime_ = std::chrono::milliseconds(validTime);
 
 			ImGui::TreePop();
 		}
@@ -1041,81 +1041,81 @@ void Particle::Debug(const std::string& guiName) {
 		// パーティクルの設定
 		if (ImGui::TreeNode("Particle")) {
 			if (ImGui::TreeNode("size")) {
-				ImGui::Checkbox("Same height and width", settings[i].isSameHW.Data());
-				if (settings[i].isSameHW) {
-					ImGui::DragFloat("size min", &settings[i].size.first.x, 0.01f);
-					ImGui::DragFloat("size max", &settings[i].size.second.x, 0.01f);
-					ImGui::DragFloat("sizeSecond min", &settings[i].sizeSecond.first.x, 0.01f);
-					ImGui::DragFloat("sizeSecond max", &settings[i].sizeSecond.second.x, 0.01f);
+				ImGui::Checkbox("Same height and width", settings_[i].isSameHW_.Data());
+				if (settings_[i].isSameHW_) {
+					ImGui::DragFloat("size min", &settings_[i].size_.first.x, 0.01f);
+					ImGui::DragFloat("size max", &settings_[i].size_.second.x, 0.01f);
+					ImGui::DragFloat("sizeSecond min", &settings_[i].sizeSecond_.first.x, 0.01f);
+					ImGui::DragFloat("sizeSecond max", &settings_[i].sizeSecond_.second.x, 0.01f);
 				}
 				else {
-					ImGui::DragFloat2("size first", &settings[i].size.first.x, 0.01f);
-					ImGui::DragFloat2("size second", &settings[i].size.second.x, 0.01f);
-					ImGui::DragFloat2("sizeSecond min", &settings[i].sizeSecond.first.x, 0.01f);
-					ImGui::DragFloat2("sizeSecond max", &settings[i].sizeSecond.second.x, 0.01f);
+					ImGui::DragFloat2("size first", &settings_[i].size_.first.x, 0.01f);
+					ImGui::DragFloat2("size second", &settings_[i].size_.second.x, 0.01f);
+					ImGui::DragFloat2("sizeSecond min", &settings_[i].sizeSecond_.first.x, 0.01f);
+					ImGui::DragFloat2("sizeSecond max", &settings_[i].sizeSecond_.second.x, 0.01f);
 				}
-				ImGui::SliderInt("easeType", &settings[i].sizeEaseType, 0, 30);
-				settings[i].sizeEase = Easeing::GetFunction(settings[i].sizeEaseType);
+				ImGui::SliderInt("easeType", &settings_[i].sizeEaseType_, 0, 30);
+				settings_[i].sizeEase_ = Easeing::GetFunction(settings_[i].sizeEaseType_);
 
 				ImGui::TreePop();
 			}
 			if (ImGui::TreeNode("spd")) {
-				ImGui::DragFloat3("velocity min", &settings[i].velocity.first.x, 0.01f);
-				ImGui::DragFloat3("velocity max", &settings[i].velocity.second.x, 0.01f);
-				ImGui::DragFloat3("velocitySecond min", &settings[i].velocitySecond.first.x, 0.01f);
-				ImGui::DragFloat3("velocitySecond max", &settings[i].velocitySecond.second.x, 0.01f);
+				ImGui::DragFloat3("velocity min", &settings_[i].velocity_.first.x, 0.01f);
+				ImGui::DragFloat3("velocity max", &settings_[i].velocity_.second.x, 0.01f);
+				ImGui::DragFloat3("velocitySecond min", &settings_[i].velocitySecond_.first.x, 0.01f);
+				ImGui::DragFloat3("velocitySecond max", &settings_[i].velocitySecond_.second.x, 0.01f);
 
-				ImGui::SliderInt("easeType", &settings[i].moveEaseType, 0, 30);
-				settings[i].moveEase = Easeing::GetFunction(settings[i].moveEaseType);
+				ImGui::SliderInt("easeType", &settings_[i].moveEaseType, 0, 30);
+				settings_[i].moveEase_ = Easeing::GetFunction(settings_[i].moveEaseType);
 
-				ImGui::DragFloat3("rotate min", &settings[i].moveRotate.first.x, 0.01f);
-				ImGui::DragFloat3("rotate max", &settings[i].moveRotate.second.x, 0.01f);
+				ImGui::DragFloat3("rotate min", &settings_[i].moveRotate_.first.x, 0.01f);
+				ImGui::DragFloat3("rotate max", &settings_[i].moveRotate_.second.x, 0.01f);
 				ImGui::TreePop();
 			}
 			if (ImGui::TreeNode("rotate")) {
-				ImGui::DragFloat3("rotate min", &settings[i].rotate.first.x, 0.01f);
-				ImGui::DragFloat3("rotate max", &settings[i].rotate.second.x, 0.01f);
-				ImGui::DragFloat3("rotateSecond min", &settings[i].rotateSecond.first.x, 0.01f);
-				ImGui::DragFloat3("rotateSecond max", &settings[i].rotateSecond.second.x, 0.01f);
-				ImGui::SliderInt("easeType", &settings[i].rotateEaseType, 0, 30);
-				settings[i].moveEase = Easeing::GetFunction(settings[i].rotateEaseType);
+				ImGui::DragFloat3("rotate min", &settings_[i].rotate_.first.x, 0.01f);
+				ImGui::DragFloat3("rotate max", &settings_[i].rotate_.second.x, 0.01f);
+				ImGui::DragFloat3("rotateSecond min", &settings_[i].rotateSecond_.first.x, 0.01f);
+				ImGui::DragFloat3("rotateSecond max", &settings_[i].rotateSecond_.second.x, 0.01f);
+				ImGui::SliderInt("easeType", &settings_[i].rotateEaseType_, 0, 30);
+				settings_[i].moveEase_ = Easeing::GetFunction(settings_[i].rotateEaseType_);
 				ImGui::TreePop();
 			}
 
 			if (ImGui::TreeNode("Appear")) {
-				auto particleNumFirst = int32_t(settings[i].particleNum.first);
-				auto particleNumSecond = int32_t(settings[i].particleNum.second);
-				ImGui::DragInt("particleNum min", &particleNumFirst, 0.1f, 0, int32_t(settings[i].emitter.particleMaxNum));
-				ImGui::DragInt("particleNum max", &particleNumSecond, 0.1f, 0, int32_t(settings[i].emitter.particleMaxNum));
-				settings[i].particleNum.first = uint32_t(particleNumFirst);
-				settings[i].particleNum.second = uint32_t(particleNumSecond);
+				auto particleNumFirst = int32_t(settings_[i].particleNum_.first);
+				auto particleNumSecond = int32_t(settings_[i].particleNum_.second);
+				ImGui::DragInt("particleNum min", &particleNumFirst, 0.1f, 0, int32_t(settings_[i].emitter_.particleMaxNum_));
+				ImGui::DragInt("particleNum max", &particleNumSecond, 0.1f, 0, int32_t(settings_[i].emitter_.particleMaxNum_));
+				settings_[i].particleNum_.first = uint32_t(particleNumFirst);
+				settings_[i].particleNum_.second = uint32_t(particleNumSecond);
 
-				auto freqFirst = int32_t(settings[i].freq.first);
-				auto freqSecond = int32_t(settings[i].freq.second);
-				ImGui::DragInt("freq min(milliseconds)", &freqFirst, 1.0f, 0, int32_t(settings[i].emitter.validTime.count()));
-				ImGui::DragInt("freq max(milliseconds)", &freqSecond, 1.0f, 0, int32_t(settings[i].emitter.validTime.count()));
-				settings[i].freq.first = uint32_t(freqFirst);
-				settings[i].freq.second = uint32_t(freqSecond);
+				auto freqFirst = int32_t(settings_[i].freq_.first);
+				auto freqSecond = int32_t(settings_[i].freq_.second);
+				ImGui::DragInt("freq min(milliseconds)", &freqFirst, 1.0f, 0, int32_t(settings_[i].emitter_.validTime_.count()));
+				ImGui::DragInt("freq max(milliseconds)", &freqSecond, 1.0f, 0, int32_t(settings_[i].emitter_.validTime_.count()));
+				settings_[i].freq_.first = uint32_t(freqFirst);
+				settings_[i].freq_.second = uint32_t(freqSecond);
 
-				auto deathFirst = int32_t(settings[i].death.first);
-				auto deathSecond = int32_t(settings[i].death.second);
+				auto deathFirst = int32_t(settings_[i].death_.first);
+				auto deathSecond = int32_t(settings_[i].death_.second);
 				ImGui::DragInt("death min(milliseconds)", &deathFirst, 10.0f, 0, std::numeric_limits<int32_t>::max());
 				ImGui::DragInt("death max(milliseconds)", &deathSecond, 10.0f, 0, std::numeric_limits<int32_t>::max());
-				settings[i].death.first = uint32_t(deathFirst);
-				settings[i].death.second = uint32_t(deathSecond);
+				settings_[i].death_.first = uint32_t(deathFirst);
+				settings_[i].death_.second = uint32_t(deathSecond);
 				ImGui::TreePop();
 			}
 
 			if (ImGui::TreeNode("Color")) {
-				ImGui::SliderInt("easeType", &settings[i].colorEaseType, 0, 30);
-				settings[i].colorEase = Easeing::GetFunction(settings[i].colorEaseType);
+				ImGui::SliderInt("easeType", &settings_[i].colorEaseType_, 0, 30);
+				settings_[i].colorEase_ = Easeing::GetFunction(settings_[i].colorEaseType_);
 
-				Vector4 colorFirst = UintToVector4(settings[i].color.first);
-				Vector4 colorSecond = UintToVector4(settings[i].color.second);
+				Vector4 colorFirst = UintToVector4(settings_[i].color_.first);
+				Vector4 colorSecond = UintToVector4(settings_[i].color_.second);
 				ImGui::ColorEdit4("color first", colorFirst.m.data());
 				ImGui::ColorEdit4("color second", colorSecond.m.data());
-				settings[i].color.first = Vector4ToUint(colorFirst);
-				settings[i].color.second = Vector4ToUint(colorSecond);
+				settings_[i].color_.first = Vector4ToUint(colorFirst);
+				settings_[i].color_.second = Vector4ToUint(colorSecond);
 				ImGui::TreePop();
 			}
 
@@ -1123,59 +1123,59 @@ void Particle::Debug(const std::string& guiName) {
 		}
 
 		if (ImGui::Button("start")) {
-			settings[i].isValid = true;
-			currentParticleIndex = uint32_t(i);
+			settings_[i].isValid_ = true;
+			currentParticleIndex_ = uint32_t(i);
 		}
 		if (ImGui::Button("stop")) {
-			settings[i].isValid = false;
+			settings_[i].isValid_ = false;
 		}
 
 		const auto groupName = ("setting" + std::to_string(i));
 
-		datas[groupName]["Emitter_Pos"] = settings[i].emitter.pos;
-		datas[groupName]["Emitter_Size"] = settings[i].emitter.size;
-		datas[groupName]["Emitter_Type"] = static_cast<uint32_t>(settings[i].emitter.type);
-		datas[groupName]["Emitter_CircleSize"] = settings[i].emitter.circleSize;
-		datas[groupName]["Emitter_CircleSize"] = settings[i].emitter.circleSize;
-		datas[groupName]["Emitter_RotateFirst"] = settings[i].emitter.rotate.first;
-		datas[groupName]["Emitter_RotateSecond"] = settings[i].emitter.rotate.second;
-		datas[groupName]["Emitter_ParticleMaxNum"] = settings[i].emitter.particleMaxNum;
-		datas[groupName]["Emitter_vaildTime"] = static_cast<uint32_t>(settings[i].emitter.validTime.count());
+		datas_[groupName]["Emitter_Pos"] = settings_[i].emitter_.pos_;
+		datas_[groupName]["Emitter_Size"] = settings_[i].emitter_.size_;
+		datas_[groupName]["Emitter_Type"] = static_cast<uint32_t>(settings_[i].emitter_.type_);
+		datas_[groupName]["Emitter_CircleSize"] = settings_[i].emitter_.circleSize_;
+		datas_[groupName]["Emitter_CircleSize"] = settings_[i].emitter_.circleSize_;
+		datas_[groupName]["Emitter_RotateFirst"] = settings_[i].emitter_.rotate_.first;
+		datas_[groupName]["Emitter_RotateSecond"] = settings_[i].emitter_.rotate_.second;
+		datas_[groupName]["Emitter_ParticleMaxNum"] = settings_[i].emitter_.particleMaxNum_;
+		datas_[groupName]["Emitter_vaildTime"] = static_cast<uint32_t>(settings_[i].emitter_.validTime_.count());
 
 		// 大きさ
-		datas[groupName]["Particle_isSameHW"] = static_cast<uint32_t>(settings[i].isSameHW);
-		datas[groupName]["Particle_size1"] = settings[i].size.first;
-		datas[groupName]["Particle_size2"] = settings[i].size.second;
-		datas[groupName]["Particle_sizeSecond1"] = settings[i].sizeSecond.first;
-		datas[groupName]["Particle_sizeSecond2"] = settings[i].sizeSecond.second;
-		datas[groupName]["Particle_sizeEase"] = static_cast<uint32_t>(settings[i].colorEaseType);
+		datas_[groupName]["Particle_isSameHW"] = static_cast<uint32_t>(settings_[i].isSameHW_);
+		datas_[groupName]["Particle_size1"] = settings_[i].size_.first;
+		datas_[groupName]["Particle_size2"] = settings_[i].size_.second;
+		datas_[groupName]["Particle_sizeSecond1"] = settings_[i].sizeSecond_.first;
+		datas_[groupName]["Particle_sizeSecond2"] = settings_[i].sizeSecond_.second;
+		datas_[groupName]["Particle_sizeEase"] = static_cast<uint32_t>(settings_[i].colorEaseType_);
 
 		// 速度
-		datas[groupName]["Particle_velocity1"] = settings[i].velocity.first;
-		datas[groupName]["Particle_velocity2"] = settings[i].velocity.second;
-		datas[groupName]["Particle_velocitySecond1"] = settings[i].velocitySecond.first;
-		datas[groupName]["Particle_velocitySecond2"] = settings[i].velocitySecond.second;
-		datas[groupName]["Particle_ease"] = static_cast<uint32_t>(settings[i].moveEaseType);
-		datas[groupName]["Particle_moveRotateFirst"] = settings[i].moveRotate.first;
-		datas[groupName]["Particle_moveRotateSecond"] = settings[i].moveRotate.second;
+		datas_[groupName]["Particle_velocity1"] = settings_[i].velocity_.first;
+		datas_[groupName]["Particle_velocity2"] = settings_[i].velocity_.second;
+		datas_[groupName]["Particle_velocitySecond1"] = settings_[i].velocitySecond_.first;
+		datas_[groupName]["Particle_velocitySecond2"] = settings_[i].velocitySecond_.second;
+		datas_[groupName]["Particle_ease"] = static_cast<uint32_t>(settings_[i].moveEaseType);
+		datas_[groupName]["Particle_moveRotateFirst"] = settings_[i].moveRotate_.first;
+		datas_[groupName]["Particle_moveRotateSecond"] = settings_[i].moveRotate_.second;
 
 		// 回転
-		datas[groupName]["Particle_rotate1"] = settings[i].rotate.first;
-		datas[groupName]["Particle_rotate2"] = settings[i].rotate.second;
-		datas[groupName]["Particle_rotateSecond1"] = settings[i].rotateSecond.first;
-		datas[groupName]["Particle_rotateSecond2"] = settings[i].rotateSecond.second;
-		datas[groupName]["Particle_rotateEase"] = static_cast<uint32_t>(settings[i].rotateEaseType);
+		datas_[groupName]["Particle_rotate1"] = settings_[i].rotate_.first;
+		datas_[groupName]["Particle_rotate2"] = settings_[i].rotate_.second;
+		datas_[groupName]["Particle_rotateSecond1"] = settings_[i].rotateSecond_.first;
+		datas_[groupName]["Particle_rotateSecond2"] = settings_[i].rotateSecond_.second;
+		datas_[groupName]["Particle_rotateEase"] = static_cast<uint32_t>(settings_[i].rotateEaseType_);
 
 
-		datas[groupName]["Particle_particleNumFirst"] = settings[i].particleNum.first;
-		datas[groupName]["Particle_particleNumSecond"] = settings[i].particleNum.second;
-		datas[groupName]["Particle_freqFirst"] = settings[i].freq.first;
-		datas[groupName]["Particle_freqSecond"] = settings[i].freq.second;
-		datas[groupName]["Particle_deathFirst"] = settings[i].death.first;
-		datas[groupName]["Particle_deathSecond"] = settings[i].death.second;
-		datas[groupName]["Particle_colorFirst"] = settings[i].color.first;
-		datas[groupName]["Particle_colorSecond"] = settings[i].color.second;
-		datas[groupName]["Particle_colorEase"] = static_cast<uint32_t>(settings[i].colorEaseType);
+		datas_[groupName]["Particle_particleNumFirst"] = settings_[i].particleNum_.first;
+		datas_[groupName]["Particle_particleNumSecond"] = settings_[i].particleNum_.second;
+		datas_[groupName]["Particle_freqFirst"] = settings_[i].freq_.first;
+		datas_[groupName]["Particle_freqSecond"] = settings_[i].freq_.second;
+		datas_[groupName]["Particle_deathFirst"] = settings_[i].death_.first;
+		datas_[groupName]["Particle_deathSecond"] = settings_[i].death_.second;
+		datas_[groupName]["Particle_colorFirst"] = settings_[i].color_.first;
+		datas_[groupName]["Particle_colorSecond"] = settings_[i].color_.second;
+		datas_[groupName]["Particle_colorEase"] = static_cast<uint32_t>(settings_[i].colorEaseType_);
 
 
 		if (ImGui::Button("this setting save")) {
@@ -1197,8 +1197,8 @@ void Particle::Debug(const std::string& guiName) {
 			if (id == IDOK) {
 				BackUpSettingFile(groupName);
 
-				settings.erase(settings.begin() + i);
-				datas.erase(groupName);
+				settings_.erase(settings_.begin() + i);
+				datas_.erase(groupName);
 				ImGui::EndMenu();
 
 				MessageBoxA(
@@ -1219,60 +1219,60 @@ void Particle::Debug(const std::string& guiName) {
 	ImGui::Checkbox("isYBillboard", &isYBillboard_);
 	ImGui::Checkbox("isLoop", isLoop_.Data());
 	if (ImGui::Button("all setting save")) {
-		for (auto i = 0llu; i < settings.size(); i++) {
+		for (auto i = 0llu; i < settings_.size(); i++) {
 			const auto groupName = ("setting" + std::to_string(i));
 
-			datas[groupName]["Emitter_Pos"] = settings[i].emitter.pos;
-			datas[groupName]["Emitter_Size"] = settings[i].emitter.size;
-			datas[groupName]["Emitter_Type"] = static_cast<uint32_t>(settings[i].emitter.type);
-			datas[groupName]["Emitter_CircleSize"] = settings[i].emitter.circleSize;
-			datas[groupName]["Emitter_CircleSize"] = settings[i].emitter.circleSize;
-			datas[groupName]["Emitter_RotateFirst"] = settings[i].emitter.rotate.first;
-			datas[groupName]["Emitter_RotateSecond"] = settings[i].emitter.rotate.second;
-			datas[groupName]["Emitter_ParticleMaxNum"] = settings[i].emitter.particleMaxNum;
-			datas[groupName]["Emitter_vaildTime"] = static_cast<uint32_t>(settings[i].emitter.validTime.count());
+			datas_[groupName]["Emitter_Pos"] = settings_[i].emitter_.pos_;
+			datas_[groupName]["Emitter_Size"] = settings_[i].emitter_.size_;
+			datas_[groupName]["Emitter_Type"] = static_cast<uint32_t>(settings_[i].emitter_.type_);
+			datas_[groupName]["Emitter_CircleSize"] = settings_[i].emitter_.circleSize_;
+			datas_[groupName]["Emitter_CircleSize"] = settings_[i].emitter_.circleSize_;
+			datas_[groupName]["Emitter_RotateFirst"] = settings_[i].emitter_.rotate_.first;
+			datas_[groupName]["Emitter_RotateSecond"] = settings_[i].emitter_.rotate_.second;
+			datas_[groupName]["Emitter_ParticleMaxNum"] = settings_[i].emitter_.particleMaxNum_;
+			datas_[groupName]["Emitter_vaildTime"] = static_cast<uint32_t>(settings_[i].emitter_.validTime_.count());
 
 			// 大きさ
-			datas[groupName]["Particle_isSameHW"] = static_cast<uint32_t>(settings[i].isSameHW);
-			datas[groupName]["Particle_size1"] = settings[i].size.first;
-			datas[groupName]["Particle_size2"] = settings[i].size.second;
-			datas[groupName]["Particle_sizeSecond1"] = settings[i].sizeSecond.first;
-			datas[groupName]["Particle_sizeSecond2"] = settings[i].sizeSecond.second;
-			datas[groupName]["Particle_sizeEase"] = static_cast<uint32_t>(settings[i].colorEaseType);
+			datas_[groupName]["Particle_isSameHW"] = static_cast<uint32_t>(settings_[i].isSameHW_);
+			datas_[groupName]["Particle_size1"] = settings_[i].size_.first;
+			datas_[groupName]["Particle_size2"] = settings_[i].size_.second;
+			datas_[groupName]["Particle_sizeSecond1"] = settings_[i].sizeSecond_.first;
+			datas_[groupName]["Particle_sizeSecond2"] = settings_[i].sizeSecond_.second;
+			datas_[groupName]["Particle_sizeEase"] = static_cast<uint32_t>(settings_[i].colorEaseType_);
 
 			// 速度
-			datas[groupName]["Particle_velocity1"] = settings[i].velocity.first;
-			datas[groupName]["Particle_velocity2"] = settings[i].velocity.second;
-			datas[groupName]["Particle_velocitySecond1"] = settings[i].velocitySecond.first;
-			datas[groupName]["Particle_velocitySecond2"] = settings[i].velocitySecond.second;
-			datas[groupName]["Particle_ease"] = static_cast<uint32_t>(settings[i].moveEaseType);
-			datas[groupName]["Particle_moveRotateFirst"] = settings[i].moveRotate.first;
-			datas[groupName]["Particle_moveRotateSecond"] = settings[i].moveRotate.second;
+			datas_[groupName]["Particle_velocity1"] = settings_[i].velocity_.first;
+			datas_[groupName]["Particle_velocity2"] = settings_[i].velocity_.second;
+			datas_[groupName]["Particle_velocitySecond1"] = settings_[i].velocitySecond_.first;
+			datas_[groupName]["Particle_velocitySecond2"] = settings_[i].velocitySecond_.second;
+			datas_[groupName]["Particle_ease"] = static_cast<uint32_t>(settings_[i].moveEaseType);
+			datas_[groupName]["Particle_moveRotateFirst"] = settings_[i].moveRotate_.first;
+			datas_[groupName]["Particle_moveRotateSecond"] = settings_[i].moveRotate_.second;
 
 			// 回転
-			datas[groupName]["Particle_rotate1"] = settings[i].rotate.first;
-			datas[groupName]["Particle_rotate2"] = settings[i].rotate.second;
-			datas[groupName]["Particle_rotateSecond1"] = settings[i].rotateSecond.first;
-			datas[groupName]["Particle_rotateSecond2"] = settings[i].rotateSecond.second;
-			datas[groupName]["Particle_rotateEase"] = static_cast<uint32_t>(settings[i].rotateEaseType);
+			datas_[groupName]["Particle_rotate1"] = settings_[i].rotate_.first;
+			datas_[groupName]["Particle_rotate2"] = settings_[i].rotate_.second;
+			datas_[groupName]["Particle_rotateSecond1"] = settings_[i].rotateSecond_.first;
+			datas_[groupName]["Particle_rotateSecond2"] = settings_[i].rotateSecond_.second;
+			datas_[groupName]["Particle_rotateEase"] = static_cast<uint32_t>(settings_[i].rotateEaseType_);
 
-			datas[groupName]["Particle_particleNumFirst"] = settings[i].particleNum.first;
-			datas[groupName]["Particle_particleNumSecond"] = settings[i].particleNum.second;
-			datas[groupName]["Particle_freqFirst"] = settings[i].freq.first;
-			datas[groupName]["Particle_freqSecond"] = settings[i].freq.second;
-			datas[groupName]["Particle_deathFirst"] = settings[i].death.first;
-			datas[groupName]["Particle_deathSecond"] = settings[i].death.second;
-			datas[groupName]["Particle_colorFirst"] = settings[i].color.first;
-			datas[groupName]["Particle_colorSecond"] = settings[i].color.second;
-			datas[groupName]["Particle_colorEase"] = static_cast<uint32_t>(settings[i].colorEaseType);
+			datas_[groupName]["Particle_particleNumFirst"] = settings_[i].particleNum_.first;
+			datas_[groupName]["Particle_particleNumSecond"] = settings_[i].particleNum_.second;
+			datas_[groupName]["Particle_freqFirst"] = settings_[i].freq_.first;
+			datas_[groupName]["Particle_freqSecond"] = settings_[i].freq_.second;
+			datas_[groupName]["Particle_deathFirst"] = settings_[i].death_.first;
+			datas_[groupName]["Particle_deathSecond"] = settings_[i].death_.second;
+			datas_[groupName]["Particle_colorFirst"] = settings_[i].color_.first;
+			datas_[groupName]["Particle_colorSecond"] = settings_[i].color_.second;
+			datas_[groupName]["Particle_colorEase"] = static_cast<uint32_t>(settings_[i].colorEaseType_);
 			SaveSettingFile(("setting" + std::to_string(i)).c_str());
 		}
 
-		std::ofstream file{ dataDirectoryName+"otherSetting.txt"};
+		std::ofstream file{ dataDirectoryName_+"otherSetting.txt"};
 
-		if (!file.fail() && isLoad) {
+		if (!file.fail() && isLoad_) {
 			file << static_cast<bool>(isLoop_) << std::endl
-				<< tex->GetFileName() << std::endl 
+				<< tex_->GetFileName() << std::endl 
 				<< isBillboard_ << std::endl 
 				<< isYBillboard_;
 			file.close();
@@ -1286,9 +1286,9 @@ void Particle::Debug(const std::string& guiName) {
 
 	auto fileNames = UtilsLib::GetFilePathFormDir("./Resources", ".png");
 
-	if (isLoad) {
+	if (isLoad_) {
 		if (ImGui::TreeNode("png files Load")) {
-			ImGui::Text(("now Texture is : " + tex->GetFileName()).c_str());
+			ImGui::Text(("now Texture is : " + tex_->GetFileName()).c_str());
 			for (auto& fileName : fileNames) {
 				if (ImGui::Button(fileName.string().c_str())) {
 					this->ThreadLoadTexture(fileName.string());
@@ -1306,7 +1306,7 @@ void Particle::AnimationStart(float aniUvPibot) {
 		aniStartTime_ = std::chrono::steady_clock::now();
 		isAnimation_ = true;
 		aniCount_ = 0.0f;
-		uvPibot.x = aniUvPibot;
+		uvPibot_.x = aniUvPibot;
 	}
 }
 
@@ -1335,8 +1335,8 @@ void Particle::Animation(size_t aniSpd, bool isLoop, float aniUvStart, float ani
 				}
 			}
 
-			uvPibot.x = aniUvStart;
-			uvPibot.x += uvPibotSpd_ * aniCount_;
+			uvPibot_.x = aniUvStart;
+			uvPibot_.x += uvPibotSpd_ * aniCount_;
 		}
 	}
 }

@@ -23,9 +23,9 @@ void GameScene::Initialize() {
 
 	// テクスチャ読み込み
 	tex2D_.LoadTexture("./Resources/uvChecker.png");
-	tex2D_.pos = Vector2{ 380.0f,  -80.0f };
-	tex2D_.isSameTexSize = true;
-	tex2D_.texScalar = 0.5f;
+	tex2D_.pos_ = Vector2{ 380.0f,  -80.0f };
+	tex2D_.isSameTexSize_ = true;
+	tex2D_.texScalar_ = 0.5f;
 
 	// テクスチャ単体でも読み込み出来る
 	texture_ =

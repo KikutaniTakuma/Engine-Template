@@ -134,7 +134,7 @@ DirectXCommon::DirectXCommon():
 
 #ifdef _DEBUG
 	// SRV用のヒープ
-	auto srvDescriptorHeap = ShaderResourceHeap::GetInstance();
+	auto srvDescriptorHeap = DescriptorHeap::GetInstance();
 
 	// ImGuiの初期化
 	IMGUI_CHECKVERSION();

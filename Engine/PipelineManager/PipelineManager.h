@@ -38,7 +38,7 @@ public:
 	/// </summary>
 	/// <param name="rootParamater_">ルートパラメータ</param>
 	/// <param name="isTexture_">テクスチャを使う場合はtrue</param>
-	static void CreateRootSgnature(D3D12_ROOT_PARAMETER* rootParamater_, size_t rootParamaterSize_, bool isTexture_);
+	static void CreateRootSgnature(D3D12_ROOT_PARAMETER* rootParamater, size_t rootParamaterSize, bool isTexture);
 
 	static void SetRootSgnature(RootSignature* rootSignature);
 
@@ -48,13 +48,13 @@ public:
 	/// <param name="semanticName_">セマンティクス名</param>
 	/// <param name="semanticIndex_">セマンティクスインデックス</param>
 	/// <param name="format_">フォーマット</param>
-	static void SetVertexInput(std::string semanticName_, uint32_t semanticIndex_, DXGI_FORMAT format_);
+	static void SetVertexInput(std::string semanticName, uint32_t semanticIndex, DXGI_FORMAT format);
 
 	/// <summary>
 	/// 使うシェーダの設定
 	/// </summary>
 	/// <param name="shader_">シェーダ</param>
-	static void SetShader(const Shader& shader_);
+	static void SetShader(const Shader& shader);
 
 	/// <summary>
 	/// ステイタスの設定
@@ -64,14 +64,14 @@ public:
 	/// <param name="cullMode_">カリング設定</param>
 	/// <param name="numRenderTarget_">レンダーターゲットの数</param>
 	static void SetState(
-		Pipeline::Blend blend_,
-		Pipeline::SolidState solidState_,
-		Pipeline::CullMode cullMode_ = Pipeline::CullMode::Back,
-		D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType_ = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
-		uint32_t numRenderTarget_ = 1u
+		Pipeline::Blend blend,
+		Pipeline::SolidState solidState,
+		Pipeline::CullMode cullMode = Pipeline::CullMode::Back,
+		D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
+		uint32_t numRenderTarget = 1u
 	);
 
-	static void IsDepth(bool isDepth_ = true);
+	static void IsDepth(bool isDepth = true);
 
 	/// <summary>
 	/// 設定したものでPSOの生成
@@ -88,24 +88,24 @@ public:
 /// シングルトンインスタンス
 /// </summary>
 private:
-	static PipelineManager* instance;
+	static PipelineManager* instance_;
 
 /// <summary>
 /// メンバ変数
 /// </summary>
 private:
-	std::list<std::unique_ptr<Pipeline>> pipelines;
-	std::list<std::unique_ptr<RootSignature>> rootSignatures;
+	std::list<std::unique_ptr<Pipeline>> pipelines_;
+	std::list<std::unique_ptr<RootSignature>> rootSignatures_;
 
-	RootSignature* rootSignature;
+	RootSignature* rootSignature_;
 
-	Shader shader;
-	Pipeline::Blend blend;
-	Pipeline::CullMode cullMode;
-	Pipeline::SolidState solidState;
-	D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType;
-	uint32_t numRenderTarget;
-	bool isDepth;
+	Shader shader_;
+	Pipeline::Blend blend_;
+	Pipeline::CullMode cullMode_;
+	Pipeline::SolidState solidState_;
+	D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType_;
+	uint32_t numRenderTarget_;
+	bool isDepth_;
 
-	std::vector<std::tuple<std::string, uint32_t, DXGI_FORMAT>> vertexInputStates;
+	std::vector<std::tuple<std::string, uint32_t, DXGI_FORMAT>> vertexInputStates_;
 };

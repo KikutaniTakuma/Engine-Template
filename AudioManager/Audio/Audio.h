@@ -13,17 +13,17 @@ class Audio {
 
 private:
 	struct ChunkHeader {
-		std::array<char,4> id;
-		int32_t size;
+		std::array<char,4> id_;
+		int32_t size_;
 	};
 	struct RiffHeader {
-		ChunkHeader chunk;
-		std::array<char, 4> type;
+		ChunkHeader chunk_;
+		std::array<char, 4> type_;
 	};
 	struct FormatChunk
 	{
-		ChunkHeader chunk;
-		WAVEFORMATEX fmt;
+		ChunkHeader chunk_;
+		WAVEFORMATEX fmt_;
 	};
 
 public:

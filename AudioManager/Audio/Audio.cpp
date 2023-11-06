@@ -47,11 +47,11 @@ void Audio::Load(const std::string& fileName, bool loopFlg) {
 	RiffHeader riff;
 	file.read((char*)&riff, sizeof(riff));
 
-	if (strncmp(riff.chunk.id.data(), "RIFF", 4) != 0) {
+	if (strncmp(riff.chunk_.id_.data(), "RIFF", 4) != 0) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found RIFF", "Audio");
 		return;
 	}
-	if (strncmp(riff.type.data(), "WAVE", 4) != 0) {
+	if (strncmp(riff.type_.data(), "WAVE", 4) != 0) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found WAVE", "Audio");
 		return;
 	}
@@ -59,7 +59,7 @@ void Audio::Load(const std::string& fileName, bool loopFlg) {
 	FormatChunk format{};
 	file.read((char*)&format, sizeof(ChunkHeader));
 	int32_t nowRead = 0;
-	while (strncmp(format.chunk.id.data(), "fmt ", 4) != 0) {
+	while (strncmp(format.chunk_.id_.data(), "fmt ", 4) != 0) {
 		file.seekg(nowRead, std::ios_base::beg);
 		if (file.eof()) {
 			ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found fmt", "Audio");
@@ -69,25 +69,25 @@ void Audio::Load(const std::string& fileName, bool loopFlg) {
 		file.read((char*)&format, sizeof(ChunkHeader));
 	}
 
-	if (format.chunk.size > sizeof(format.fmt)) {
+	if (format.chunk_.size_ > sizeof(format.fmt_)) {
 		ErrorCheck::GetInstance()->ErrorTextBox(
-			"Load() : format chunk size is too big ->" + std::to_string(format.chunk.size) + " byte (max is " + std::to_string(sizeof(format.fmt)) + " byte)", 
+			"Load() : format chunk size is too big ->" + std::to_string(format.chunk_.size_) + " byte (max is " + std::to_string(sizeof(format.fmt_)) + " byte)", 
 			"Audio"
 		);
 		return;
 	}
-	file.read((char*)&format.fmt, format.chunk.size);
+	file.read((char*)&format.fmt_, format.chunk_.size_);
 
 	ChunkHeader data;
 	file.read((char*)&data, sizeof(data));
 
-	if (strncmp(data.id.data(), "JUNK", 4) == 0) {
-		file.seekg(data.size, std::ios_base::cur);
+	if (strncmp(data.id_.data(), "JUNK", 4) == 0) {
+		file.seekg(data.size_, std::ios_base::cur);
 		file.read((char*)&data, sizeof(data));
 	}
 
-	while (strncmp(data.id.data(), "data", 4) != 0) {
-		file.seekg(data.size, std::ios_base::cur);
+	while (strncmp(data.id_.data(), "data", 4) != 0) {
+		file.seekg(data.size_, std::ios_base::cur);
 		if (file.eof()) {
 			ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found data", "Audio");
 			return;
@@ -95,14 +95,14 @@ void Audio::Load(const std::string& fileName, bool loopFlg) {
 		file.read((char*)&data, sizeof(data));
 	}
 
-	char* pBufferLocal = new char[data.size];
-	file.read(pBufferLocal, data.size);
+	char* pBufferLocal = new char[data.size_];
+	file.read(pBufferLocal, data.size_);
 
 	file.close();
 
-	wfet_ = format.fmt;
+	wfet_ = format.fmt_;
 	pBuffer_ = reinterpret_cast<BYTE*>(pBufferLocal);
-	bufferSize_ = data.size;
+	bufferSize_ = data.size_;
 
 	HRESULT hr = AudioManager::GetInstance()->xAudio2_->CreateSourceVoice(&pSourceVoice_, &wfet_);
 	if (!SUCCEEDED(hr)) {

@@ -262,7 +262,7 @@ void Texture::Set(
 	UINT handleUINT
 ) {
 	if (CanUse()) {
-		ShaderResourceHeap* srvHeap = ShaderResourceHeap::GetInstance();
+		DescriptorHeap* srvHeap = DescriptorHeap::GetInstance();
 		srvHeap->ReleaseView(srvHeapHandleUint);
 		textureResouce->Release();
 		textureResouce.Reset();

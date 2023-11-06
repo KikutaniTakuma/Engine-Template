@@ -110,14 +110,14 @@ void UIeditor::Update() {
 	ImGui::End();
 
 	for (auto& i : textures) {
-		i.second.pos = GetVector3Value(i.first, "pos");
-		i.second.rotate = GetVector3Value(i.first, "rotate");
+		i.second.pos_ = GetVector3Value(i.first, "pos");
+		i.second.rotate_ = GetVector3Value(i.first, "rotate");
 		auto scaleTmp = GetVector3Value(i.first, "scale");
-		i.second.scale = { scaleTmp.x,scaleTmp.y };
+		i.second.scale_ = { scaleTmp.x,scaleTmp.y };
 		auto uvPibotTmp = GetVector3Value(i.first, "uvPibot");
-		i.second.uvPibot = { uvPibotTmp.x,uvPibotTmp.y };
+		i.second.uvPibot_ = { uvPibotTmp.x,uvPibotTmp.y };
 		auto uvSizeTmp = GetVector3Value(i.first, "uvSize");
-		i.second.uvSize = { uvSizeTmp.x,uvSizeTmp.y };
+		i.second.uvSize_ = { uvSizeTmp.x,uvSizeTmp.y };
 	}
 }
 
@@ -138,13 +138,13 @@ void UIeditor::Update(const Mat4x4& vpvpMat) {
 		if (tex->second.Collision({ mousePos.x, mousePos.y })) {
 			if (mouse->Pushed(Mouse::Button::Left)) {
 				texItr = tex;
-				texItr->second.scale *= 1.2f;
+				texItr->second.scale_ *= 1.2f;
 			}
 			else if(mouse->Releaed(Mouse::Button::Left)){
 				if (texItr == textures.end()) {
 					continue;
 				}
-				texItr->second.scale /= 1.2f;
+				texItr->second.scale_ /= 1.2f;
 				texItr = textures.end();
 			}
 			break;
@@ -155,8 +155,8 @@ void UIeditor::Update(const Mat4x4& vpvpMat) {
 	}
 
 	if (texItr != textures.end()) {
-		texItr->second.pos = mousePos;
-		AddItem(texItr->first, "pos", texItr->second.pos);
+		texItr->second.pos_ = mousePos;
+		AddItem(texItr->first, "pos", texItr->second.pos_);
 		texItr->second.Update();
 	}
 }
@@ -296,13 +296,13 @@ void UIeditor::LoadFile(const std::string& groupName) {
 	}
 
 	for (auto& i : textures) {
-		i.second.pos = GetVector3Value(i.first, "pos");
-		i.second.rotate = GetVector3Value(i.first, "rotate");
+		i.second.pos_ = GetVector3Value(i.first, "pos");
+		i.second.rotate_ = GetVector3Value(i.first, "rotate");
 		auto scaleTmp = GetVector3Value(i.first, "scale");
-		i.second.scale = { scaleTmp.x,scaleTmp.y };
+		i.second.scale_ = { scaleTmp.x,scaleTmp.y };
 		auto uvPibotTmp = GetVector3Value(i.first, "uvPibot");
-		i.second.uvPibot = { uvPibotTmp.x,uvPibotTmp.y };
+		i.second.uvPibot_ = { uvPibotTmp.x,uvPibotTmp.y };
 		auto uvSizeTmp = GetVector3Value(i.first, "uvSize");
-		i.second.uvSize = { uvSizeTmp.x,uvSizeTmp.y };
+		i.second.uvSize_ = { uvSizeTmp.x,uvSizeTmp.y };
 	}
 }

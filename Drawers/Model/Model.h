@@ -50,11 +50,11 @@ private:
 	static void CreateGraphicsPipeline();
 
 private:
-	static Shader shader;
+	static Shader shader_;
 
-	static Pipeline* pipeline;
-	static bool loadShaderFlg;
-	static bool createGPFlg;
+	static Pipeline* pipeline_;
+	static bool loadShaderFlg_;
+	static bool createGPFlg_;
 
 
 public:
@@ -67,8 +67,8 @@ public:
 
 	void Debug(const std::string& guiName);
 
-	void SetParent(Model* parent_) {
-		parent = parent_;
+	void SetParent(Model* parent) {
+		parent_ = parent;
 	}
 	
 	void ChangeTexture(const std::string& useMtlName, const std::string& texName);
@@ -78,25 +78,25 @@ public:
 	void MeshChangeTexture(const std::string& useMtlName, Texture* tex);
 
 public:
-	Vector3 pos;
-	Vector3 rotate;
-	Vector3 scale;
+	Vector3 pos_;
+	Vector3 rotate_;
+	Vector3 scale_;
 
-	uint32_t color;
-	Model* parent;
+	uint32_t color_;
+	Model* parent_;
 
-	Mesh::DirectionLight light;
+	Mesh::DirectionLight light_;
 
 private:
-	Mesh* mesh;
+	Mesh* mesh_;
 
-	std::unordered_map<std::string, Mesh::CopyData> data;
+	std::unordered_map<std::string, Mesh::CopyData> data_;
 
-	bool isLoadObj;
+	bool isLoadObj_;
 
-	ConstBuffer<Mesh::MatrixData> wvpData;
+	ConstBuffer<Mesh::MatrixData> wvpData_;
 
-	ConstBuffer<Mesh::DirectionLight> dirLig;
+	ConstBuffer<Mesh::DirectionLight> dirLig_;
 
-	ConstBuffer<Vector4> colorBuf;
+	ConstBuffer<Vector4> colorBuf_;
 };

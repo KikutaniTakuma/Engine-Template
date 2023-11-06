@@ -19,7 +19,7 @@ public:
 	void Draw();
 
 	inline Vector3 GetPos() const {
-		return (*model.begin())->pos;
+		return (*model.begin())->pos_;
 	}
 
 	inline void SetCamera(Camera* camera_) {

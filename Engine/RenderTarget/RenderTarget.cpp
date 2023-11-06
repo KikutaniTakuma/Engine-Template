@@ -8,14 +8,14 @@
 #include "Utils/Math/Vector4.h"
 
 RenderTarget::RenderTarget():
-	resource(),
-	RTVHeap(),
-	srvHeapHandle(),
-	isResourceStateChange(false),
-	width(Engine::GetInstance()->clientWidth),
-	height(Engine::GetInstance()->clientHeight),
-	srvDesc{},
-	srvHeapHandleUint()
+	resource_(),
+	RTVHeap_(),
+	srvHeapHandle_(),
+	isResourceStateChange_(false),
+	width_(Engine::GetInstance()->clientWidth),
+	height_(Engine::GetInstance()->clientHeight),
+	srvDesc_{},
+	srvHeapHandleUint_()
 {
 	auto resDesc = DirectXCommon::GetInstance()->GetSwapchainBufferDesc();
 
@@ -40,14 +40,14 @@ RenderTarget::RenderTarget():
 			&resDesc, 
 			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, 
 			&clearValue, 
-			IID_PPV_ARGS(resource.GetAddressOf())
+			IID_PPV_ARGS(resource_.GetAddressOf())
 		);
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CreateCommittedResource Function Failed", "RenderTarget");
 		return;
 	}
 
-	RTVHeap = DirectXDevice::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
+	RTVHeap_ = DirectXDevice::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
 
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
@@ -55,31 +55,31 @@ RenderTarget::RenderTarget():
 
 	device->
 		CreateRenderTargetView(
-			resource.Get(),
+			resource_.Get(),
 			&rtvDesc,
-			RTVHeap->GetCPUDescriptorHandleForHeapStart()
+			RTVHeap_->GetCPUDescriptorHandleForHeapStart()
 		);
 
-	srvDesc = {};
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Format = rtvDesc.Format;
-	srvDesc.Texture2D.MipLevels = 1;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc_ = {};
+	srvDesc_.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc_.Format = rtvDesc.Format;
+	srvDesc_.Texture2D.MipLevels = 1;
+	srvDesc_.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 }
 
-RenderTarget::RenderTarget(uint32_t width_, uint32_t height_) :
-	resource(),
-	RTVHeap(),
-	srvHeapHandle(),
-	isResourceStateChange(false),
-	width(width_),
-	height(height_),
-	srvDesc{},
-	srvHeapHandleUint()
+RenderTarget::RenderTarget(uint32_t width, uint32_t height) :
+	resource_(),
+	RTVHeap_(),
+	srvHeapHandle_(),
+	isResourceStateChange_(false),
+	width_(width),
+	height_(height),
+	srvDesc_{},
+	srvHeapHandleUint_()
 {
 	auto resDesc = DirectXCommon::GetInstance()->GetSwapchainBufferDesc();
-	resDesc.Width = width;
-	resDesc.Height = height;
+	resDesc.Width = width_;
+	resDesc.Height = height_;
 
 
 	// Resourceを生成する
@@ -103,14 +103,14 @@ RenderTarget::RenderTarget(uint32_t width_, uint32_t height_) :
 			&resDesc,
 			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 			&clearValue,
-			IID_PPV_ARGS(resource.GetAddressOf())
+			IID_PPV_ARGS(resource_.GetAddressOf())
 		);
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CreateCommittedResource Function Failed", "RenderTarget");
 		return;
 	}
 
-	RTVHeap = DirectXDevice::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
+	RTVHeap_ = DirectXDevice::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
 
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
@@ -118,34 +118,34 @@ RenderTarget::RenderTarget(uint32_t width_, uint32_t height_) :
 
 	device->
 		CreateRenderTargetView(
-			resource.Get(),
+			resource_.Get(),
 			&rtvDesc,
-			RTVHeap->GetCPUDescriptorHandleForHeapStart()
+			RTVHeap_->GetCPUDescriptorHandleForHeapStart()
 		);
 
-	srvDesc = {};
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Format = rtvDesc.Format;
-	srvDesc.Texture2D.MipLevels = 1;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc_ = {};
+	srvDesc_.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc_.Format = rtvDesc.Format;
+	srvDesc_.Texture2D.MipLevels = 1;
+	srvDesc_.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 }
 
 RenderTarget::~RenderTarget() {
-	if (RTVHeap) {
-		RTVHeap->Release();
+	if (RTVHeap_) {
+		RTVHeap_->Release();
 	}
 }
 
 void RenderTarget::SetThisRenderTarget() {
-	isResourceStateChange = false;
+	isResourceStateChange_ = false;
 
 	DirectXCommon::GetInstance()->Barrier(
-		resource.Get(),
+		resource_.Get(),
 		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 		D3D12_RESOURCE_STATE_RENDER_TARGET
 	);
 
-	auto rtvHeapHandle = RTVHeap->GetCPUDescriptorHandleForHeapStart();
+	auto rtvHeapHandle = RTVHeap_->GetCPUDescriptorHandleForHeapStart();
 	auto dsvH = Engine::GetDsvHandle();
 	DirectXCommon::GetInstance()->GetCommandList()->OMSetRenderTargets(1, &rtvHeapHandle, false, &dsvH);
 
@@ -155,13 +155,13 @@ void RenderTarget::SetThisRenderTarget() {
 }
 
 void RenderTarget::ChangeResourceState() {
-	if (!isResourceStateChange) {
+	if (!isResourceStateChange_) {
 		DirectXCommon::GetInstance()->Barrier(
-			resource.Get(),
+			resource_.Get(),
 			D3D12_RESOURCE_STATE_RENDER_TARGET,
 			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
 		);
-		isResourceStateChange = true;
+		isResourceStateChange_ = true;
 	}
 }
 
@@ -173,28 +173,28 @@ void RenderTarget::SetMainRenderTarget() {
 
 void RenderTarget::UseThisRenderTargetShaderResource() {
 	static auto mainComList = DirectXCommon::GetInstance()->GetCommandList();
-	mainComList->SetGraphicsRootDescriptorTable(0, srvHeapHandle);
+	mainComList->SetGraphicsRootDescriptorTable(0, srvHeapHandle_);
 }
 
 void RenderTarget::CreateView(D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle, D3D12_GPU_DESCRIPTOR_HANDLE descHeapHandleGPU, UINT descHeapHandleUINT) {
 	static ID3D12Device* device = DirectXDevice::GetInstance()->GetDevice();
 	
 	device->CreateShaderResourceView(
-		resource.Get(),
-		&srvDesc,
+		resource_.Get(),
+		&srvDesc_,
 		descHeapHandle
 	);
 
-	srvHeapHandle = descHeapHandleGPU;
-	srvHeapHandleUint = descHeapHandleUINT;
+	srvHeapHandle_ = descHeapHandleGPU;
+	srvHeapHandleUint_ = descHeapHandleUINT;
 
 	tex_.reset();
 	tex_ = std::make_unique<Texture>();
 	assert(tex_);
 	tex_->Set(
-		resource,
-		srvDesc,
-		srvHeapHandle,
-		srvHeapHandleUint
+		resource_,
+		srvDesc_,
+		srvHeapHandle_,
+		srvHeapHandleUint_
 	);
 }

@@ -10,55 +10,55 @@
 /// 静的変数のインスタンス化
 /// </summary>
 
-std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum) * 2> Texture2D::graphicsPipelineState = {};
-Shader Texture2D::shader = {};
+std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum) * 2> Texture2D::graphicsPipelineState_ = {};
+Shader Texture2D::shader_ = {};
 
-D3D12_INDEX_BUFFER_VIEW Texture2D::indexView = {};
-Microsoft::WRL::ComPtr<ID3D12Resource> Texture2D::indexResource = nullptr;
+D3D12_INDEX_BUFFER_VIEW Texture2D::indexView_ = {};
+Microsoft::WRL::ComPtr<ID3D12Resource> Texture2D::indexResource_ = nullptr;
 
 Texture2D::Texture2D() :
-	scale(Vector2::identity),
-	rotate(),
-	pos({ 0.0f,0.0f,0.01f }),
-	uvPibot(),
-	uvSize(Vector2::identity),
-	tex(nullptr),
-	isLoad(false),
-	color(std::numeric_limits<uint32_t>::max()),
-	wvpMat(),
-	colorBuf(),
+	scale_(Vector2::identity),
+	rotate_(),
+	pos_({ 0.0f,0.0f,0.01f }),
+	uvPibot_(),
+	uvSize_(Vector2::identity),
+	tex_(nullptr),
+	isLoad_(false),
+	color_(std::numeric_limits<uint32_t>::max()),
+	wvpMat_(),
+	colorBuf_(),
 	aniStartTime_(),
 	aniCount_(0.0f),
 	uvPibotSpd_(0.0f),
 	isAnimation_(0.0f),
-	isSameTexSize(),
-	texScalar(1.0f)
+	isSameTexSize_(),
+	texScalar_(1.0f)
 {
-	*wvpMat = Mat4x4::kIdentity_;
-	*colorBuf = Vector4::identity;
+	*wvpMat_ = Mat4x4::kIdentity_;
+	*colorBuf_ = Vector4::identity;
 
-	if (vertexResource) {
-		vertexResource->Release();
-		vertexResource.Reset();
-		vertexResource = nullptr;
+	if (vertexResource_) {
+		vertexResource_->Release();
+		vertexResource_.Reset();
+		vertexResource_ = nullptr;
 	}
 
-	vertexResource =DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * 4);
+	vertexResource_ =DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * 4);
 
-	vertexView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexView.SizeInBytes = sizeof(VertexData) * 4;
-	vertexView.StrideInBytes = sizeof(VertexData);
+	vertexView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+	vertexView_.SizeInBytes = sizeof(VertexData) * 4;
+	vertexView_.StrideInBytes = sizeof(VertexData);
 
-	tex = TextureManager::GetInstance()->GetWhiteTex();
+	tex_ = TextureManager::GetInstance()->GetWhiteTex();
 
-	if (tex && !isLoad) {
-		isLoad = true;
+	if (tex_ && !isLoad_) {
+		isLoad_ = true;
 	}
 
-	auto srvHeap = ShaderResourceHeap::GetInstance();
+	auto srvHeap = DescriptorHeap::GetInstance();
 	srvHeap->BookingHeapPos(2u);
-	srvHeap->CreateConstBufferView(wvpMat);
-	srvHeap->CreateConstBufferView(colorBuf);
+	srvHeap->CreateConstBufferView(wvpMat_);
+	srvHeap->CreateConstBufferView(colorBuf_);
 }
 
 Texture2D::Texture2D(const std::string& fileName):
@@ -79,82 +79,82 @@ Texture2D::Texture2D(Texture2D&& right) noexcept :
 }
 
 Texture2D& Texture2D::operator=(const Texture2D& right) {
-	scale = right.scale;
-	rotate = right.rotate;
-	pos = right.pos;
+	scale_ = right.scale_;
+	rotate_ = right.rotate_;
+	pos_ = right.pos_;
 
-	uvPibot = right.uvPibot;
-	uvSize = right.uvSize;
+	uvPibot_ = right.uvPibot_;
+	uvSize_ = right.uvSize_;
 
-	color = right.color;
+	color_ = right.color_;
 
-	worldPos = right.worldPos;
+	worldPos_ = right.worldPos_;
 
-	tex = right.tex;
-	isLoad = right.isLoad;
+	tex_ = right.tex_;
+	isLoad_ = right.isLoad_;
 
 
-	*wvpMat = *right.wvpMat;
-	*colorBuf = *right.colorBuf;
+	*wvpMat_ = *right.wvpMat_;
+	*colorBuf_ = *right.colorBuf_;
 
 	aniStartTime_ = right.aniStartTime_;
 	aniCount_ = right.aniCount_;
 	isAnimation_ = right.isAnimation_;
 	uvPibotSpd_ = right.uvPibotSpd_;
 
-	isSameTexSize = right.isSameTexSize;
+	isSameTexSize_ = right.isSameTexSize_;
 
-	texScalar = right.texScalar;
+	texScalar_ = right.texScalar_;
 
 	return *this;
 }
 
 Texture2D& Texture2D::operator=(Texture2D&& right) noexcept {
-	scale = std::move(right.scale);
-	rotate = std::move(right.rotate);
-	pos = std::move(right.pos);
+	scale_ = std::move(right.scale_);
+	rotate_ = std::move(right.rotate_);
+	pos_ = std::move(right.pos_);
 
-	uvPibot = std::move(right.uvPibot);
-	uvSize = std::move(right.uvSize);
+	uvPibot_ = std::move(right.uvPibot_);
+	uvSize_ = std::move(right.uvSize_);
 
-	color = std::move(right.color);
+	color_ = std::move(right.color_);
 
-	worldPos = std::move(right.worldPos);
+	worldPos_ = std::move(right.worldPos_);
 
-	tex = std::move(right.tex);
-	isLoad = std::move(right.isLoad);
+	tex_ = std::move(right.tex_);
+	isLoad_ = std::move(right.isLoad_);
 
-	*wvpMat = *right.wvpMat;
-	*colorBuf = *right.colorBuf;
+	*wvpMat_ = *right.wvpMat_;
+	*colorBuf_ = *right.colorBuf_;
 
 	aniStartTime_ = std::move(right.aniStartTime_);
 	aniCount_ = std::move(right.aniCount_);
 	isAnimation_ = std::move(right.isAnimation_);
 	uvPibotSpd_ = std::move(right.uvPibotSpd_);
 
-	isSameTexSize = std::move(right.isSameTexSize);
-	texScalar = std::move(right.texScalar);
+	isSameTexSize_ = std::move(right.isSameTexSize_);
+	texScalar_ = std::move(right.texScalar_);
 
 	return *this;
 }
 
 Texture2D::~Texture2D() {
-	auto descriptorHeap = ShaderResourceHeap::GetInstance();
-	descriptorHeap->ReleaseView(wvpMat.GetViewHandleUINT());
-	descriptorHeap->ReleaseView(colorBuf.GetViewHandleUINT());
+	auto descriptorHeap = DescriptorHeap::GetInstance();
+	descriptorHeap->ReleaseView(wvpMat_.GetViewHandleUINT());
+	descriptorHeap->ReleaseView(colorBuf_.GetViewHandleUINT());
 
-	if (vertexResource) {
-		vertexResource->Release();
-		vertexResource.Reset();
-		vertexResource = nullptr;
+	if (vertexResource_) {
+		vertexResource_->Release();
+		vertexResource_.Reset();
+		vertexResource_ = nullptr;
 	}
 }
 
 void Texture2D::Initialize(const std::string& vsFileName, const std::string& psFileName) {
-	if (indexResource) { 
-		indexResource->Release();
-		indexResource.Reset();
-		indexResource = nullptr;
+	if (indexResource_) { 
+		indexResource_->Release();
+		indexResource_.Reset();
+		indexResource_ = nullptr;
 	}
 	
 	LoadShader(vsFileName, psFileName);
@@ -162,33 +162,33 @@ void Texture2D::Initialize(const std::string& vsFileName, const std::string& psF
 	uint16_t indices[] = {
 			0,1,3, 1,2,3
 	};
-	indexResource = DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(indices));
-	indexView.BufferLocation = indexResource->GetGPUVirtualAddress();
-	indexView.SizeInBytes = sizeof(indices);
-	indexView.Format = DXGI_FORMAT_R16_UINT;
+	indexResource_ = DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(indices));
+	indexView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
+	indexView_.SizeInBytes = sizeof(indices);
+	indexView_.Format = DXGI_FORMAT_R16_UINT;
 	uint16_t* indexMap = nullptr;
-	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexMap));
+	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexMap));
 	for (int32_t i = 0; i < _countof(indices); i++) {
 		indexMap[i] = indices[i];
 	}
-	indexResource->Unmap(0, nullptr);
+	indexResource_->Unmap(0, nullptr);
 
 	CreateGraphicsPipeline();
 }
 
 void Texture2D::Finalize() {
-	if (indexResource) { 
-		indexResource->Release();
-		indexResource.Reset();
-		indexResource = nullptr;
+	if (indexResource_) { 
+		indexResource_->Release();
+		indexResource_.Reset();
+		indexResource_ = nullptr;
 	}
 }
 
 void Texture2D::LoadShader(const std::string& vsFileName, const std::string& psFileName) {
-	shader.vertex = ShaderManager::LoadVertexShader(vsFileName);
-	assert(shader.vertex);
-	shader.pixel = ShaderManager::LoadPixelShader(psFileName);
-	assert(shader.pixel);
+	shader_.vertex_ = ShaderManager::LoadVertexShader(vsFileName);
+	assert(shader_.vertex_);
+	shader_.pixel_ = ShaderManager::LoadPixelShader(psFileName);
+	assert(shader_.pixel_);
 }
 
 void Texture2D::CreateGraphicsPipeline() {
@@ -217,25 +217,25 @@ void Texture2D::CreateGraphicsPipeline() {
 
 
 	PipelineManager::CreateRootSgnature(rootPrams.data(), rootPrams.size(), true);
-	PipelineManager::SetShader(shader);
+	PipelineManager::SetShader(shader_);
 	PipelineManager::SetVertexInput("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT);
 	PipelineManager::SetVertexInput("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT);
 
-	for (int32_t i = Pipeline::Blend::None; i < graphicsPipelineState.size(); i++) {
+	for (int32_t i = Pipeline::Blend::None; i < graphicsPipelineState_.size(); i++) {
 		if (i < Pipeline::Blend::BlendTypeNum) {
 			PipelineManager::SetState(Pipeline::Blend(i), Pipeline::SolidState::Solid);
-			graphicsPipelineState[i] = PipelineManager::Create();
+			graphicsPipelineState_[i] = PipelineManager::Create();
 		}
 		else {
 			PipelineManager::IsDepth(false);
 			PipelineManager::SetState(Pipeline::Blend(i - Pipeline::Blend::BlendTypeNum), Pipeline::SolidState::Solid);
-			graphicsPipelineState[i] = PipelineManager::Create();
+			graphicsPipelineState_[i] = PipelineManager::Create();
 		}
 	}
 
 	PipelineManager::StateReset();
 
-	for (auto& i : graphicsPipelineState) {
+	for (auto& i : graphicsPipelineState_) {
 		if (!i) {
 			ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Texture2D");
 			return;
@@ -248,37 +248,37 @@ void Texture2D::LoadTexture(const std::string& fileName) {
 	assert(textureManager);
 	while (true) {
 		if (textureManager->ThreadLoadFinish()) {
-			tex = textureManager->LoadTexture(fileName);
+			tex_ = textureManager->LoadTexture(fileName);
 			break;
 		}
 	}
 
-	if (tex && !isLoad) {
-		isLoad = true;
+	if (tex_ && !isLoad_) {
+		isLoad_ = true;
 	}
 }
 
 void Texture2D::ThreadLoadTexture(const std::string& fileName) {
 	static TextureManager* textureManager = TextureManager::GetInstance();
 	assert(textureManager);
-	tex = nullptr;
-	textureManager->LoadTexture(fileName, &tex);
-	isLoad = false;
+	tex_ = nullptr;
+	textureManager->LoadTexture(fileName, &tex_);
+	isLoad_ = false;
 }
 
 void Texture2D::Update() {
 
-	if (tex && tex->CanUse() && !isLoad) {
-		isLoad = true;
+	if (tex_ && tex_->CanUse() && !isLoad_) {
+		isLoad_ = true;
 	}
 
-	if (tex && isLoad) {
-		if (isSameTexSize) {
-			scale = tex->getSize() * texScalar;
+	if (tex_ && isLoad_) {
+		if (isSameTexSize_) {
+			scale_ = tex_->getSize() * texScalar_;
 		}
-		else if(isSameTexSize.OnExit()) {
-			scale.x /= tex->getSize().x;
-			scale.y /= tex->getSize().y;
+		else if(isSameTexSize_.OnExit()) {
+			scale_.x /= tex_->getSize().x;
+			scale_.y /= tex_->getSize().y;
 		}
 
 		static const std::array<Vector3, 4> pv{
@@ -288,20 +288,20 @@ void Texture2D::Update() {
 			Vector3{ -0.5f, -0.5f, 0.1f },
 		};
 
-		std::copy(pv.begin(), pv.end(), worldPos.begin());
+		std::copy(pv.begin(), pv.end(), worldPos_.begin());
 		auto&& worldMat =
 			MakeMatrixAffin(
-				Vector3(scale.x, scale.y, 1.0f),
-				rotate,
-				pos
+				Vector3(scale_.x, scale_.y, 1.0f),
+				rotate_,
+				pos_
 			);
-		for (auto& i : worldPos) {
+		for (auto& i : worldPos_) {
 			i *= worldMat;
 		}
 
-		*colorBuf = UintToVector4(color);
+		*colorBuf_ = UintToVector4(color_);
 	}
-	isSameTexSize.Update();
+	isSameTexSize_.Update();
 }
 
 void Texture2D::Draw(
@@ -309,61 +309,61 @@ void Texture2D::Draw(
 	Pipeline::Blend blend,
 	bool isDepth
 ) {
-	if (tex && isLoad) {
-		const Vector2& uv0 = { uvPibot.x, uvPibot.y + uvSize.y }; const Vector2& uv1 = uvSize + uvPibot;
-		const Vector2& uv2 = { uvPibot.x + uvSize.x, uvPibot.y }; const Vector2& uv3 = uvPibot;
+	if (tex_ && isLoad_) {
+		const Vector2& uv0 = { uvPibot_.x, uvPibot_.y + uvSize_.y }; const Vector2& uv1 = uvSize_ + uvPibot_;
+		const Vector2& uv2 = { uvPibot_.x + uvSize_.x, uvPibot_.y }; const Vector2& uv3 = uvPibot_;
 
 		std::array<VertexData, 4> pv = {
-			worldPos[0], uv3,
-			worldPos[1], uv2,
-			worldPos[2], uv1,
-			worldPos[3], uv0,
+			worldPos_[0], uv3,
+			worldPos_[1], uv2,
+			worldPos_[2], uv1,
+			worldPos_[3], uv0,
 		};
 
 		VertexData* mappedData = nullptr;
-		vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedData));
+		vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedData));
 		std::copy(pv.begin(), pv.end(), mappedData);
-		vertexResource->Unmap(0, nullptr);
+		vertexResource_->Unmap(0, nullptr);
 
-		*wvpMat = viewProjection;
+		*wvpMat_ = viewProjection;
 
 		auto commandlist = DirectXCommon::GetInstance()->GetCommandList();
 
 
 		// 各種描画コマンドを積む
 		if (isDepth) {
-			graphicsPipelineState[blend]->Use();
+			graphicsPipelineState_[blend]->Use();
 		}
 		else {
-			graphicsPipelineState[blend + Pipeline::Blend::BlendTypeNum]->Use();
+			graphicsPipelineState_[blend + Pipeline::Blend::BlendTypeNum]->Use();
 		}
 		
-		tex->Use(0);
-		commandlist->SetGraphicsRootDescriptorTable(1, wvpMat.GetViewHandle());
-		commandlist->IASetVertexBuffers(0, 1, &vertexView);
-		commandlist->IASetIndexBuffer(&indexView);
+		tex_->Use(0);
+		commandlist->SetGraphicsRootDescriptorTable(1, wvpMat_.GetViewHandle());
+		commandlist->IASetVertexBuffers(0, 1, &vertexView_);
+		commandlist->IASetIndexBuffer(&indexView_);
 		commandlist->DrawIndexedInstanced(6, 1, 0, 0, 0);
 	}
 }
 
 void Texture2D::Debug([[maybe_unused]]const std::string& guiName) {
 #ifdef _DEBUG
-	*colorBuf = UintToVector4(color);
+	*colorBuf_ = UintToVector4(color_);
 	ImGui::Begin(guiName.c_str());
-	ImGui::Checkbox("is same scale and Texture", isSameTexSize.Data());
-	if (isSameTexSize) {
-		ImGui::DragFloat("tex scalar", &texScalar, 0.01f);
+	ImGui::Checkbox("is same scale and Texture", isSameTexSize_.Data());
+	if (isSameTexSize_) {
+		ImGui::DragFloat("tex scalar", &texScalar_, 0.01f);
 	}
-	ImGui::DragFloat2("scale", &scale.x, 1.0f);
-	ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
-	ImGui::DragFloat3("pos", &pos.x, 1.0f);
-	ImGui::DragFloat2("uvPibot", &uvPibot.x, 0.01f);
-	ImGui::DragFloat2("uvSize", &uvSize.x, 0.01f);
-	ImGui::ColorEdit4("SphereColor", &colorBuf->color.r);
-	color = Vector4ToUint(*colorBuf);
+	ImGui::DragFloat2("scale", &scale_.x, 1.0f);
+	ImGui::DragFloat3("rotate", &rotate_.x, 0.01f);
+	ImGui::DragFloat3("pos", &pos_.x, 1.0f);
+	ImGui::DragFloat2("uvPibot", &uvPibot_.x, 0.01f);
+	ImGui::DragFloat2("uvSize", &uvSize_.x, 0.01f);
+	ImGui::ColorEdit4("SphereColor", &colorBuf_->color.r);
+	color_ = Vector4ToUint(*colorBuf_);
 
 	if (ImGui::TreeNode("tex load")) {
-		if (isLoad) {
+		if (isLoad_) {
 		auto texures = UtilsLib::GetFilePathFormDir("./Resources/", ".png");
 
 			for (auto& i : texures) {
@@ -384,19 +384,19 @@ void Texture2D::Debug([[maybe_unused]]const std::string& guiName) {
 bool Texture2D::Collision(const Vector2& pos2D) const {
 	Vector2 max;
 	Vector2 min;
-	max.x = std::max_element(worldPos.begin(), worldPos.end(),
+	max.x = std::max_element(worldPos_.begin(), worldPos_.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.x < right.x;
 		})->x;
-	max.y = std::max_element(worldPos.begin(), worldPos.end(),
+	max.y = std::max_element(worldPos_.begin(), worldPos_.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.y < right.y;
 		})->y;
-	min.x = std::min_element(worldPos.begin(), worldPos.end(),
+	min.x = std::min_element(worldPos_.begin(), worldPos_.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.x < right.x;
 		})->x;
-	min.y = std::min_element(worldPos.begin(), worldPos.end(),
+	min.y = std::min_element(worldPos_.begin(), worldPos_.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.y < right.y;
 		})->y;
@@ -413,27 +413,27 @@ bool Texture2D::Collision(const Vector2& pos2D) const {
 bool Texture2D::Collision(const Texture2D& tex2D) const {
 	Vector3 max;
 	Vector3 min;
-	max.x = std::max_element(worldPos.begin(), worldPos.end(),
+	max.x = std::max_element(worldPos_.begin(), worldPos_.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.x < right.x;
 		})->x;
-	max.y = std::max_element(worldPos.begin(), worldPos.end(),
+	max.y = std::max_element(worldPos_.begin(), worldPos_.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.y < right.y;
 		})->y;
-	max.z = std::max_element(worldPos.begin(), worldPos.end(),
+	max.z = std::max_element(worldPos_.begin(), worldPos_.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.z < right.z;
 		})->z;
-	min.x = std::min_element(worldPos.begin(), worldPos.end(),
+	min.x = std::min_element(worldPos_.begin(), worldPos_.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.x < right.x;
 		})->x;
-	min.y = std::min_element(worldPos.begin(), worldPos.end(),
+	min.y = std::min_element(worldPos_.begin(), worldPos_.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.y < right.y;
 		})->y;
-	min.z = std::min_element(worldPos.begin(), worldPos.end(),
+	min.z = std::min_element(worldPos_.begin(), worldPos_.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.z < right.z;
 		})->z;
@@ -441,27 +441,27 @@ bool Texture2D::Collision(const Texture2D& tex2D) const {
 	// 追加変更。by Korone
 	Vector3 max2;
 	Vector3 min2;
-	max2.x = std::max_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
+	max2.x = std::max_element(tex2D.worldPos_.begin(), tex2D.worldPos_.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.x < right.x;
 		})->x;
-	max2.y = std::max_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
+	max2.y = std::max_element(tex2D.worldPos_.begin(), tex2D.worldPos_.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.y < right.y;
 		})->y;
-	max2.z = std::max_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
+	max2.z = std::max_element(tex2D.worldPos_.begin(), tex2D.worldPos_.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.z < right.z;
 		})->z;
-	min2.x = std::min_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
+	min2.x = std::min_element(tex2D.worldPos_.begin(), tex2D.worldPos_.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.x < right.x;
 		})->x;
-	min2.y = std::min_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
+	min2.y = std::min_element(tex2D.worldPos_.begin(), tex2D.worldPos_.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.y < right.y;
 		})->y;
-	min2.z = std::min_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
+	min2.z = std::min_element(tex2D.worldPos_.begin(), tex2D.worldPos_.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.z < right.z;
 		})->z;
@@ -487,7 +487,7 @@ void Texture2D::AnimationStart(float aniUvPibot) {
 		aniStartTime_ = std::chrono::steady_clock::now();
 		isAnimation_ = true;
 		aniCount_ = 0.0f;
-		uvPibot.x = aniUvPibot;
+		uvPibot_.x = aniUvPibot;
 	}
 }
 
@@ -516,8 +516,8 @@ void Texture2D::Animation(size_t aniSpd, bool isLoop, float aniUvStart, float an
 				}
 			}
 
-			uvPibot.x = aniUvStart;
-			uvPibot.x += uvPibotSpd_ * aniCount_;
+			uvPibot_.x = aniUvStart;
+			uvPibot_.x += uvPibotSpd_ * aniCount_;
 		}
 	}
 }

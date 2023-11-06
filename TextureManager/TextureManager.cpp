@@ -82,7 +82,7 @@ TextureManager::TextureManager() :
 		return;
 	}
 
-	srvHeap = ShaderResourceHeap::GetInstance();
+	srvHeap = DescriptorHeap::GetInstance();
 }
 
 TextureManager::~TextureManager() {

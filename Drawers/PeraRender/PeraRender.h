@@ -17,18 +17,18 @@
 class PeraRender {
 public:
 	struct PeraVertexData {
-		Vector3 position;
-		Vector2 uv;
+		Vector3 position_;
+		Vector2 uv_;
 	};
 
 	struct Wipe {
-		Vector2 center;
-		float wipeSize;
+		Vector2 center_;
+		float wipeSize_;
 	};
 
 public:
 	PeraRender();
-	PeraRender(uint32_t width_, uint32_t height_);
+	PeraRender(uint32_t width, uint32_t height);
 	~PeraRender();
 
 	PeraRender(const PeraRender&) = delete;

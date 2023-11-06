@@ -26,8 +26,8 @@ void MoveFloor::Update() {
 	moveVec_ = pos_ - prePos;
 	collisionPos_ = pos_;
 
-	model_->pos = pos_;
-	model_->scale = scale_*0.5f;
+	model_->pos_ = pos_;
+	model_->scale_ = scale_*0.5f;
 
 	ease_.Update();
 }

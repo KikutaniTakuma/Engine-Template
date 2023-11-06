@@ -65,7 +65,7 @@ public:
 
 
 private:
-	class ShaderResourceHeap* srvHeap;
+	class DescriptorHeap* srvHeap;
 
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;

@@ -20,7 +20,7 @@ Mesh::Mesh() :
 	color_{},
 	drawCount_{0u}
 {
-	auto descriptorHeap = ShaderResourceHeap::GetInstance();
+	auto descriptorHeap = DescriptorHeap::GetInstance();
 	descriptorHeap->BookingHeapPos(3u);
 	descriptorHeap->CreateStructuredBufferView(wvpMats_);
 	descriptorHeap->CreateConstBufferView(dirLig_);
@@ -543,14 +543,14 @@ void Mesh::LoadShader(
 	const std::string& domain
 ) {
 	if (!loadShaderFlg_) {
-		shader_.vertex = ShaderManager::LoadVertexShader(vertex);
-		shader_.pixel = ShaderManager::LoadPixelShader(pixel);
+		shader_.vertex_ = ShaderManager::LoadVertexShader(vertex);
+		shader_.pixel_ = ShaderManager::LoadPixelShader(pixel);
 		if (geometory.size() != 0LLU) {
-			shader_.geometory = ShaderManager::LoadGeometoryShader(geometory);
+			shader_.geometory_ = ShaderManager::LoadGeometoryShader(geometory);
 		}
 		if (hull.size() != 0LLU && geometory.size() != 0LLU) {
-			shader_.hull = ShaderManager::LoadHullShader(hull);
-			shader_.domain = ShaderManager::LoadHullShader(domain);
+			shader_.hull_ = ShaderManager::LoadHullShader(hull);
+			shader_.domain_ = ShaderManager::LoadHullShader(domain);
 		}
 		loadShaderFlg_ = true;
 	}

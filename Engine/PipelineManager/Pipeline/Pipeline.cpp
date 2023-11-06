@@ -7,19 +7,19 @@
 #include "Engine/EngineParts/DirectXCommon/DirectXCommon.h"
 
 Pipeline::Pipeline():
-	graphicsPipelineState(),
-	shader(),
-	vertexInput(0),
-	blend(),
-	cullMode(),
-	solidState(),
-	numRenderTarget(1u),
-	semanticNames(0),
-	topologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE),
-	rootSignature(nullptr),
-	isDepth(true)
+	graphicsPipelineState_(),
+	shader_(),
+	vertexInput_(0),
+	blend_(),
+	cullMode_(),
+	solidState_(),
+	numRenderTarget_(1u),
+	semanticNames_(0),
+	topologyType_(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE),
+	rootSignature_(nullptr),
+	isDepth_(true)
 {
-	vertexInput.reserve(0);
+	vertexInput_.reserve(0);
 }
 
 Pipeline::Pipeline(Pipeline&& right) noexcept {
@@ -27,23 +27,23 @@ Pipeline::Pipeline(Pipeline&& right) noexcept {
 }
 
 Pipeline& Pipeline::operator=(Pipeline&& right) noexcept {
-	graphicsPipelineState = std::move(right.graphicsPipelineState);
-	shader = std::move(right.shader);
+	graphicsPipelineState_ = std::move(right.graphicsPipelineState_);
+	shader_ = std::move(right.shader_);
 
 	return *this;
 }
 
 bool Pipeline::operator==(const Pipeline& right) const {
-	return shader.vertex == right.shader.vertex
-		&& shader.pixel == right.shader.pixel
-		&& shader.hull == right.shader.hull
-		&& shader.domain == right.shader.domain
-		&& shader.geometory == right.shader.geometory
-		&& blend == right.blend
-		&& cullMode == right.cullMode
-		&& solidState == right.solidState
-		&& numRenderTarget && right.numRenderTarget
-		&& isDepth == right.isDepth;
+	return shader_.vertex_ == right.shader_.vertex_
+		&& shader_.pixel_ == right.shader_.pixel_
+		&& shader_.hull_ == right.shader_.hull_
+		&& shader_.domain_ == right.shader_.domain_
+		&& shader_.geometory_ == right.shader_.geometory_
+		&& blend_ == right.blend_
+		&& cullMode_ == right.cullMode_
+		&& solidState_ == right.solidState_
+		&& numRenderTarget_ && right.numRenderTarget_
+		&& isDepth_ == right.isDepth_;
 }
 bool Pipeline::operator!=(const Pipeline& right) const {
 	return !this->operator==(right);
@@ -57,44 +57,44 @@ void Pipeline::SetVertexInput(std::string semanticName, uint32_t semanticIndex, 
 	inputElementDescs.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 	inputElementDescs.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
 
-	vertexInput.push_back(inputElementDescs);
-	semanticNames.push_back(semanticName);
+	vertexInput_.push_back(inputElementDescs);
+	semanticNames_.push_back(semanticName);
 }
 
-void Pipeline::SetShader(const Shader& shader_) {
-	shader = shader_;
+void Pipeline::SetShader(const Shader& shader) {
+	shader_ = shader;
 
-	assert(shader.hull == shader.domain || shader.hull != nullptr && shader.domain != nullptr);
+	assert(shader_.hull_ == shader_.domain_ || shader_.hull_ != nullptr && shader_.domain_ != nullptr);
 }
 
 void Pipeline::Create(
-	const RootSignature& rootSignature_,
-	Pipeline::Blend blend_,
-	Pipeline::CullMode cullMode_,
-	Pipeline::SolidState solidState_,
-	D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType_,
-	uint32_t numRenderTarget_,
-	bool isDepth_
+	const RootSignature& rootSignature,
+	Pipeline::Blend blend,
+	Pipeline::CullMode cullMode,
+	Pipeline::SolidState solidState,
+	D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType,
+	uint32_t numRenderTarget,
+	bool isDepth
 ) {
-	blend = blend_;
-	cullMode = cullMode_;
-	solidState = solidState_;
-	numRenderTarget = numRenderTarget_;
-	topologyType = topologyType_;
-	isDepth = isDepth_;
+	blend_ = blend;
+	cullMode_ = cullMode;
+	solidState_ = solidState;
+	topologyType_ = topologyType;
+	numRenderTarget_ = numRenderTarget;
+	isDepth_ = isDepth;
 
-	rootSignature = rootSignature_.Get();
+	rootSignature_ = rootSignature.Get();
 
 
-	numRenderTarget = std::clamp(numRenderTarget, 1u, 8u);
+	numRenderTarget_ = std::clamp(numRenderTarget_, 1u, 8u);
 
-	for (size_t i = 0; i < vertexInput.size(); i++) {
-		vertexInput[i].SemanticName = semanticNames[i].c_str();
+	for (size_t i = 0; i < vertexInput_.size(); i++) {
+		vertexInput_[i].SemanticName = semanticNames_[i].c_str();
 	}
 
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-	inputLayoutDesc.pInputElementDescs = vertexInput.data();
-	inputLayoutDesc.NumElements = UINT(vertexInput.size());
+	inputLayoutDesc.pInputElementDescs = vertexInput_.data();
+	inputLayoutDesc.NumElements = UINT(vertexInput_.size());
 
 	// BlendStateの設定
 	D3D12_BLEND_DESC blendDec{};
@@ -104,39 +104,39 @@ void Pipeline::Create(
 	// RasterizerStateの設定
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	// 裏面(時計回り)を表示しない
-	rasterizerDesc.CullMode = D3D12_CULL_MODE(cullMode);
+	rasterizerDesc.CullMode = D3D12_CULL_MODE(cullMode_);
 	// 三角形の中を塗りつぶす
-	rasterizerDesc.FillMode = D3D12_FILL_MODE(solidState);
+	rasterizerDesc.FillMode = D3D12_FILL_MODE(solidState_);
 	rasterizerDesc.DepthClipEnable = true;
 
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 
-	graphicsPipelineStateDesc.pRootSignature = rootSignature;
+	graphicsPipelineStateDesc.pRootSignature = rootSignature_;
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;
 
 	graphicsPipelineStateDesc.VS = {
-			shader.vertex->GetBufferPointer(),
-			shader.vertex->GetBufferSize()
+			shader_.vertex_->GetBufferPointer(),
+			shader_.vertex_->GetBufferSize()
 	};
 	graphicsPipelineStateDesc.PS = {
-			shader.pixel->GetBufferPointer(),
-			shader.pixel->GetBufferSize()
+			shader_.pixel_->GetBufferPointer(),
+			shader_.pixel_->GetBufferSize()
 	};
-	if (shader.hull && shader.domain) {
+	if (shader_.hull_ && shader_.domain_) {
 		graphicsPipelineStateDesc.HS = {
-				shader.hull->GetBufferPointer(),
-				shader.hull->GetBufferSize()
+				shader_.hull_->GetBufferPointer(),
+				shader_.hull_->GetBufferSize()
 		};
 		graphicsPipelineStateDesc.DS = {
-				shader.domain->GetBufferPointer(),
-				shader.domain->GetBufferSize()
+				shader_.domain_->GetBufferPointer(),
+				shader_.domain_->GetBufferSize()
 		};
 	}
-	if (shader.geometory) {
+	if (shader_.geometory_) {
 		graphicsPipelineStateDesc.GS = {
-				shader.geometory->GetBufferPointer(),
-				shader.geometory->GetBufferSize()
+				shader_.geometory_->GetBufferPointer(),
+				shader_.geometory_->GetBufferSize()
 		};
 	}
 
@@ -144,25 +144,25 @@ void Pipeline::Create(
 	graphicsPipelineStateDesc.BlendState = blendDec;
 	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;
 	// 書き込むRTVの情報
-	graphicsPipelineStateDesc.NumRenderTargets = numRenderTarget;
+	graphicsPipelineStateDesc.NumRenderTargets = numRenderTarget_;
 	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	// 利用するトポロジ(形状)のタイプ
-	graphicsPipelineStateDesc.PrimitiveTopologyType = topologyType;
+	graphicsPipelineStateDesc.PrimitiveTopologyType = topologyType_;
 
 	// どのように画面に打ち込むかの設定
 	graphicsPipelineStateDesc.SampleDesc.Count = 1;
 	graphicsPipelineStateDesc.SampleDesc.Quality = 0;
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
-	if (isDepth) {
+	if (isDepth_) {
 		graphicsPipelineStateDesc.DepthStencilState.DepthEnable = true;
 		graphicsPipelineStateDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 		graphicsPipelineStateDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 		graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 	}
 
-	for (uint32_t i = 0; i < numRenderTarget; i++) {
-		switch (blend)
+	for (uint32_t i = 0; i < numRenderTarget_; i++) {
+		switch (blend_)
 		{
 		case Pipeline::Blend::None:
 		default:
@@ -200,7 +200,7 @@ void Pipeline::Create(
 	}
 
 	static ID3D12Device* device = DirectXDevice::GetInstance()->GetDevice();
-	HRESULT hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(graphicsPipelineState.GetAddressOf()));
+	HRESULT hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(graphicsPipelineState_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Create() : CreateGraphicsPipelineState", "Pipeline");
@@ -211,16 +211,16 @@ void Pipeline::Create(
 void Pipeline::Use() const {
 	static ID3D12Device* device = DirectXDevice::GetInstance()->GetDevice();
 
-	assert(graphicsPipelineState);
-	if (!graphicsPipelineState) {
+	assert(graphicsPipelineState_);
+	if (!graphicsPipelineState_) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Use() : GraphicsPipelineState is nullptr", "Pipeline");
 		return;
 	}
 	auto commandlist = DirectXCommon::GetInstance()->GetCommandList();
-	commandlist->SetGraphicsRootSignature(rootSignature);
-	commandlist->SetPipelineState(graphicsPipelineState.Get());
+	commandlist->SetGraphicsRootSignature(rootSignature_);
+	commandlist->SetPipelineState(graphicsPipelineState_.Get());
 
-	switch (topologyType)
+	switch (topologyType_)
 	{
 	case D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE:
 		commandlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
@@ -240,25 +240,25 @@ void Pipeline::Use() const {
 }
 
 bool Pipeline::IsSame(
-	const Shader& shader_,
-	Pipeline::Blend blend_,
-	Pipeline::CullMode cullMode_,
-	Pipeline::SolidState solidState_,
-	D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType_,
-	uint32_t numRenderTarget_,
-	ID3D12RootSignature* rootSignature_,
-	bool isDepth_
+	const Shader& shader,
+	Pipeline::Blend blend,
+	Pipeline::CullMode cullMode,
+	Pipeline::SolidState solidState,
+	D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType,
+	uint32_t numRenderTarget,
+	ID3D12RootSignature* rootSignature,
+	bool isDepth
 ) {
-	return shader.vertex == shader_.vertex
-		&& shader.pixel == shader_.pixel
-		&& shader.hull == shader_.hull
-		&& shader.domain == shader_.domain
-		&& shader.geometory == shader_.geometory
-		&& blend == blend_
-		&& cullMode == cullMode_
-		&& solidState == solidState_
-		&& topologyType == topologyType_
-		&& numRenderTarget == numRenderTarget_
-		&& rootSignature == rootSignature_
-		&& isDepth == isDepth_;
+	return shader_.vertex_ == shader.vertex_
+		&& shader_.pixel_ == shader.pixel_
+		&& shader_.hull_ == shader.hull_
+		&& shader_.domain_ == shader.domain_
+		&& shader_.geometory_ == shader.geometory_
+		&& blend_ == blend
+		&& cullMode_ == cullMode
+		&& solidState_ == solidState
+		&& topologyType_ == topologyType
+		&& numRenderTarget_ == numRenderTarget
+		&& rootSignature_ == rootSignature
+		&& isDepth_ == isDepth;
 }

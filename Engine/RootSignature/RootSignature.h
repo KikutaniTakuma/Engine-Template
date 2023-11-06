@@ -23,19 +23,19 @@ public:
 	bool operator!=(const RootSignature& right) const;
 
 public:
-	void Create(D3D12_ROOT_PARAMETER* rootParamater_, size_t rootParamaterSize_, bool isTexture_);
+	void Create(D3D12_ROOT_PARAMETER* rootParamater, size_t rootParamaterSize, bool isTexture);
 
 	inline ID3D12RootSignature* Get() const {
-		return rootSignature.Get();
+		return rootSignature_.Get();
 	}
 
-	bool IsSame(D3D12_ROOT_PARAMETER* rootParamater_, size_t rootParamaterSize_, bool isTexture_) const;
+	bool IsSame(D3D12_ROOT_PARAMETER* rootParamater, size_t rootParamaterSize, bool isTexture) const;
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
-	std::vector<std::pair<D3D12_ROOT_PARAMETER, std::vector<D3D12_DESCRIPTOR_RANGE>>> rootParamater;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
+	std::vector<std::pair<D3D12_ROOT_PARAMETER, std::vector<D3D12_DESCRIPTOR_RANGE>>> rootParamater_;
 	
-	bool isTexture;
+	bool isTexture_;
 };
 
 bool operator==(const D3D12_ROOT_PARAMETER& left, const D3D12_ROOT_PARAMETER& right);

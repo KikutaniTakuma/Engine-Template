@@ -34,12 +34,12 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	inline bool GetError() const {
-		return isError;
+		return isError_;
 	}
 
 private:
 	void ErrorLog(const std::string& text, const std::string& boxName = "Error");
 
 private:
-	bool isError;
+	bool isError_;
 };

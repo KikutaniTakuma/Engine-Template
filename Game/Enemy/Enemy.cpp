@@ -19,7 +19,7 @@ Enemy::Enemy() :
 	model.push_back(std::make_unique<Model>());
 	model[1]->LoadObj("./Resources/Cube.obj");
 	model[1]->SetParent(model[0].get());
-	model[1]->scale *= 0.5f;
+	model[1]->scale_ *= 0.5f;
 
 	easeDuration.first.y = 2.0f;
 	easeDuration.second.y = 3.0f;
@@ -50,10 +50,10 @@ void Enemy::Move() {
 			moveVec.y = -15.0f;
 			Vector2 rotate = { moveVec.z, moveVec.x };
 
-			model[0]->rotate.y = rotate.GetRad() + (std::numbers::pi_v<float> *1.5f);
+			model[0]->rotate_.y = rotate.GetRad() + (std::numbers::pi_v<float> *1.5f);
 		}
 		else {
-			model[0]->rotate.y = freq + (std::numbers::pi_v<float> *0.5f);
+			model[0]->rotate_.y = freq + (std::numbers::pi_v<float> *0.5f);
 			moveVec.y = -15.0f;
 		}
 	}
@@ -64,9 +64,9 @@ void Enemy::Update() {
 
 	pos_ += moveVec * deltaTime;
 	collisionPos_ = pos_;
-	model[0]->pos = pos_;
+	model[0]->pos_ = pos_;
 
-	model[1]->pos = ease.Get(easeDuration.first, easeDuration.second);
+	model[1]->pos_ = ease.Get(easeDuration.first, easeDuration.second);
 
 	ease.Update();
 }

@@ -10,25 +10,25 @@
 /// <summary>
 /// ディスクリプタヒープ管理クラス
 /// </summary>
-class ShaderResourceHeap {
+class DescriptorHeap {
 private:
-	ShaderResourceHeap() = delete;
-	ShaderResourceHeap(const ShaderResourceHeap& right) = delete;
-	ShaderResourceHeap(ShaderResourceHeap&& right) noexcept = delete;
-	ShaderResourceHeap(UINT numDescriptor);
-	~ShaderResourceHeap();
-	ShaderResourceHeap& operator=(const ShaderResourceHeap& right) = delete;
-	ShaderResourceHeap& operator=(ShaderResourceHeap&& right) noexcept = delete;
+	DescriptorHeap() = delete;
+	DescriptorHeap(const DescriptorHeap& right) = delete;
+	DescriptorHeap(DescriptorHeap&& right) noexcept = delete;
+	DescriptorHeap(UINT numDescriptor);
+	~DescriptorHeap();
+	DescriptorHeap& operator=(const DescriptorHeap& right) = delete;
+	DescriptorHeap& operator=(DescriptorHeap&& right) noexcept = delete;
 
 public:
 	static void Initialize(UINT numDescriptor);
 
 	static void Finalize();
 
-	static ShaderResourceHeap* GetInstance();
+	static DescriptorHeap* GetInstance();
 
 private:
-	static ShaderResourceHeap* instance;
+	static DescriptorHeap* instance;
 
 public:
 	void SetHeap();

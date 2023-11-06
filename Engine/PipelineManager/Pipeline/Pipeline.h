@@ -64,48 +64,48 @@ public:
 		DXGI_FORMAT format
 	);
 
-	void SetShader(const Shader& shader_);
+	void SetShader(const Shader& shader);
 
 	void Create(
 		const RootSignature& rootSignature,
-		Pipeline::Blend blend_,
-		Pipeline::CullMode cullMode_,
-		Pipeline::SolidState solidState_,
-		D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType_,
-		uint32_t numRenderTarget_ = 1,
-		bool isDepth_ = true
+		Pipeline::Blend blend,
+		Pipeline::CullMode cullMode,
+		Pipeline::SolidState solidState,
+		D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType,
+		uint32_t numRenderTarget = 1,
+		bool isDepth = true
 	);
 
 	void Use() const;
 
 	bool IsSame(
-		const Shader& shader_,
-		Pipeline::Blend blend_,
-		Pipeline::CullMode cullMode_,
-		Pipeline::SolidState solidState_,
-		D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType_,
-		uint32_t numRenderTarget_,
-		ID3D12RootSignature* rootSignature_,
-		bool isDepth_
+		const Shader& shader,
+		Pipeline::Blend blend,
+		Pipeline::CullMode cullMode,
+		Pipeline::SolidState solidState,
+		D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType,
+		uint32_t numRenderTarget,
+		ID3D12RootSignature* rootSignature,
+		bool isDepth
 	);
 
 /// <summary>
 /// メンバ変数
 /// </summary>
 private:
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
 
-	Shader shader;
+	Shader shader_;
 
-	std::vector<D3D12_INPUT_ELEMENT_DESC> vertexInput;
-	std::vector<std::string> semanticNames;
+	std::vector<D3D12_INPUT_ELEMENT_DESC> vertexInput_;
+	std::vector<std::string> semanticNames_;
 
-	Pipeline::Blend blend;
-	Pipeline::CullMode cullMode;
-	Pipeline::SolidState solidState;
-	uint32_t numRenderTarget;
-	D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType;
-	bool isDepth;
+	Pipeline::Blend blend_;
+	Pipeline::CullMode cullMode_;
+	Pipeline::SolidState solidState_;
+	uint32_t numRenderTarget_;
+	D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType_;
+	bool isDepth_;
 
-	ID3D12RootSignature* rootSignature;
+	ID3D12RootSignature* rootSignature_;
 };

@@ -5,10 +5,10 @@
 #include "Engine/EngineParts/DirectXDevice/DirectXDevice.h"
 
 RootSignature::RootSignature():
-	rootSignature{},
-	isTexture(false)
+	rootSignature_{},
+	isTexture_(false)
 {
-	rootParamater = {};
+	rootParamater_ = {};
 }
 RootSignature::RootSignature(const RootSignature& right) {
 	*this = right;
@@ -17,55 +17,55 @@ RootSignature::RootSignature(RootSignature&& right) noexcept {
 	*this = std::move(right);
 }
 RootSignature& RootSignature::operator=(const RootSignature& right) {
-	rootSignature = right.rootSignature;
-	rootParamater = right.rootParamater;
-	isTexture = right.isTexture;
+	rootSignature_ = right.rootSignature_;
+	rootParamater_ = right.rootParamater_;
+	isTexture_ = right.isTexture_;
 
 	return *this;
 }
 RootSignature& RootSignature::operator=(RootSignature&& right) noexcept {
-	rootSignature = std::move(right.rootSignature);
-	rootParamater = std::move(right.rootParamater);
-	isTexture = std::move(right.isTexture);
+	rootSignature_ = std::move(right.rootSignature_);
+	rootParamater_ = std::move(right.rootParamater_);
+	isTexture_ = std::move(right.isTexture_);
 
 	return *this;
 }
 
 bool RootSignature::operator==(const RootSignature& right) const {
-	if (rootParamater.size() != right.rootParamater.size()) {
+	if (rootParamater_.size() != right.rootParamater_.size()) {
 		return false;
 	}
-	for (size_t i = 0; i < rootParamater.size(); i++) {
-		if (rootParamater[i].first != right.rootParamater[i].first) {
+	for (size_t i = 0; i < rootParamater_.size(); i++) {
+		if (rootParamater_[i].first != right.rootParamater_[i].first) {
 			return false;
 		}
 	}
-	return  isTexture == right.isTexture;
+	return  isTexture_ == right.isTexture_;
 }
 bool RootSignature::operator!=(const RootSignature& right) const {
 	return !(*this == right);
 }
 
-void RootSignature::Create(D3D12_ROOT_PARAMETER* rootParamater_, size_t rootParamaterSize_, bool isTexture_) {
+void RootSignature::Create(D3D12_ROOT_PARAMETER* rootParamater, size_t rootParamaterSize, bool isTexture) {
 	// RootSignatureの生成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-	rootParamater.clear();
-	rootParamater.reserve(rootParamaterSize_);
-	for (size_t i = 0; i < rootParamaterSize_; i++) {
+	rootParamater_.clear();
+	rootParamater_.reserve(rootParamaterSize);
+	for (size_t i = 0; i < rootParamaterSize; i++) {
 		std::vector<D3D12_DESCRIPTOR_RANGE> ranges = {};
-		if (rootParamater_[i].ParameterType == D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE) {
-			for (uint32_t j = 0; j < rootParamater_[i].DescriptorTable.NumDescriptorRanges;j++) {
-				ranges.push_back(rootParamater_[i].DescriptorTable.pDescriptorRanges[j]);
+		if (rootParamater[i].ParameterType == D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE) {
+			for (uint32_t j = 0; j < rootParamater[i].DescriptorTable.NumDescriptorRanges;j++) {
+				ranges.push_back(rootParamater[i].DescriptorTable.pDescriptorRanges[j]);
 			}
 		}
-		rootParamater.push_back({ rootParamater_[i], ranges });
+		rootParamater_.push_back({ rootParamater[i], ranges });
 	}
 
 	std::vector<D3D12_ROOT_PARAMETER> params = {};
-	params.reserve(rootParamater.size());
-	for (auto& i : rootParamater) {
+	params.reserve(rootParamater_.size());
+	for (auto& i : rootParamater_) {
 		if (i.first.ParameterType == D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE) {
 			i.first.DescriptorTable.pDescriptorRanges = i.second.data();
 			i.first.DescriptorTable.NumDescriptorRanges = static_cast<UINT>(i.second.size());
@@ -76,7 +76,7 @@ void RootSignature::Create(D3D12_ROOT_PARAMETER* rootParamater_, size_t rootPara
 	descriptionRootSignature.pParameters = params.data();
 	descriptionRootSignature.NumParameters = static_cast<UINT>(params.size());
 
-	isTexture = isTexture_;
+	isTexture_ = isTexture;
 
 	D3D12_STATIC_SAMPLER_DESC staticSamplers{};
 	staticSamplers.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
@@ -88,8 +88,8 @@ void RootSignature::Create(D3D12_ROOT_PARAMETER* rootParamater_, size_t rootPara
 	staticSamplers.ShaderRegister = 0;
 	staticSamplers.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 
-	descriptionRootSignature.pStaticSamplers = isTexture ? &staticSamplers : nullptr;
-	descriptionRootSignature.NumStaticSamplers = isTexture ? 1u : 0u;
+	descriptionRootSignature.pStaticSamplers = isTexture_ ? &staticSamplers : nullptr;
+	descriptionRootSignature.NumStaticSamplers = isTexture_ ? 1u : 0u;
 
 	// シリアライズしてバイナリにする
 	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
@@ -100,11 +100,11 @@ void RootSignature::Create(D3D12_ROOT_PARAMETER* rootParamater_, size_t rootPara
 		assert(false);
 	}
 	// バイナリをもとに生成
-	if (rootSignature) {
-		rootSignature.Reset();
+	if (rootSignature_) {
+		rootSignature_.Reset();
 	}
 	static ID3D12Device* device = DirectXDevice::GetInstance()->GetDevice();
-	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(rootSignature.GetAddressOf()));
+	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(rootSignature_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Device::CreateRootSignature() failed", "RootSignature");
@@ -157,14 +157,14 @@ bool operator!=(const D3D12_ROOT_PARAMETER& left, const D3D12_ROOT_PARAMETER& ri
 	return !(left == right);
 }
 
-bool RootSignature::IsSame(D3D12_ROOT_PARAMETER* rootParamater_, size_t rootParamaterSize_, bool isTexture_) const {
-	if (rootParamater.size() != rootParamaterSize_) {
+bool RootSignature::IsSame(D3D12_ROOT_PARAMETER* rootParamater, size_t rootParamaterSize, bool isTexture) const {
+	if (rootParamater_.size() != rootParamaterSize) {
 		return false;
 	}
-	for (size_t i = 0; i < rootParamater.size();i++) {
-		if (rootParamater[i].first != rootParamater_[i]) {
+	for (size_t i = 0; i < rootParamater_.size();i++) {
+		if (rootParamater_[i].first != rootParamater[i]) {
 			return false;
 		}
 	}
-	return isTexture == isTexture_;
+	return isTexture_ == isTexture;
 }
