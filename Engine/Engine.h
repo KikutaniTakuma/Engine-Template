@@ -121,7 +121,7 @@ private:
 	void InitializeDirect3D();
 
 private:
-	class Direct3D* direct3D_ = nullptr;
+	class DirectXDevice* direct3D_ = nullptr;
 
 
 

@@ -1,6 +1,6 @@
 #include "RenderTarget.h"
 #include "Engine/Engine.h"
-#include "Engine/EngineParts/Direct3D/Direct3D.h"
+#include "Engine/EngineParts/DirectXDevice/DirectXDevice.h"
 #include "Engine/EngineParts/DirectXCommon/DirectXCommon.h"
 #include "Utils/ConvertString/ConvertString.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
@@ -30,7 +30,7 @@ RenderTarget::RenderTarget():
 		clearValue.Color[i] = clsValue[i];
 	}
 
-	static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+	static ID3D12Device* device = DirectXDevice::GetInstance()->GetDevice();
 
 	// 実際にリソースを作る
 	HRESULT hr = device->
@@ -47,7 +47,7 @@ RenderTarget::RenderTarget():
 		return;
 	}
 
-	RTVHeap = Direct3D::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
+	RTVHeap = DirectXDevice::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
 
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
@@ -93,7 +93,7 @@ RenderTarget::RenderTarget(uint32_t width_, uint32_t height_) :
 		clearValue.Color[i] = clsValue[i];
 	}
 
-	static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+	static ID3D12Device* device = DirectXDevice::GetInstance()->GetDevice();
 
 	// 実際にリソースを作る
 	HRESULT hr = device->
@@ -110,7 +110,7 @@ RenderTarget::RenderTarget(uint32_t width_, uint32_t height_) :
 		return;
 	}
 
-	RTVHeap = Direct3D::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
+	RTVHeap = DirectXDevice::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
 
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
@@ -177,7 +177,7 @@ void RenderTarget::UseThisRenderTargetShaderResource() {
 }
 
 void RenderTarget::CreateView(D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle, D3D12_GPU_DESCRIPTOR_HANDLE descHeapHandleGPU, UINT descHeapHandleUINT) {
-	static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+	static ID3D12Device* device = DirectXDevice::GetInstance()->GetDevice();
 	
 	device->CreateShaderResourceView(
 		resource.Get(),

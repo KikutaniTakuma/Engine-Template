@@ -167,9 +167,6 @@
     <ClCompile Include="SceneManager\SubMenu\SubMenu.cpp">
       <Filter>SceneManager\SubMenu</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\EngineParts\Direct3D\Direct3D.cpp">
-      <Filter>Engine\EngineParts\Direct3D</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\ExecutionLog\ExecutionLog.cpp">
       <Filter>Utils\ExecutionLog</Filter>
     </ClCompile>
@@ -181,6 +178,9 @@
     </ClCompile>
     <ClCompile Include="Engine\EngineParts\DirectXCommon\DirectXCommon.cpp">
       <Filter>Engine\EngineParts\DirectXCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\EngineParts\DirectXDevice\DirectXDevice.cpp">
+      <Filter>Engine\EngineParts\DirectXDevice</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -343,9 +343,6 @@
     <Filter Include="Engine\EngineParts">
       <UniqueIdentifier>{d48493c0-fbf6-4f90-a87e-20a9f228c0ba}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\EngineParts\Direct3D">
-      <UniqueIdentifier>{fc72a1ac-b158-4732-9c50-43f6c06d90e9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Utils\ExecutionLog">
       <UniqueIdentifier>{68109607-fdfe-4fef-9345-8ea31bbf59bd}</UniqueIdentifier>
     </Filter>
@@ -357,6 +354,9 @@
     </Filter>
     <Filter Include="Engine\EngineParts\DirectXCommon">
       <UniqueIdentifier>{f8b2e7c6-10e5-449e-8f53-36f5bd1aa9ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\EngineParts\DirectXDevice">
+      <UniqueIdentifier>{fc72a1ac-b158-4732-9c50-43f6c06d90e9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -534,9 +534,6 @@
     <ClInclude Include="SceneManager\SubMenu\SubMenu.h">
       <Filter>SceneManager\SubMenu</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\EngineParts\Direct3D\Direct3D.h">
-      <Filter>Engine\EngineParts\Direct3D</Filter>
-    </ClInclude>
     <ClInclude Include="Utils\ExecutionLog\ExecutionLog.h">
       <Filter>Utils\ExecutionLog</Filter>
     </ClInclude>
@@ -548,6 +545,9 @@
     </ClInclude>
     <ClInclude Include="Engine\EngineParts\DirectXCommon\DirectXCommon.h">
       <Filter>Engine\EngineParts\DirectXCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\EngineParts\DirectXDevice\DirectXDevice.h">
+      <Filter>Engine\EngineParts\DirectXDevice</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

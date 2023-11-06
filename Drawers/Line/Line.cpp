@@ -41,7 +41,7 @@ Line::Line() :
 	start(),
 	end()
 {
-	vertexBuffer = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * kVertexNum);
+	vertexBuffer = DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * kVertexNum);
 	vertexView.BufferLocation = vertexBuffer->GetGPUVirtualAddress();
 	vertexView.SizeInBytes = sizeof(VertexData) * kVertexNum;
 	vertexView.StrideInBytes = sizeof(VertexData);

@@ -43,7 +43,7 @@ Texture2D::Texture2D() :
 		vertexResource = nullptr;
 	}
 
-	vertexResource =Direct3D::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * 4);
+	vertexResource =DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * 4);
 
 	vertexView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	vertexView.SizeInBytes = sizeof(VertexData) * 4;
@@ -162,7 +162,7 @@ void Texture2D::Initialize(const std::string& vsFileName, const std::string& psF
 	uint16_t indices[] = {
 			0,1,3, 1,2,3
 	};
-	indexResource = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(indices));
+	indexResource = DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(indices));
 	indexView.BufferLocation = indexResource->GetGPUVirtualAddress();
 	indexView.SizeInBytes = sizeof(indices);
 	indexView.Format = DXGI_FORMAT_R16_UINT;

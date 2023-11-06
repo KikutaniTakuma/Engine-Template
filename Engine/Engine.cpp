@@ -4,7 +4,7 @@
 #include <filesystem>
 
 #include "WinApp/WinApp.h"
-#include "EngineParts/Direct3D/Direct3D.h"
+#include "EngineParts/DirectXDevice/DirectXDevice.h"
 #include "EngineParts/DirectXCommon/DirectXCommon.h"
 
 #include "ShaderManager/ShaderManager.h"
@@ -159,8 +159,8 @@ void Engine::Finalize() {
 /// 
 
 void Engine::InitializeDirect3D() {
-	Direct3D::Initialize();
-	direct3D_ = Direct3D::GetInstance();
+	DirectXDevice::Initialize();
+	direct3D_ = DirectXDevice::GetInstance();
 }
 
 
@@ -405,5 +405,5 @@ Engine::~Engine() {
 	depthStencilResource->Release();
 
 	DirectXCommon::Finalize();
-	Direct3D::Finalize();
+	DirectXDevice::Finalize();
 }

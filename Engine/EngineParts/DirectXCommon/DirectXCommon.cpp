@@ -1,7 +1,7 @@
 #include "DirectXCommon.h"
 #include "Engine/Engine.h"
 #include "Engine/WinApp/WinApp.h"
-#include "Engine/EngineParts/Direct3D/Direct3D.h"
+#include "Engine/EngineParts/DirectXDevice/DirectXDevice.h"
 #include "Engine/ShaderResource/ShaderResourceHeap.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
 
@@ -46,9 +46,9 @@ DirectXCommon::DirectXCommon():
 	fenceEvent_{nullptr},
 	isRenderState_{false}
 {
-	static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
-	static IDXGIFactory7* dxgiFactory = Direct3D::GetInstance()->GetDxgiFactory();
-	static UINT incrementRTVHeap = Direct3D::GetInstance()->GetIncrementRTVHeap();
+	static ID3D12Device* device = DirectXDevice::GetInstance()->GetDevice();
+	static IDXGIFactory7* dxgiFactory = DirectXDevice::GetInstance()->GetDxgiFactory();
+	static UINT incrementRTVHeap = DirectXDevice::GetInstance()->GetIncrementRTVHeap();
 
 	// コマンドキューを作成
 	commandQueue_ = nullptr;
@@ -102,7 +102,7 @@ DirectXCommon::DirectXCommon():
 
 
 	// デスクリプタヒープの作成
-	rtvDescriptorHeap_ = Direct3D::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+	rtvDescriptorHeap_ = DirectXDevice::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
 	// SwepChainのメモリとディスクリプタと関連付け
 	// バックバッファの数を取得

@@ -3,7 +3,7 @@
 #include <algorithm>
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Engine/RootSignature/RootSignature.h"
-#include "Engine/EngineParts/Direct3D/Direct3D.h"
+#include "Engine/EngineParts/DirectXDevice/DirectXDevice.h"
 #include "Engine/EngineParts/DirectXCommon/DirectXCommon.h"
 
 Pipeline::Pipeline():
@@ -199,7 +199,7 @@ void Pipeline::Create(
 		graphicsPipelineStateDesc.BlendState.RenderTarget[i].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 	}
 
-	static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+	static ID3D12Device* device = DirectXDevice::GetInstance()->GetDevice();
 	HRESULT hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(graphicsPipelineState.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
@@ -209,7 +209,7 @@ void Pipeline::Create(
 }
 
 void Pipeline::Use() const {
-	static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+	static ID3D12Device* device = DirectXDevice::GetInstance()->GetDevice();
 
 	assert(graphicsPipelineState);
 	if (!graphicsPipelineState) {

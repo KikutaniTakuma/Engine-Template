@@ -6,25 +6,25 @@
 #pragma comment(lib, "dxgi.lib")
 #include <cstdint>
 
-class Direct3D {
+class DirectXDevice {
 private:
-	Direct3D();
-	Direct3D(const Direct3D&) = delete;
-	Direct3D(Direct3D&&) = delete;
-	~Direct3D() = default;
+	DirectXDevice();
+	DirectXDevice(const DirectXDevice&) = delete;
+	DirectXDevice(DirectXDevice&&) = delete;
+	~DirectXDevice() = default;
 
 public:
-	Direct3D operator=(const Direct3D&) = delete;
-	Direct3D operator=(Direct3D&&) = delete;
+	DirectXDevice operator=(const DirectXDevice&) = delete;
+	DirectXDevice operator=(DirectXDevice&&) = delete;
 
 public:
-	static Direct3D* GetInstance();
+	static DirectXDevice* GetInstance();
 
 	static void Initialize();
 	static void Finalize();
 
 private:
-	static Direct3D* instance_;
+	static DirectXDevice* instance_;
 
 public:
 	ID3D12DescriptorHeap* CreateDescriptorHeap(

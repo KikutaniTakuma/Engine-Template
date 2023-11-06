@@ -1,26 +1,26 @@
-#include "Direct3D.h"
+#include "DirectXDevice.h"
 #include "Utils/ExecutionLog/ExecutionLog.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Utils/ConvertString/ConvertString.h"
 #include <cassert>
 #include <format>
 
-Direct3D* Direct3D::instance_ = nullptr;
+DirectXDevice* DirectXDevice::instance_ = nullptr;
 
-Direct3D* Direct3D::GetInstance() {
+DirectXDevice* DirectXDevice::GetInstance() {
 	return instance_;
 }
 
-void Direct3D::Initialize() {
-	instance_ = new Direct3D{};
+void DirectXDevice::Initialize() {
+	instance_ = new DirectXDevice{};
 }
-void Direct3D::Finalize() {
+void DirectXDevice::Finalize() {
 	delete instance_;
 	instance_ = nullptr;
 }
 
 
-Direct3D::Direct3D():
+DirectXDevice::DirectXDevice():
 	incrementSRVCBVUAVHeap_(0u),
 	incrementRTVHeap_(0u),
 	incrementDSVHeap_(0u),
@@ -122,7 +122,7 @@ Direct3D::Direct3D():
 	incrementSAMPLER_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
 }
 
-ID3D12DescriptorHeap* Direct3D::CreateDescriptorHeap(
+ID3D12DescriptorHeap* DirectXDevice::CreateDescriptorHeap(
 	D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderrVisible
 ) {
 	ID3D12DescriptorHeap* descriptorHeap = nullptr;
@@ -139,7 +139,7 @@ ID3D12DescriptorHeap* Direct3D::CreateDescriptorHeap(
 	return nullptr;
 }
 
-ID3D12Resource* Direct3D::CreateBufferResuorce(size_t sizeInBytes) {
+ID3D12Resource* DirectXDevice::CreateBufferResuorce(size_t sizeInBytes) {
 	if (!device_) {
 		OutputDebugStringA("device is nullptr!!");
 		return nullptr;
@@ -174,7 +174,7 @@ ID3D12Resource* Direct3D::CreateBufferResuorce(size_t sizeInBytes) {
 	return resuorce;
 }
 
-ID3D12Resource* Direct3D::CreateDepthStencilTextureResource(int32_t width, int32_t height) {
+ID3D12Resource* DirectXDevice::CreateDepthStencilTextureResource(int32_t width, int32_t height) {
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = width;
 	resourceDesc.Height = height;

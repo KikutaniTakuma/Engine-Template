@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/EngineParts/Direct3D/Direct3D.h"
+#include "Engine/EngineParts/DirectXDevice/DirectXDevice.h"
 #include "Engine/EngineParts/DirectXCommon/DirectXCommon.h"
 #include <cassert>
 #include <wrl.h>
@@ -24,7 +24,7 @@ public:
 		shaderRegister(0)
 	{
 		// バイトサイズは256アライメントする(vramを効率的に使うための仕組み)
-		bufferResource = Direct3D::GetInstance()->CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
+		bufferResource = DirectXDevice::GetInstance()->CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
 		cbvDesc.BufferLocation = bufferResource->GetGPUVirtualAddress();
 		cbvDesc.SizeInBytes = UINT(bufferResource->GetDesc().Width);
 
@@ -81,7 +81,7 @@ public:
 	}
 
 	void CrerateView(D3D12_CPU_DESCRIPTOR_HANDLE descHandle, D3D12_GPU_DESCRIPTOR_HANDLE descHandleGPU, UINT dsecIndex) noexcept {
-		static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+		static ID3D12Device* device = DirectXDevice::GetInstance()->GetDevice();
 		device->CreateConstantBufferView(&cbvDesc, descHandle);
 		descriptorHandle = descHandleGPU;
 		dsecIndex_ = dsecIndex;

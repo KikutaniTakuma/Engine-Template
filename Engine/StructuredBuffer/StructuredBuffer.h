@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/EngineParts/Direct3D/Direct3D.h"
+#include "Engine/EngineParts/DirectXDevice/DirectXDevice.h"
 #include "Engine/EngineParts/DirectXCommon/DirectXCommon.h"
 #include <cassert>
 #include <wrl.h>
@@ -24,7 +24,7 @@ public:
 		roootParamater_(),
 		instanceNum_(1u)
 	{
-		bufferResource_ = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(T) * 1u);
+		bufferResource_ = DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(T) * 1u);
 		srvDesc_ = {};
 		srvDesc_.Format = DXGI_FORMAT_UNKNOWN;
 		srvDesc_.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -62,7 +62,7 @@ public:
 		roootParamater_(),
 		instanceNum_(instanceNum)
 	{
-		bufferResource_ = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(T) * instanceNum);
+		bufferResource_ = DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(T) * instanceNum);
 		srvDesc_ = {};
 		srvDesc_.Format = DXGI_FORMAT_UNKNOWN;
 		srvDesc_.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -155,7 +155,7 @@ public:
 
 		instanceNum_ = indexNum;
 		
-		bufferResource_ = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(T) * instanceNum_);
+		bufferResource_ = DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(T) * instanceNum_);
 		srvDesc_ = {};
 		srvDesc_.Format = DXGI_FORMAT_UNKNOWN;
 		srvDesc_.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -190,7 +190,7 @@ public:
 	}
 
 	void CrerateView(D3D12_CPU_DESCRIPTOR_HANDLE descHandle, D3D12_GPU_DESCRIPTOR_HANDLE descHandleGPU, UINT dsecIndex) noexcept {
-		static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+		static ID3D12Device* device = DirectXDevice::GetInstance()->GetDevice();
 		device->CreateShaderResourceView(bufferResource_.Get(), &srvDesc_, descHandle);
 		descriptorHandleCPU_ = descHandle;
 		isCreateView_ = true;

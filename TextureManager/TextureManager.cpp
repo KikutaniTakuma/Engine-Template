@@ -1,7 +1,7 @@
 #include "TextureManager.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Engine/Engine.h"
-#include "Engine/EngineParts/Direct3D/Direct3D.h"
+#include "Engine/EngineParts/DirectXDevice/DirectXDevice.h"
 #include <cassert>
 #include "Engine/ShaderResource/ShaderResourceHeap.h"
 
@@ -33,7 +33,7 @@ TextureManager::TextureManager() :
 	fenceEvent(nullptr),
 	srvHeap(nullptr)
 {
-	ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+	ID3D12Device* device = DirectXDevice::GetInstance()->GetDevice();
 
 	// コマンドキューを作成
 	commandQueue = nullptr;

@@ -1,7 +1,7 @@
 #include "ShaderResourceHeap.h"
 #include "Utils/ConvertString/ConvertString.h"
 #include "Engine/WinApp/WinApp.h"
-#include "Engine/EngineParts/Direct3D/Direct3D.h"
+#include "Engine/EngineParts/DirectXDevice/DirectXDevice.h"
 #include "Engine/EngineParts/DirectXCommon/DirectXCommon.h"
 #include <cassert>
 #include <cmath>
@@ -39,9 +39,9 @@ ShaderResourceHeap::ShaderResourceHeap(UINT numDescriptor) :
 	useHandle_(),
 	bookingHandle_()
 {
-	SRVHeap = Direct3D::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, numDescriptor, true);
+	SRVHeap = DirectXDevice::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, numDescriptor, true);
 
-	UINT incrementSRVCBVUAVHeap = Direct3D::GetInstance()->GetIncrementSRVCBVUAVHeap();
+	UINT incrementSRVCBVUAVHeap = DirectXDevice::GetInstance()->GetIncrementSRVCBVUAVHeap();
 
 	heapHandles.reserve(heapSize);
 	heapHandles.push_back({ SRVHeap->GetCPUDescriptorHandleForHeapStart(),

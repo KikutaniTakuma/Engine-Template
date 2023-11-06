@@ -67,7 +67,7 @@ void PeraRender::Initialize(const std::string& vsFileName, const std::string& ps
 	uint16_t indices[] = {
 			0,1,3, 1,2,3
 	};
-	indexResource_ = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(indices));
+	indexResource_ = DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(indices));
 	indexView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
 	indexView_.SizeInBytes = sizeof(indices);
 	indexView_.Format = DXGI_FORMAT_R16_UINT;
@@ -85,7 +85,7 @@ void PeraRender::Initialize(const std::string& vsFileName, const std::string& ps
 		Vector3{ -0.5f, -0.5f, 0.1f }, Vector2{ 1.0f, 0.0f }
 	};
 
-	peraVertexResource_ = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(pv));
+	peraVertexResource_ = DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(pv));
 
 	peraVertexView_.BufferLocation = peraVertexResource_->GetGPUVirtualAddress();
 	peraVertexView_.SizeInBytes = sizeof(pv);
