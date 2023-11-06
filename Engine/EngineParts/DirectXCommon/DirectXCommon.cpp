@@ -134,7 +134,8 @@ DirectXCommon::DirectXCommon():
 
 #ifdef _DEBUG
 	// SRV用のヒープ
-	auto srvDescriptorHeap = DescriptorHeap::GetInstance();
+	auto descriptorHeap = DescriptorHeap::GetInstance();
+	uint32_t useHandle = descriptorHeap->BookingHeapPos(1u);
 
 	// ImGuiの初期化
 	IMGUI_CHECKVERSION();
@@ -145,10 +146,12 @@ DirectXCommon::DirectXCommon():
 		device,
 		swapChainDesc.BufferCount,
 		rtvDesc.Format,
-		srvDescriptorHeap->Get(),
-		srvDescriptorHeap->GetSrvCpuHeapHandle(0),
-		srvDescriptorHeap->GetSrvGpuHeapHandle(0)
+		descriptorHeap->Get(),
+		descriptorHeap->GetSrvCpuHeapHandle(useHandle),
+		descriptorHeap->GetSrvGpuHeapHandle(useHandle)
 	);
+
+	descriptorHeap->UseThisPosition(useHandle);
 #endif // DEBUG
 
 

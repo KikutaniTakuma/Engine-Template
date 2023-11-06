@@ -5,6 +5,7 @@
 #include "Input/Gamepad/Gamepad.h"
 #include "externals/imgui/imgui.h"
 #include "Engine/WinApp/WinApp.h"
+#include <algorithm>
 #include <numbers>
 #include <cmath>
 

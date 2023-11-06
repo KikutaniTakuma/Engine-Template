@@ -1,5 +1,6 @@
 #include "StringOut.h"
 #include "Engine/EngineParts/DirectXCommon/DirectXCommon.h"
+#include "Engine/EngineParts/StringOutPutManager/StringOutPutManager.h"
 #include "Engine/Engine.h"
 #include "externals/imgui/imgui.h"
 
@@ -77,11 +78,14 @@ StringOut& StringOut::operator=(StringOut && right) noexcept{
 
 void StringOut::Draw() {
 	ID3D12GraphicsCommandList* commandList = DirectXCommon::GetInstance()->GetCommandList();
-	commandList->SetDescriptorHeaps(1, Engine::GetFontHeap(format_).GetAddressOf());
+	auto  stringOutPutManager = StringOutPutManager::GetInstance();
+	
+	auto batch = stringOutPutManager->GetBatch(format_);
 
-	Engine::GetBatch(format_)->Begin(commandList);
-	Engine::GetFont(format_)->DrawString(
-		Engine::GetBatch(format_),
+	batch->Begin(commandList);
+
+	stringOutPutManager->GetFont(format_)->DrawString(
+		stringOutPutManager->GetBatch(format_),
 		str_.c_str(),
 		DirectX::XMFLOAT2(pos_.x, pos_.y),
 		UintToVector4(color_).m128,
@@ -89,7 +93,7 @@ void StringOut::Draw() {
 		DirectX::XMFLOAT2(0.0f, 0.0f),
 		DirectX::XMFLOAT2(scale_.x, scale_.y)
 	);
-	Engine::GetBatch(format_)->End();
+	batch->End();
 }
 
 #ifdef _DEBUG

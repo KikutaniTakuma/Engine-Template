@@ -8,9 +8,6 @@
 #include <dxcapi.h>
 #pragma comment(lib, "dxcompiler.lib")
 #include <wrl.h>
-#include <SpriteFont.h>
-#include <ResourceUploadBatch.h>
-#pragma comment(lib, "DirectXTK12.lib")
 
 #include <string>
 #include <memory>
@@ -25,18 +22,6 @@ class Mat4x4;
 /// 各種マネージャーやDirectX12関連、ウィンドウ関連の初期化と解放を担う
 /// </summary>
 class Engine {
-public:
-	enum class Resolution {
-		HD,   // 1280x720  720p
-		FHD,  // 1920x1080 1080p
-		UHD,  // 2560x1440 4K
-		SHV,  // 3840x2160 8K
-
-		User, // Userのディスプレイ環境の解像度(メインディスプレイがFHDならFHDになる)。又、Debug時フルスクリーンならこれになる
-
-		ResolutionNum // 設定では使わない(これをセットした場合FHDになる)
-	};
-
 private:
 	Engine() = default;
 	Engine(const Engine&) = delete;
@@ -81,19 +66,6 @@ public:
 	}
 
 
-	static inline DirectX::SpriteFont* GetFont(const std::string& fontName) {
-		return engine->spriteFonts[fontName].get();
-	}
-
-	static inline DirectX::SpriteBatch* GetBatch(const std::string& fontName) {
-		return engine->spriteBatch[fontName].get();
-	}
-
-	static inline Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetFontHeap(const std::string& fontName) {
-		return engine->fontHeap[fontName];
-	}
-
-
 	///
 	/// Window生成用
 	/// 
@@ -127,44 +99,33 @@ private:
 
 
 	/// 
-	/// Dirct3D
+	/// DirctXDevice
 	/// 
 private:
-	void InitializeDirect3D();
+	void InitializeDirectXDevice();
 
 private:
-	class DirectXDevice* direct3D_ = nullptr;
+	class DirectXDevice* directXDevice_ = nullptr;
 
 
 
 	/// 
-	/// DirectX12
+	/// DirectXCommon
 	/// 
 private:
-	void InitializeDirect12();
+	void InitializeDirectXCommon();
 
 private:
-	class DirectXCommon* direct12_ = nullptr;
+	class DirectXCommon* directXCommon_ = nullptr;
 	
-
-
 /// <summary>
-/// 文字表示関係
+/// DirectXTK
 /// </summary>
 private:
-	bool InitializeSprite();
-
-public:
-	static void LoadFont(const std::string& formatName);
+	void InitializeDirectXTK();
 
 private:
-	std::unique_ptr<DirectX::GraphicsMemory> gmemory;
-	std::unordered_map<std::string, std::unique_ptr<DirectX::SpriteFont>> spriteFonts;
-	std::unordered_map<std::string, std::unique_ptr<DirectX::SpriteBatch>> spriteBatch;
-
-	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>> fontHeap;
-
-
+	class StringOutPutManager* stringOutPutManager_ = nullptr;
 
 
 	/// 

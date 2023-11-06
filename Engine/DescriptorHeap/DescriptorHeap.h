@@ -165,8 +165,14 @@ public:
 	}
 
 public:
-	void BookingHeapPos(UINT nextCreateViewNum);
+	uint32_t BookingHeapPos(UINT nextCreateViewNum);
 	void ReleaseView(UINT viewHandle);
+
+	/// <summary>
+	/// Useハンドルコンテナに追加(既に追加済みなら追加されない)
+	/// </summary>
+	/// <param name=""></param>
+	void UseThisPosition(uint32_t handle);
 
 private:
 	void Reset();

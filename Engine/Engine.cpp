@@ -6,6 +6,7 @@
 #include "WinApp/WinApp.h"
 #include "EngineParts/DirectXDevice/DirectXDevice.h"
 #include "EngineParts/DirectXCommon/DirectXCommon.h"
+#include "Engine/EngineParts/StringOutPutManager/StringOutPutManager.h"
 
 #include "ShaderManager/ShaderManager.h"
 #include "TextureManager/TextureManager.h"
@@ -98,23 +99,20 @@ bool Engine::Initialize(const std::string& windowName, const Vector2& windowSize
 #endif
 
 	// Direct3D生成
-	engine->InitializeDirect3D();
+	engine->InitializeDirectXDevice();
 
 	// ディスクリプタヒープ初期化
 	DescriptorHeap::Initialize(4096);
 
 	// DirectX12生成
-	engine->InitializeDirect12();
+	engine->InitializeDirectXCommon();
 
 	if (!engine->InitializeDraw()) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Initialize() : InitializeDraw() Failed", "Engine");
 		return false;
 	}
 
-	if (!engine->InitializeSprite()) {
-		ErrorCheck::GetInstance()->ErrorTextBox("Initialize() : InitializeSprite() Failed", "Engine");
-		return false;
-	}
+	engine->InitializeDirectXTK();
 
 	Input::Initialize();
 	ShaderManager::Initialize();
@@ -144,6 +142,8 @@ void Engine::Finalize() {
 	ShaderManager::Finalize();
 	Input::Finalize();
 
+	StringOutPutManager::Finalize();
+
 	DescriptorHeap::Finalize();
 
 	delete engine;
@@ -162,102 +162,35 @@ bool Engine::IsFinalize() {
 
 
 ///
-/// Direct3D初期化
+/// DirectXDevice
 /// 
 
-void Engine::InitializeDirect3D() {
+void Engine::InitializeDirectXDevice() {
 	DirectXDevice::Initialize();
-	direct3D_ = DirectXDevice::GetInstance();
+	directXDevice_ = DirectXDevice::GetInstance();
 }
 
 
 
 
 /// 
-/// DirectX12
+/// DirectXCommon
 /// 
 
-void Engine::InitializeDirect12() {
+void Engine::InitializeDirectXCommon() {
 	DirectXCommon::Initialize();
-	direct12_ = DirectXCommon::GetInstance();
+	directXCommon_ = DirectXCommon::GetInstance();
 }
 
 
+///
+///  DirectXTK
+///
 
-
-
-/// <summary>
-/// 文字表示関係
-/// </summary>
-bool Engine::InitializeSprite() {
-	static ID3D12Device* device = engine->direct3D_->GetDevice();
-	// GraphicsMemory初期化
-	gmemory.reset(new DirectX::GraphicsMemory(device));
-
-	return static_cast<bool>(gmemory);
+void Engine::InitializeDirectXTK() {
+	StringOutPutManager::Initialize();
+	stringOutPutManager_ = StringOutPutManager::GetInstance();
 }
-
-void Engine::LoadFont(const std::string& formatName) {
-	static ID3D12Device* device = engine->direct3D_->GetDevice();
-	if (!std::filesystem::exists(std::filesystem::path(formatName))) {
-		ErrorCheck::GetInstance()->ErrorTextBox("Engine::LoadFont() Failed : This file is not exist -> " + formatName, "Engine");
-		return;
-	}
-
-	engine->fontHeap.insert(
-		std::make_pair(
-			formatName,
-			engine->direct3D_->CreateDescriptorHeap(
-				D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true
-			)
-		)
-	);
-
-	DirectX::ResourceUploadBatch resUploadBach(device);
-	resUploadBach.Begin();
-	DirectX::RenderTargetState rtState(
-		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
-		DXGI_FORMAT_D32_FLOAT
-	);
-
-	DirectX::SpriteBatchPipelineStateDescription pd(rtState);
-
-	// SpriteFontオブジェクトの初期化
-	engine->spriteBatch.insert(
-		std::make_pair(formatName, std::make_unique<DirectX::SpriteBatch>(device, resUploadBach, pd)));
-	// ビューポート
-	D3D12_VIEWPORT viewport{};
-	// クライアント領域のサイズと一緒にして画面全体に表示
-	viewport.Width = static_cast<float>(engine->clientWidth);
-	viewport.Height = static_cast<float>(engine->clientHeight);
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-	engine->spriteBatch[formatName]->SetViewport(viewport);
-
-	engine->spriteFonts.insert(
-		std::make_pair(
-			formatName,
-			std::make_unique<DirectX::SpriteFont>(
-				device,
-				resUploadBach,
-				ConvertString(formatName).c_str(),
-				engine->fontHeap[formatName]->GetCPUDescriptorHandleForHeapStart(),
-				engine->fontHeap[formatName]->GetGPUDescriptorHandleForHeapStart()
-			)
-		)
-	);
-
-	ID3D12CommandQueue* commandQueue = engine->direct12_->GetCommandQueue();
-	auto future = resUploadBach.End(commandQueue);
-
-	engine->direct12_->WaitForFinishCommnadlist();
-
-	future.wait();
-}
-
-
 
 
 
@@ -266,10 +199,10 @@ void Engine::LoadFont(const std::string& formatName) {
 /// 描画用
 /// 
 bool Engine::InitializeDraw() {
-	static ID3D12Device* device = engine->direct3D_->GetDevice();
+	static ID3D12Device* device = engine->directXDevice_->GetDevice();
 
 	// DepthStencilTextureをウィンドウサイズで作成
-	depthStencilResource = direct3D_->CreateDepthStencilTextureResource(clientWidth, clientHeight);
+	depthStencilResource = directXDevice_->CreateDepthStencilTextureResource(clientWidth, clientHeight);
 	assert(depthStencilResource);
 	if (!depthStencilResource) {
 		assert(!"depthStencilResource failed");
@@ -328,12 +261,12 @@ void Engine::FrameStart() {
 	ImGui::NewFrame();
 #endif // _DEBUG
 
-	engine->direct12_->ChangeBackBufferState();
-	engine->direct12_->SetMainRenderTarget();
-	engine->direct12_->ClearBackBuffer();
+	engine->directXCommon_->ChangeBackBufferState();
+	engine->directXCommon_->SetMainRenderTarget();
+	engine->directXCommon_->ClearBackBuffer();
 
 	// ビューポート
-	engine->direct12_->SetViewPort(engine->clientWidth, engine->clientHeight);
+	engine->directXCommon_->SetViewPort(engine->clientWidth, engine->clientHeight);
 
 	// SRV用のヒープ
 	static auto srvDescriptorHeap = DescriptorHeap::GetInstance();
@@ -349,30 +282,30 @@ void Engine::FrameEnd() {
 
 
 #ifdef _DEBUG
-	ID3D12GraphicsCommandList* commandList = engine->direct12_->GetCommandList();
+	ID3D12GraphicsCommandList* commandList = engine->directXCommon_->GetCommandList();
 	// ImGui描画
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 #endif // DEBUG
 
 	
-	engine->direct12_->ChangeBackBufferState();
+	engine->directXCommon_->ChangeBackBufferState();
 
 	// コマンドリストを確定させる
-	engine->direct12_->CloseCommandlist();
+	engine->directXCommon_->CloseCommandlist();
 
 	// GPUにコマンドリストの実行を行わせる
-	engine->direct12_->ExecuteCommandLists();
+	engine->directXCommon_->ExecuteCommandLists();
 
 
 	// GPUとOSに画面の交換を行うように通知する
-	engine->direct12_->SwapChainPresent();
-	ID3D12CommandQueue* commandQueue = engine->direct12_->GetCommandQueue();
-	engine->gmemory->Commit(commandQueue);
+	engine->directXCommon_->SwapChainPresent();
 
-	engine->direct12_->WaitForFinishCommnadlist();
+	engine->stringOutPutManager_->GmemoryCommit();
 
-	engine->direct12_->ResetCommandlist();
+	engine->directXCommon_->WaitForFinishCommnadlist();
+
+	engine->directXCommon_->ResetCommandlist();
 	
 	// テクスチャの非同期読み込み
 	auto textureManager = TextureManager::GetInstance();
@@ -406,9 +339,6 @@ void Engine::FrameEnd() {
 /// 各種解放処理
 /// 
 Engine::~Engine() {
-	for (auto& i : fontHeap) {
-		i.second->Release();
-	}
 	depthStencilResource->Release();
 
 	DirectXCommon::Finalize();

@@ -169,6 +169,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ClCompile>
     <ClCompile Include="Engine\EngineParts\DirectXCommon\DirectXCommon.cpp" />
     <ClCompile Include="Engine\EngineParts\DirectXDevice\DirectXDevice.cpp" />
+    <ClCompile Include="Engine\EngineParts\StringOutPutManager\StringOutPutManager.cpp" />
     <ClCompile Include="Engine\ErrorCheck\ErrorCheck.cpp" />
     <ClCompile Include="Engine\FrameInfo\FrameInfo.cpp" />
     <ClCompile Include="Engine\PipelineManager\PipelineManager.cpp" />
@@ -239,6 +240,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Engine.h" />
     <ClInclude Include="Engine\EngineParts\DirectXCommon\DirectXCommon.h" />
     <ClInclude Include="Engine\EngineParts\DirectXDevice\DirectXDevice.h" />
+    <ClInclude Include="Engine\EngineParts\StringOutPutManager\StringOutPutManager.h" />
     <ClInclude Include="Engine\ErrorCheck\ErrorCheck.h" />
     <ClInclude Include="Engine\FrameInfo\FrameInfo.h" />
     <ClInclude Include="Engine\PipelineManager\PipelineManager.h" />

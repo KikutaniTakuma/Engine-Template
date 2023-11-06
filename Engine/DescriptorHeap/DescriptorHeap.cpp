@@ -29,11 +29,7 @@ DescriptorHeap* DescriptorHeap::GetInstance() {
 DescriptorHeap::DescriptorHeap(UINT numDescriptor) :
 	heap_(),
 	heapSize_(numDescriptor),
-#ifdef _DEBUG
-	currentHandleIndex_(1),
-#else
-	currentHandleIndex(0),
-#endif // _DEBUG
+	currentHandleIndex_(0u),
 	heapHandles_(0),
 	releaseHandle_(),
 	useHandle_(),
@@ -54,10 +50,6 @@ DescriptorHeap::DescriptorHeap(UINT numDescriptor) :
 		heapHandles_.push_back(hadleTmp);
 	}
 	bookingHandle_.clear();
-
-#ifdef _DEBUG
-	useHandle_.push_back(0u);
-#endif // _DEBUG
 }
 
 DescriptorHeap::~DescriptorHeap() {
@@ -158,16 +150,16 @@ uint32_t DescriptorHeap::CreatePerarenderView(RenderTarget& renderTarget) {
 	}
 }
 
-void DescriptorHeap::BookingHeapPos(UINT nextCreateViewNum) {
+uint32_t DescriptorHeap::BookingHeapPos(UINT nextCreateViewNum) {
 	// リリースハンドルがないなら予約しない
 	if (releaseHandle_.empty()) {
 		bookingHandle_.clear();
-		return;
+		return currentHandleIndex_;
 	}
 	// ディスクリプタが一つも作られてない場合は0を指定
 	if (useHandle_.empty()) {
 		currentHandleIndex_ = 0u;
-		return;
+		return currentHandleIndex_;
 	}
 
 	// リリースハンドルがの最初のイテレータ
@@ -198,7 +190,7 @@ void DescriptorHeap::BookingHeapPos(UINT nextCreateViewNum) {
 
 		// 予約出来なかったらループを抜けて早期リターン
 		if (bookingHandle_.empty()) {
-			return;
+			return currentHandleIndex_;
 		}
 
 		// 予約したものが連続したハンドルか
@@ -219,6 +211,13 @@ void DescriptorHeap::BookingHeapPos(UINT nextCreateViewNum) {
 		std::erase(releaseHandle_, i);
 		// 予約済みになったUseハンドルを解放
 		std::erase(useHandle_, i);
+	}
+
+	if (!bookingHandle_.empty()) {
+		return bookingHandle_.front();
+	}
+	else {
+		return currentHandleIndex_;
 	}
 }
 
@@ -241,4 +240,32 @@ void DescriptorHeap::ReleaseView(UINT viewHandle) {
 
 	// リリースハンドルに格納
 	releaseHandle_.push_back(viewHandle);
+}
+
+void DescriptorHeap::UseThisPosition(uint32_t handle) {
+	// 使ったハンドルがcurrentHandleIndex_と一致していらcurrentHandleIndex_をインクリメント
+	if (currentHandleIndex_ == handle) {
+		currentHandleIndex_++;
+	}
+	// 空だったら代入
+	if (useHandle_.empty()) {
+		useHandle_.push_back(handle);
+		return;
+	}
+
+	auto isUsed = std::find(useHandle_.begin(), useHandle_.end(), handle);
+
+	if (isUsed != useHandle_.end()) {
+		// すでに格納済み
+		return;
+	}
+	else {
+		useHandle_.push_back(handle);
+	}
+
+	// 予約済みハンドルに含まれていたら削除
+	auto isBookingHandle = std::find(bookingHandle_.begin(), bookingHandle_.end(), handle);
+	if (isBookingHandle != bookingHandle_.end()) {
+		std::erase(bookingHandle_, handle);
+	}
 }
