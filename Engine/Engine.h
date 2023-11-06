@@ -37,7 +37,12 @@ public:
 
 private:
 	Engine() = default;
+	Engine(const Engine&) = delete;
+	Engine(Engine&&) = default;
 	~Engine();
+
+	Engine& operator=(const Engine&) = delete;
+	Engine& operator=(Engine&&) = delete;
 
 public:
 	/// <summary>
@@ -49,11 +54,16 @@ public:
 
 	static void Finalize();
 
+	static bool IsFinalize();
+
 private:
 	/// <summary>
 	/// シングルトンインスタンス
 	/// </summary>
 	static Engine* engine;
+
+private:
+	bool isFinalize;
 
 public:
 	static inline Engine* GetInstance() {

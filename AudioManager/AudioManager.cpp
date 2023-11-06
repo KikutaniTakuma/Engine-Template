@@ -1,5 +1,6 @@
 #include "AudioManager.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
+#include "Engine/Engine.h"
 #include <cassert>
 #include <filesystem>
 
@@ -38,6 +39,9 @@ AudioManager::AudioManager() :
 }
 AudioManager::~AudioManager() {
 	xAudio2_.Reset();
+	if (load_.joinable()) {
+		load_.join();
+	}
 }
 
 Audio* AudioManager::LoadWav(const std::string& fileName, bool loopFlg) {
@@ -73,6 +77,9 @@ void AudioManager::ThreadLoad() {
 		auto loadProc = [this]() {
 			std::lock_guard<std::mutex> lock(mtx_);
 			while (!threadAudioBuff_.empty()) {
+				if (Engine::IsFinalize()) {
+					break;
+				}
 
 				auto& front = threadAudioBuff_.front();
 

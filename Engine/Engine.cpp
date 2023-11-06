@@ -121,6 +121,7 @@ bool Engine::Initialize(const std::string& windowName, const Vector2& windowSize
 	TextureManager::Initialize();
 	AudioManager::Inititalize();
 	PipelineManager::Initialize();
+	MeshManager::Initialize();
 
 	Texture2D::Initialize();
 	Mesh::Initialize();
@@ -132,9 +133,11 @@ bool Engine::Initialize(const std::string& windowName, const Vector2& windowSize
 }
 
 void Engine::Finalize() {
+	engine->isFinalize = true;
 	Particle::Finalize();
 	Texture2D::Finalize();
 
+	MeshManager::Finalize();
 	PipelineManager::Finalize();
 	AudioManager::Finalize();
 	TextureManager::Finalize();
@@ -148,6 +151,10 @@ void Engine::Finalize() {
 
 	// COM 終了
 	CoUninitialize();
+}
+
+bool Engine::IsFinalize() {
+	return engine->isFinalize;
 }
 
 

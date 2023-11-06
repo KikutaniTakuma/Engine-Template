@@ -1,9 +1,32 @@
 #include "MeshManager.h"
+#include "Engine/Engine.h"
+
+MeshManager* MeshManager::instance_ = nullptr;
 
 MeshManager* const MeshManager::GetInstance() {
-	static MeshManager instance;
+	assert(instance_);
+	return instance_;
+}
 
-	return &instance;
+MeshManager::~MeshManager() {
+	if (load_.joinable()) {
+		load_.join();
+	}
+
+	meshs_.clear();
+
+	while (!threadMeshBuff_.empty()) {
+		threadMeshBuff_.pop();
+	}
+}
+
+void MeshManager::Initialize() {
+	instance_ = new MeshManager{};
+	assert(instance_);
+}
+void MeshManager::Finalize() {
+	delete instance_;
+	instance_ = nullptr;
 }
 
 Mesh* MeshManager::LoadObj(const std::string& objFileName) {
@@ -37,9 +60,10 @@ void MeshManager::Draw() {
 void MeshManager::ThreadLoad() {
 	if (!threadMeshBuff_.empty() && !load_.joinable()) {
 		auto loadProc = [this]() {
-			std::lock_guard<std::mutex> lock(mtx_);
-
 			while (!threadMeshBuff_.empty()) {
+				if (Engine::IsFinalize()) {
+					break;
+				}
 				// ロードするmeshを取得
 				auto& front = threadMeshBuff_.front();
 				
@@ -61,6 +85,10 @@ void MeshManager::ThreadLoad() {
 
 			bool isTextureLoadFinish = false;
 			while (!isTextureLoadFinish) {
+				if (Engine::IsFinalize()) {
+					break;
+				}
+
 				for (auto& i : meshs_) {
 					i.second->CheckModelTextureLoadFinish();
 				}
