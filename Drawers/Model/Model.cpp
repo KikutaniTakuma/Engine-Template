@@ -3,7 +3,7 @@
 #include <climits>
 #include "Utils/ConvertString/ConvertString.h"
 #include "Utils/UtilsLib/UtilsLib.h"
-#include "Engine/ShaderResource/ShaderResourceHeap.h"
+#include "Engine/DescriptorHeap/DescriptorHeap.h"
 #include "externals/imgui/imgui.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Engine/PipelineManager/PipelineManager.h"

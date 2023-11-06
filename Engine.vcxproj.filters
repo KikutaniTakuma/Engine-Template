@@ -107,9 +107,6 @@
     <ClCompile Include="Engine\RenderTarget\RenderTarget.cpp">
       <Filter>Engine\RenderTarget</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\ShaderResource\DescriptorHeap.cpp">
-      <Filter>Engine\ShaderResource</Filter>
-    </ClCompile>
     <ClCompile Include="MeshManager\MeshManager.cpp">
       <Filter>MeshManager</Filter>
     </ClCompile>
@@ -181,6 +178,9 @@
     </ClCompile>
     <ClCompile Include="Engine\EngineParts\DirectXDevice\DirectXDevice.cpp">
       <Filter>Engine\EngineParts\DirectXDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\DescriptorHeap\DescriptorHeap.cpp">
+      <Filter>Engine\DescriptorHeap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -255,9 +255,6 @@
     </Filter>
     <Filter Include="Engine\RenderTarget">
       <UniqueIdentifier>{ece16fea-31ac-410e-9402-f17c929ef028}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\ShaderResource">
-      <UniqueIdentifier>{5325ce8c-6115-444a-84db-472a18839f17}</UniqueIdentifier>
     </Filter>
     <Filter Include="Utils">
       <UniqueIdentifier>{42aaa316-1089-4ab2-ba8d-4be0f3334763}</UniqueIdentifier>
@@ -357,6 +354,9 @@
     </Filter>
     <Filter Include="Engine\EngineParts\DirectXDevice">
       <UniqueIdentifier>{fc72a1ac-b158-4732-9c50-43f6c06d90e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\DescriptorHeap">
+      <UniqueIdentifier>{5325ce8c-6115-444a-84db-472a18839f17}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -471,9 +471,6 @@
     <ClInclude Include="Engine\RenderTarget\RenderTarget.h">
       <Filter>Engine\RenderTarget</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\ShaderResource\DescriptorHeap.h">
-      <Filter>Engine\ShaderResource</Filter>
-    </ClInclude>
     <ClInclude Include="MeshManager\MeshManager.h">
       <Filter>MeshManager</Filter>
     </ClInclude>
@@ -548,6 +545,9 @@
     </ClInclude>
     <ClInclude Include="Engine\EngineParts\DirectXDevice\DirectXDevice.h">
       <Filter>Engine\EngineParts\DirectXDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\DescriptorHeap\DescriptorHeap.h">
+      <Filter>Engine\DescriptorHeap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

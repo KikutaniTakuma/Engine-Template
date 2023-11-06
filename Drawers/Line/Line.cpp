@@ -1,7 +1,7 @@
 #include "Line.h"
 #include <algorithm>
 #include "Engine/PipelineManager/PipelineManager.h"
-#include "Engine/ShaderResource/ShaderResourceHeap.h"
+#include "Engine/DescriptorHeap/DescriptorHeap.h"
 
 Shader Line::shader_ = {};
 

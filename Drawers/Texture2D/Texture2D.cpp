@@ -1,7 +1,7 @@
 #include "Texture2D.h"
 #include "externals/imgui/imgui.h"
 #include "Utils/UtilsLib/UtilsLib.h"
-#include "Engine/ShaderResource/ShaderResourceHeap.h"
+#include "Engine/DescriptorHeap/DescriptorHeap.h"
 #include <numeric>
 #undef max
 #undef min

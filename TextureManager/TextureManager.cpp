@@ -3,7 +3,7 @@
 #include "Engine/Engine.h"
 #include "Engine/EngineParts/DirectXDevice/DirectXDevice.h"
 #include <cassert>
-#include "Engine/ShaderResource/ShaderResourceHeap.h"
+#include "Engine/DescriptorHeap/DescriptorHeap.h"
 
 TextureManager* TextureManager::instance = nullptr;
 

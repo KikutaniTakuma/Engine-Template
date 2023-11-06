@@ -2,7 +2,7 @@
 #include "Engine/Engine.h"
 #include "Engine/WinApp/WinApp.h"
 #include "Engine/EngineParts/DirectXDevice/DirectXDevice.h"
-#include "Engine/ShaderResource/ShaderResourceHeap.h"
+#include "Engine/DescriptorHeap/DescriptorHeap.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
 
 #include "Utils/Math/Vector2.h"

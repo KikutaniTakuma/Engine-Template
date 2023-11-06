@@ -7,7 +7,7 @@
 #include <filesystem>
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "TextureManager/TextureManager.h"
-#include "Engine/ShaderResource/ShaderResourceHeap.h"
+#include "Engine/DescriptorHeap/DescriptorHeap.h"
 
 Texture::Texture():
 	textureResouce(nullptr),

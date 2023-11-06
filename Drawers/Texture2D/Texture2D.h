@@ -1,6 +1,6 @@
 #pragma once
 #include "TextureManager/TextureManager.h"
-#include "Engine/ShaderResource/ShaderResourceHeap.h"
+#include "Engine/DescriptorHeap/DescriptorHeap.h"
 #include "Engine/PipelineManager/PipelineManager.h"
 
 #include "Utils/Math/Vector3.h"
