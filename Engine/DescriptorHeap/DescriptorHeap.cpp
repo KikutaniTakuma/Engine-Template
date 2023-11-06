@@ -8,22 +8,22 @@
 #include <algorithm>
 #include <numeric>
 
-DescriptorHeap* DescriptorHeap::instance = nullptr;
+DescriptorHeap* DescriptorHeap::instance_ = nullptr;
 
 void DescriptorHeap::Initialize(UINT numDescriptor) {
 	// 1～(10^6-1)でクランプ
 	numDescriptor = std::clamp(numDescriptor, 1u, static_cast<UINT>(std::pow(10u, 6u)) - 1u);
 
-	instance = new DescriptorHeap{ numDescriptor };
+	instance_ = new DescriptorHeap{ numDescriptor };
 }
 
 void DescriptorHeap::Finalize() {
-	delete instance;
-	instance = nullptr;
+	delete instance_;
+	instance_ = nullptr;
 }
 
 DescriptorHeap* DescriptorHeap::GetInstance() {
-	return instance;
+	return instance_;
 }
 
 DescriptorHeap::DescriptorHeap(UINT numDescriptor) :

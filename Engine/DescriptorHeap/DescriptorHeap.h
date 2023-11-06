@@ -28,7 +28,7 @@ public:
 	static DescriptorHeap* GetInstance();
 
 private:
-	static DescriptorHeap* instance;
+	static DescriptorHeap* instance_;
 
 public:
 	void SetHeap();
