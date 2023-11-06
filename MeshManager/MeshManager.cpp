@@ -74,10 +74,16 @@ void MeshManager::ThreadLoad() {
 				if (mesh == meshs_.end()) {
 					meshs_[front.first] = std::make_unique<Mesh>();
 					meshs_[front.first]->ThreadLoadObj(front.first);
+					if (Engine::IsFinalize()) {
+						break;
+					}
 					(*front.second) = meshs_[front.first].get();
 				}
 				// ロード済みだったらロード済みのmeshポインタを代入
 				else {
+					if (Engine::IsFinalize()) {
+						break;
+					}
 					(*front.second) = mesh->second.get();
 				}
 				threadMeshBuff_.pop();
