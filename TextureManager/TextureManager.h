@@ -7,6 +7,9 @@
 #include <queue>
 #include <thread>
 
+/// <summary>
+/// テクスチャの管理
+/// </summary>
 class TextureManager {
 private:
 	TextureManager();

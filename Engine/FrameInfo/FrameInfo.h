@@ -2,6 +2,9 @@
 #include <chrono>
 #include <queue>
 
+/// <summary>
+/// フレーム情報の管理(fps固定、デルタタイム、平均fps)
+/// </summary>
 class FrameInfo {
 /// <summary>
 /// コンストラクタ

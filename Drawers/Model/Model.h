@@ -11,6 +11,9 @@ class Pipeline;
 
 #include <wrl.h>
 
+/// <summary>
+/// 3Dモデルの描画
+/// </summary>
 class Model {
 public:
 	Model();

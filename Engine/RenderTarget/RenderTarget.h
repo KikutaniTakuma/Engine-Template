@@ -2,6 +2,9 @@
 #include "Engine/ConstBuffer/ConstBuffer.h"
 #include "TextureManager/Texture/Texture.h"
 
+/// <summary>
+/// ポストエフェクト用のレンダーターゲットリソース等を管理するクラス
+/// </summary>
 class RenderTarget {
 public:
 	RenderTarget();

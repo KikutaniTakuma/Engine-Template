@@ -4,6 +4,9 @@
 #pragma comment(lib, "d3d12.lib")
 #include <vector>
 
+/// <summary>
+/// ルートシグネチャを管理
+/// </summary>
 class RootSignature {
 public:
 	RootSignature();

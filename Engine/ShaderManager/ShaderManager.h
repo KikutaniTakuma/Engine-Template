@@ -10,6 +10,9 @@
 #include <string>
 #include <wrl.h>
 
+/// <summary>
+/// シェーダーをまとめる構造体
+/// </summary>
 struct Shader {
 	IDxcBlob* vertex = nullptr;
 	IDxcBlob* hull = nullptr;
@@ -18,6 +21,9 @@ struct Shader {
 	IDxcBlob* pixel = nullptr;
 };
 
+/// <summary>
+/// シェーダーを管理するクラス
+/// </summary>
 class ShaderManager {
 private:
 	ShaderManager();

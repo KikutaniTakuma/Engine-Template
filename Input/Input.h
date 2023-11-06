@@ -7,6 +7,9 @@
 #include "Input/Mouse/Mouse.h"
 #include <cassert>
 
+/// <summary>
+/// 入力関連初期化
+/// </summary>
 class Input {
 private:
 	Input();

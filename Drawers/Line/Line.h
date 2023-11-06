@@ -6,6 +6,9 @@
 #include "Engine/ShaderManager/ShaderManager.h"
 class Pipeline;
 
+/// <summary>
+/// 線の描画
+/// </summary>
 class Line {
 private:
 	struct VertexData {

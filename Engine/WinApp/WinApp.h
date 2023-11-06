@@ -7,6 +7,9 @@
 #include <string>
 class Vector2;
 
+/// <summary>
+/// ウィンドウズAPI管理クラス(ウィンドウ生成等)
+/// </summary>
 class WinApp {
 private:
 	WinApp();

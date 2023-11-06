@@ -6,6 +6,9 @@
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
+/// <summary>
+/// キーボードの入力
+/// </summary>
 class KeyInput {
 private:
 	KeyInput() = delete;

@@ -11,6 +11,9 @@
 #include <array>
 #include <variant>
 
+/// <summary>
+/// パーティクルの描画
+/// </summary>
 class Particle {
 public:
 	using Item = std::variant<uint32_t, float, Vector2, Vector3, std::string>;

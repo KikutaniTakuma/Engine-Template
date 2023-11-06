@@ -1,6 +1,9 @@
 #pragma once
 #include <string>
 
+/// <summary>
+/// エラーのチェック(ErrorTextBox()を呼び出したらメインループが止まる)
+/// </summary>
 class ErrorCheck {
 private:
 	ErrorCheck();

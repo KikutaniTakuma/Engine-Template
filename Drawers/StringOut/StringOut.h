@@ -4,7 +4,9 @@
 #include "Utils/Math/Vector4.h"
 #include "Utils/ConvertString/ConvertString.h"
 
-
+/// <summary>
+/// 文字列描画(座標系はスクリーンなので注意)
+/// </summary>
 class StringOut {
 public:
 	StringOut();

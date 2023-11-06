@@ -1,5 +1,8 @@
 #pragma once
 
+/// <summary>
+///	二次元ベクトル
+/// </summary>
 class Vector2 final {
 /// <summary>
 /// コンストラクタ

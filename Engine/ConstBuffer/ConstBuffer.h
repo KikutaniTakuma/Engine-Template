@@ -9,7 +9,9 @@
 template<class T>
 concept IsNotPtrCB = !std::is_pointer_v<T>;
 
-// ポインタをテンプレートパラメータに設定してはいけない
+/// <summary>
+/// 定数バッファ
+/// </summary>
 template<IsNotPtrCB T>
 class ConstBuffer {
 public:

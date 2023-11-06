@@ -21,7 +21,9 @@ class Vector3;
 class Vector4;
 class Mat4x4;
 
-
+/// <summary>
+/// 各種マネージャーやDirectX12関連、ウィンドウ関連の初期化と解放を担う
+/// </summary>
 class Engine {
 public:
 	enum class Resolution {

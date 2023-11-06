@@ -1,5 +1,8 @@
 #pragma once
 
+/// <summary>
+/// 三次元配列
+/// </summary>
 class Vector3 final {
 /// <summary>
 /// コンストラクタ

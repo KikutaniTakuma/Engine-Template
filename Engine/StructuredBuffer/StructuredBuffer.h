@@ -10,7 +10,10 @@
 template<class T>
 concept IsNotPtrSB = !std::is_pointer_v<T>;
 
-// ポインタをテンプレートパラメータに設定してはいけない
+/// <summary>
+/// ストラクチャードバッファ
+/// </summary>
+/// <typeparam name="T">ポインタ以外をサポート</typeparam>
 template<IsNotPtrSB T>
 class StructuredBuffer {
 public:

@@ -5,6 +5,9 @@
 
 #include <string>
 
+/// <summary>
+/// 音の再生や停止、ロードを担う
+/// </summary>
 class Audio {
 	friend class AudioManager;
 

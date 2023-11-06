@@ -2,6 +2,9 @@
 #include <array>
 #include <immintrin.h>
 
+/// <summary>
+/// 4次元配列
+/// </summary>
 class Vector4 final {
 	/// <summary>
 	/// コンストラクタ

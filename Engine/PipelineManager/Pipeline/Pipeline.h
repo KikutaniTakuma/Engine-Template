@@ -2,6 +2,9 @@
 #include "Engine/ShaderManager/ShaderManager.h"
 class RootSignature;
 
+/// <summary>
+/// グラフィックスパイプライン
+/// </summary>
 class Pipeline {
 public:
 	/// <summary>

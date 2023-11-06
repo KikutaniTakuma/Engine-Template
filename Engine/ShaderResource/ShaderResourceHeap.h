@@ -7,6 +7,9 @@
 #include "TextureManager/Texture/Texture.h"
 #include "Engine/RenderTarget/RenderTarget.h"
 
+/// <summary>
+/// ディスクリプタヒープ管理クラス
+/// </summary>
 class ShaderResourceHeap {
 private:
 	ShaderResourceHeap() = delete;

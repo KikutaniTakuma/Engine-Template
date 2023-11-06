@@ -14,7 +14,7 @@
 #include "Engine/StructuredBuffer/StructuredBuffer.h"
 
 /// <summary>
-/// 基本的にポインタ型で使う
+/// メッシュクラス。objファイルの読み込みやリソースを管理(基本的にポインタ型で使う)
 /// </summary>
 class Mesh {
 	friend class MeshManager;

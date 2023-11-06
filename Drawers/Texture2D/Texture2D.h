@@ -12,6 +12,9 @@
 
 #include <array>
 
+/// <summary>
+/// 板ポリ描画
+/// </summary>
 class Texture2D {
 public:
 	struct MatrixData {

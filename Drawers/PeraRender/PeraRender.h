@@ -11,6 +11,9 @@
 #include "Utils/Math/Vector2.h"
 #include "Utils/Math/Mat4x4.h"
 
+/// <summary>
+/// ポストエフェクトの描画
+/// </summary>
 class PeraRender {
 public:
 	struct PeraVertexData {

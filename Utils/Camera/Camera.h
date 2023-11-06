@@ -5,6 +5,9 @@
 #include "Utils/Math/Vector4.h"
 #include <string>
 
+/// <summary>
+/// カメラ
+/// </summary>
 class Camera {
 /// <summary>
 /// コンストラクタ

@@ -1,6 +1,9 @@
 #pragma once
 #include <list>
 
+/// <summary>
+/// コリジョンマネージャー
+/// </summary>
 class CollisionManager {
 
 

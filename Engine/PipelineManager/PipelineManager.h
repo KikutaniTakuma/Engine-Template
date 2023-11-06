@@ -6,6 +6,9 @@
 #include <tuple>
 class RootSignature;
 
+/// <summary>
+/// グラフィックスパイプラインとルートシグネチャの管理
+/// </summary>
 class PipelineManager {
 /// <summary>
 /// コンストラクタ

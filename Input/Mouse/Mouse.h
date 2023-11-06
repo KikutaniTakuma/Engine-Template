@@ -7,6 +7,9 @@
 
 #include "Utils/Math/Vector2.h"
 
+/// <summary>
+/// マウスの入力
+/// </summary>
 class Mouse {
 public:
 	enum class Button : uint8_t {

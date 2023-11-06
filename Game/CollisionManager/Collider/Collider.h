@@ -5,6 +5,9 @@
 #include "Utils/UtilsLib/UtilsLib.h"
 #include <bitset>
 
+/// <summary>
+/// 当たり判定(AABB)
+/// </summary>
 class Collider {
 public:
 	Collider();

@@ -5,7 +5,9 @@
 #include "Mesh/Mesh.h"
 #include "Utils/UtilsLib/UtilsLib.h"
 
-
+/// <summary>
+/// メッシュを管理
+/// </summary>
 class MeshManager final {
 private:
 	MeshManager() = default;

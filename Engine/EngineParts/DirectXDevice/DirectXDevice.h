@@ -6,6 +6,9 @@
 #pragma comment(lib, "dxgi.lib")
 #include <cstdint>
 
+/// <summary>
+/// デバイス等の管理クラス
+/// </summary>
 class DirectXDevice {
 private:
 	DirectXDevice();

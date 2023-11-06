@@ -9,6 +9,9 @@
 #include <vector>
 #include <cstdint>
 
+/// <summary>
+/// DirectX12のデバイス以外を管理(スワップチェイン、コマンドリストなど)
+/// </summary>
 class DirectXCommon {
 private:
 	DirectXCommon();

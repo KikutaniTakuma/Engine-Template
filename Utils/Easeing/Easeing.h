@@ -3,15 +3,15 @@
 #include <string>
 #include <algorithm>
 #include <cassert>
-#include <type_traits>
+#include <concepts>
 #include "Utils/Math/Vector2.h"
 #include "Utils/Math/Vector3.h"
 #include "Utils/Math/Vector4.h"
 #include"Utils/UtilsLib/UtilsLib.h"
 
-template<class T>
-concept IsInt = std::is_integral_v<T>;
-
+/// <summary>
+/// イージング管理
+/// </summary>
 class Easeing {
 public:
 	Easeing();
@@ -119,8 +119,8 @@ private:
 	float spdT_;
 
 public:
-	template<IsInt T>
-	static std::function<float(float)> GetFunction(T typeNum) {
+	template<std::integral IsInt>
+	static std::function<float(float)> GetFunction(IsInt typeNum) {
 		std::function<float(float)> ease;
 
 		switch (typeNum)

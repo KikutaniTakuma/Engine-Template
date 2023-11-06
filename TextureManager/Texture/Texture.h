@@ -11,6 +11,9 @@
 
 #include "Utils/Math/Vector2.h"
 
+/// <summary>
+/// テクスチャの読み込みやリソースの管理を担う
+/// </summary>
 class Texture {
 	friend class TextureManager;
 

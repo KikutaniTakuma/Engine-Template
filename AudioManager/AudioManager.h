@@ -9,6 +9,9 @@
 #include <mutex>
 #include "Audio/Audio.h"
 
+/// <summary>
+/// Audioを管理
+/// </summary>
 class AudioManager {
 	friend Audio;
 

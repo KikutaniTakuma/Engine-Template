@@ -5,6 +5,9 @@
 
 class Vector3;
 
+/// <summary>
+/// 4x4行列
+/// </summary>
 class Mat4x4 final {
 /// <summary>
 /// コンストラクタ

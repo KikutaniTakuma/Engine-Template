@@ -5,6 +5,9 @@
 #include "Utils/UtilsLib/UtilsLib.h"
 #include <array>
 
+/// <summary>
+/// 当たり判定(OBB)
+/// </summary>
 class Obb {
 public:
 	Obb();
