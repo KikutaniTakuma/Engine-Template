@@ -3,6 +3,7 @@
 #include "TextureManager/TextureManager.h"
 #include "Engine/PipelineManager/PipelineManager.h"
 #include "MeshManager/MeshManager.h"
+#include "Engine/Engine.h"
 #include <fstream>
 #include <sstream>
 #include <cassert>
@@ -239,6 +240,10 @@ void Mesh::ThreadLoadObj(const std::string& objFileName) {
 		std::string lineBuf;
 
 		while (std::getline(objFile, lineBuf)) {
+			if (Engine::IsFinalize()) {
+				return;
+			}
+
 			std::string identifier;
 			std::istringstream line(lineBuf);
 			line >> identifier;
