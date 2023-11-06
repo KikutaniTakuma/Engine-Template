@@ -29,24 +29,24 @@ public:
 	void Create(const std::wstring& windowTitle, int32_t width, int32_t height);
 
 	inline HWND GetHwnd() const {
-		return hwnd;
+		return hwnd_;
 	}
 
 	inline const WNDCLASSEX& getWNDCLASSEX() const {
-		return w;
+		return wndEx_;
 	}
 
 	inline std::wstring GetWindowClassName() const {
-		return windowName;
+		return windowName_;
 	}
 
 	Vector2 GetWindowSize() const;
 
 
 private:
-	HWND hwnd = nullptr;
-	WNDCLASSEX w{};
-	UINT windowStyle;
-	RECT windowRect;
-	std::wstring windowName;
+	HWND hwnd_ = nullptr;
+	WNDCLASSEX wndEx_{};
+	UINT windowStyle_;
+	RECT windowRect_;
+	std::wstring windowName_;
 };

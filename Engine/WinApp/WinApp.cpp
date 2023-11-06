@@ -8,17 +8,17 @@ extern IMGUI_IMPL_API LRESULT
 ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 WinApp::WinApp():
-	hwnd{},
-	w{},
-	windowStyle(0u),
-	windowRect{},
-	windowName()
+	hwnd_{},
+	wndEx_{},
+	windowStyle_(0u),
+	windowRect_{},
+	windowName_()
 {
 	timeBeginPeriod(1);
 }
 
 WinApp::~WinApp() {
-	UnregisterClass(w.lpszClassName, w.hInstance);
+	UnregisterClass(wndEx_.lpszClassName, wndEx_.hInstance);
 }
 
 LRESULT WinApp::WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
@@ -37,50 +37,50 @@ LRESULT WinApp::WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 void WinApp::Create(const std::wstring& windowTitle, int32_t width, int32_t height) {
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
-	windowName = windowTitle;
+	windowName_ = windowTitle;
 
 	// 最大化ボタンを持たないかつサイズ変更不可
-	windowStyle = WS_OVERLAPPEDWINDOW & ~(WS_MAXIMIZEBOX | WS_THICKFRAME);
+	windowStyle_ = WS_OVERLAPPEDWINDOW & ~(WS_MAXIMIZEBOX | WS_THICKFRAME);
 
-	w.cbSize = sizeof(WNDCLASSEX);
-	w.lpfnWndProc = WindowProcedure;
-	w.lpszClassName = windowTitle.c_str();
-	w.hInstance = GetModuleHandle(nullptr);
-	w.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wndEx_.cbSize = sizeof(WNDCLASSEX);
+	wndEx_.lpfnWndProc = WindowProcedure;
+	wndEx_.lpszClassName = windowTitle.c_str();
+	wndEx_.hInstance = GetModuleHandle(nullptr);
+	wndEx_.hCursor = LoadCursor(NULL, IDC_ARROW);
 
-	RegisterClassEx(&w);
+	RegisterClassEx(&wndEx_);
 
-	windowRect = { 0,0,width, height };
+	windowRect_ = { 0,0,width, height };
 
 	// 指定のサイズになるようなウィンドウサイズを計算
-	AdjustWindowRect(&windowRect, windowStyle, false);
+	AdjustWindowRect(&windowRect_, windowStyle_, false);
 
-	hwnd = CreateWindow(
-		w.lpszClassName,
+	hwnd_ = CreateWindow(
+		wndEx_.lpszClassName,
 		windowTitle.c_str(),
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
-		windowRect.right - windowRect.left,
-		windowRect.bottom - windowRect.top,
+		windowRect_.right - windowRect_.left,
+		windowRect_.bottom - windowRect_.top,
 		nullptr,
 		nullptr,
-		w.hInstance,
+		wndEx_.hInstance,
 		nullptr
 	);
 
-	windowStyle &= ~WS_THICKFRAME;
+	windowStyle_ &= ~WS_THICKFRAME;
 
-	SetWindowLong(hwnd, GWL_STYLE, windowStyle);
+	SetWindowLong(hwnd_, GWL_STYLE, windowStyle_);
 	SetWindowPos(
-		hwnd, NULL, 0, 0, 0, 0, (SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED));
-	ShowWindow(hwnd, SW_NORMAL);
+		hwnd_, NULL, 0, 0, 0, 0, (SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED));
+	ShowWindow(hwnd_, SW_NORMAL);
 }
 
 
 Vector2 WinApp::GetWindowSize() const {
 	return Vector2(
-		static_cast<float>(windowRect.right), 
-		static_cast<float>(windowRect.bottom)
+		static_cast<float>(windowRect_.right), 
+		static_cast<float>(windowRect_.bottom)
 	);
 }

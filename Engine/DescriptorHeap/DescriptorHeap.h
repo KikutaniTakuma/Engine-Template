@@ -44,21 +44,21 @@ public:
 	/// <returns>作成した場所のハンドル</returns>
 	template<IsNotPtrCB T>
 	uint32_t CreateConstBufferView(ConstBuffer<T>& conBuf) {
-		assert(currentHandleIndex < heapSize);
-		if (currentHandleIndex >= heapSize) {
+		assert(currentHandleIndex_ < heapSize_);
+		if (currentHandleIndex_ >= heapSize_) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateConstBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 
 		if (bookingHandle_.empty()) {
-			useHandle_.push_back(currentHandleIndex);
-			conBuf.CrerateView(heapHandles[currentHandleIndex].first, heapHandles[currentHandleIndex].second, currentHandleIndex);
-			currentHandleIndex++;
-			return currentHandleIndex - 1u;
+			useHandle_.push_back(currentHandleIndex_);
+			conBuf.CrerateView(heapHandles_[currentHandleIndex_].first, heapHandles_[currentHandleIndex_].second, currentHandleIndex_);
+			currentHandleIndex_++;
+			return currentHandleIndex_ - 1u;
 		}
 		else {
 			uint32_t nowCreateViewHandle = bookingHandle_.front();
 			useHandle_.push_back(nowCreateViewHandle);
-			conBuf.CrerateView(heapHandles[nowCreateViewHandle].first, heapHandles[nowCreateViewHandle].second, nowCreateViewHandle);
+			conBuf.CrerateView(heapHandles_[nowCreateViewHandle].first, heapHandles_[nowCreateViewHandle].second, nowCreateViewHandle);
 			bookingHandle_.pop_front();
 			return nowCreateViewHandle;
 		}
@@ -73,12 +73,12 @@ public:
 	/// <param name="heapIndex">作成する場所のハンドル</param>
 	template<IsNotPtrCB T>
 	void CreateConstBufferView(ConstBuffer<T>& conBuf, UINT heapIndex) {
-		assert(heapIndex < heapSize);
-		if (heapIndex >= heapSize) {
+		assert(heapIndex < heapSize_);
+		if (heapIndex >= heapSize_) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateConstBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 
-		conBuf.CrerateView(heapHandles[heapIndex].first, heapHandles[heapIndex].second, heapIndex);
+		conBuf.CrerateView(heapHandles_[heapIndex].first, heapHandles_[heapIndex].second, heapIndex);
 	}
 
 	/// <summary>
@@ -89,20 +89,20 @@ public:
 	/// <returns>作成した場所のハンドル</returns>
 	template<IsNotPtrSB T>
 	uint32_t CreateStructuredBufferView(StructuredBuffer<T>& strcBuf) {
-		assert(currentHandleIndex < heapSize);
-		if (currentHandleIndex >= heapSize) {
+		assert(currentHandleIndex_ < heapSize_);
+		if (currentHandleIndex_ >= heapSize_) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateStructuredBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 		if (bookingHandle_.empty()) {
-			useHandle_.push_back(currentHandleIndex);
-			strcBuf.CrerateView(heapHandles[currentHandleIndex].first, heapHandles[currentHandleIndex].second, currentHandleIndex);
-			currentHandleIndex++;
-			return currentHandleIndex - 1u;
+			useHandle_.push_back(currentHandleIndex_);
+			strcBuf.CrerateView(heapHandles_[currentHandleIndex_].first, heapHandles_[currentHandleIndex_].second, currentHandleIndex_);
+			currentHandleIndex_++;
+			return currentHandleIndex_ - 1u;
 		}
 		else {
 			uint32_t nowCreateViewHandle = bookingHandle_.front();
 			useHandle_.push_back(nowCreateViewHandle);
-			strcBuf.CrerateView(heapHandles[nowCreateViewHandle].first, heapHandles[nowCreateViewHandle].second, nowCreateViewHandle);
+			strcBuf.CrerateView(heapHandles_[nowCreateViewHandle].first, heapHandles_[nowCreateViewHandle].second, nowCreateViewHandle);
 			bookingHandle_.pop_front();
 			return nowCreateViewHandle;
 		}
@@ -116,12 +116,12 @@ public:
 	/// <param name="heapIndex">作成する場所のハンドル</param>
 	template<IsNotPtrSB T>
 	void CreateStructuredBufferView(StructuredBuffer<T>& strcBuf, UINT heapIndex) {
-		assert(heapIndex < heapSize);
-		if (heapIndex >= heapSize) {
+		assert(heapIndex < heapSize_);
+		if (heapIndex >= heapSize_) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateStructuredBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 		
-		strcBuf.CrerateView(heapHandles[heapIndex].first, heapHandles[heapIndex].second, heapIndex);
+		strcBuf.CrerateView(heapHandles_[heapIndex].first, heapHandles_[heapIndex].second, heapIndex);
 	}
 
 	/// <summary>
@@ -146,22 +146,22 @@ public:
 	uint32_t CreatePerarenderView(RenderTarget& renderTarget);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCpuHeapHandle(uint32_t heapIndex) {
-		return heapHandles[heapIndex].first;
+		return heapHandles_[heapIndex].first;
 	}
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGpuHeapHandle(uint32_t heapIndex) {
-		return heapHandles[heapIndex].second;
+		return heapHandles_[heapIndex].second;
 	}
 	
 	inline UINT GetSize() const {
-		return heapSize;
+		return heapSize_;
 	}
 
 	inline ID3D12DescriptorHeap* Get() const {
-		return SRVHeap.Get();
+		return heap_.Get();
 	}
 
 	inline ID3D12DescriptorHeap* const* GetAddressOf() const {
-		return SRVHeap.GetAddressOf();
+		return heap_.GetAddressOf();
 	}
 
 public:
@@ -172,15 +172,15 @@ private:
 	void Reset();
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> SRVHeap;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap_;
 
-	UINT heapSize;
-	UINT currentHandleIndex;
+	UINT heapSize_;
+	UINT currentHandleIndex_;
 
 	std::list<uint32_t> releaseHandle_;
 	std::list<uint32_t> useHandle_;
 	std::deque<uint32_t> bookingHandle_;
 
 
-	std::vector<std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE>> heapHandles;
+	std::vector<std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE>> heapHandles_;
 };

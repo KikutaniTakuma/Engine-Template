@@ -27,31 +27,31 @@ DescriptorHeap* DescriptorHeap::GetInstance() {
 }
 
 DescriptorHeap::DescriptorHeap(UINT numDescriptor) :
-	SRVHeap(),
-	heapSize(numDescriptor),
+	heap_(),
+	heapSize_(numDescriptor),
 #ifdef _DEBUG
-	currentHandleIndex(1),
+	currentHandleIndex_(1),
 #else
 	currentHandleIndex(0),
 #endif // _DEBUG
-	heapHandles(0),
+	heapHandles_(0),
 	releaseHandle_(),
 	useHandle_(),
 	bookingHandle_()
 {
-	SRVHeap = DirectXDevice::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, numDescriptor, true);
+	heap_ = DirectXDevice::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, numDescriptor, true);
 
 	UINT incrementSRVCBVUAVHeap = DirectXDevice::GetInstance()->GetIncrementSRVCBVUAVHeap();
 
-	heapHandles.reserve(heapSize);
-	heapHandles.push_back({ SRVHeap->GetCPUDescriptorHandleForHeapStart(),
-							SRVHeap->GetGPUDescriptorHandleForHeapStart() });
-	auto heapHandleFirstItr = heapHandles.begin();
-	for (uint32_t i = 1; i < heapSize; i++) {
+	heapHandles_.reserve(heapSize_);
+	heapHandles_.push_back({ heap_->GetCPUDescriptorHandleForHeapStart(),
+							heap_->GetGPUDescriptorHandleForHeapStart() });
+	auto heapHandleFirstItr = heapHandles_.begin();
+	for (uint32_t i = 1; i < heapSize_; i++) {
 		auto hadleTmp = *heapHandleFirstItr;
 		hadleTmp.first.ptr += incrementSRVCBVUAVHeap * i;
 		hadleTmp.second.ptr += incrementSRVCBVUAVHeap * i;
-		heapHandles.push_back(hadleTmp);
+		heapHandles_.push_back(hadleTmp);
 	}
 	bookingHandle_.clear();
 
@@ -66,7 +66,7 @@ DescriptorHeap::~DescriptorHeap() {
 
 void DescriptorHeap::SetHeap() {
 	static auto commandlist = DirectXCommon::GetInstance()->GetCommandList();
-	commandlist->SetDescriptorHeaps(1, SRVHeap.GetAddressOf());
+	commandlist->SetDescriptorHeaps(1, heap_.GetAddressOf());
 }
 
 void DescriptorHeap::Use(D3D12_GPU_DESCRIPTOR_HANDLE handle, UINT rootParmIndex) {
@@ -76,44 +76,44 @@ void DescriptorHeap::Use(D3D12_GPU_DESCRIPTOR_HANDLE handle, UINT rootParmIndex)
 
 void DescriptorHeap::Use(uint32_t handleIndex, UINT rootParmIndex) {
 	auto commandlist = DirectXCommon::GetInstance()->GetCommandList();
-	commandlist->SetGraphicsRootDescriptorTable(rootParmIndex, heapHandles[handleIndex].second);
+	commandlist->SetGraphicsRootDescriptorTable(rootParmIndex, heapHandles_[handleIndex].second);
 }
 
 void DescriptorHeap::Reset() {
-	if (SRVHeap) {
-		SRVHeap->Release();
-		SRVHeap.Reset();
+	if (heap_) {
+		heap_->Release();
+		heap_.Reset();
 	}
 }
 
 uint32_t DescriptorHeap::CreateTxtureView(Texture* tex) {
 	assert(tex != nullptr);
 	if (tex == nullptr || !*tex) {
-		return currentHandleIndex;
+		return currentHandleIndex_;
 	}
-	assert(currentHandleIndex < heapSize);
-	if (currentHandleIndex >= heapSize) {
+	assert(currentHandleIndex_ < heapSize_);
+	if (currentHandleIndex_ >= heapSize_) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CreateTxtureBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		return std::numeric_limits<uint32_t>::max();
 	}
 
 	if (bookingHandle_.empty()) {
-		useHandle_.push_back(currentHandleIndex);
+		useHandle_.push_back(currentHandleIndex_);
 		tex->CreateSRVView(
-			heapHandles[currentHandleIndex].first,
-			heapHandles[currentHandleIndex].second,
-			currentHandleIndex
+			heapHandles_[currentHandleIndex_].first,
+			heapHandles_[currentHandleIndex_].second,
+			currentHandleIndex_
 			);
-		currentHandleIndex++;
-		return currentHandleIndex - 1u;
+		currentHandleIndex_++;
+		return currentHandleIndex_ - 1u;
 	}
 	// もしリリースした場所に作るなら
 	else {
 		uint32_t nowCreateViewHandle = bookingHandle_.front();
 		useHandle_.push_back(nowCreateViewHandle);
 		tex->CreateSRVView(
-			heapHandles[nowCreateViewHandle].first,
-			heapHandles[nowCreateViewHandle].second,
+			heapHandles_[nowCreateViewHandle].first,
+			heapHandles_[nowCreateViewHandle].second,
 			nowCreateViewHandle
 		);
 		bookingHandle_.pop_front();
@@ -123,36 +123,36 @@ uint32_t DescriptorHeap::CreateTxtureView(Texture* tex) {
 
 void DescriptorHeap::CreateTxtureView(Texture* tex, uint32_t heapIndex) {
 	assert(tex != nullptr);
-	assert(heapIndex < heapSize);
-	if (currentHandleIndex >= heapSize) {
+	assert(heapIndex < heapSize_);
+	if (currentHandleIndex_ >= heapSize_) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CreatTxtureBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		return;
 	}
 
 	tex->CreateSRVView(
-		heapHandles[heapIndex].first,
-		heapHandles[heapIndex].second,
+		heapHandles_[heapIndex].first,
+		heapHandles_[heapIndex].second,
 		heapIndex
 		);
 }
 
 uint32_t DescriptorHeap::CreatePerarenderView(RenderTarget& renderTarget) {
-	assert(currentHandleIndex < heapSize);
-	if (currentHandleIndex >= heapSize) {
+	assert(currentHandleIndex_ < heapSize_);
+	if (currentHandleIndex_ >= heapSize_) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CreatePerarenderView failed\nOver HeapSize", "ShaderResourceHeap");
 		return std::numeric_limits<uint32_t>::max();
 	}
 
 	if (bookingHandle_.empty()) {
-		useHandle_.push_back(currentHandleIndex);
-		renderTarget.CreateView(heapHandles[currentHandleIndex].first, heapHandles[currentHandleIndex].second, currentHandleIndex);
-		currentHandleIndex++;
-		return currentHandleIndex - 1u;
+		useHandle_.push_back(currentHandleIndex_);
+		renderTarget.CreateView(heapHandles_[currentHandleIndex_].first, heapHandles_[currentHandleIndex_].second, currentHandleIndex_);
+		currentHandleIndex_++;
+		return currentHandleIndex_ - 1u;
 	}
 	else {
 		uint32_t nowCreateViewHandle = bookingHandle_.front();
 		useHandle_.push_back(nowCreateViewHandle);
-		renderTarget.CreateView(heapHandles[nowCreateViewHandle].first, heapHandles[nowCreateViewHandle].second, nowCreateViewHandle);
+		renderTarget.CreateView(heapHandles_[nowCreateViewHandle].first, heapHandles_[nowCreateViewHandle].second, nowCreateViewHandle);
 		bookingHandle_.pop_front();
 		return nowCreateViewHandle;
 	}
@@ -166,7 +166,7 @@ void DescriptorHeap::BookingHeapPos(UINT nextCreateViewNum) {
 	}
 	// ディスクリプタが一つも作られてない場合は0を指定
 	if (useHandle_.empty()) {
-		currentHandleIndex = 0u;
+		currentHandleIndex_ = 0u;
 		return;
 	}
 
