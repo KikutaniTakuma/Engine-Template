@@ -421,7 +421,13 @@ Particle::~Particle() {
 
 
 void Particle::LoadTexture(const std::string& fileName) {
-	tex_ = TextureManager::GetInstance()->LoadTexture(fileName);
+	static TextureManager* textureManager = TextureManager::GetInstance();
+	assert(textureManager);
+	while (textureManager->IsNowThreadLoading()) {
+		// 非同期読み込みが終わるまでビジーループ
+	}
+
+	tex_ = textureManager->LoadTexture(fileName);
 
 	if (tex_ && !isLoad_) {
 		isLoad_ = true;

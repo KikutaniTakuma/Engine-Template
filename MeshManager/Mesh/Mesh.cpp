@@ -34,11 +34,6 @@ Mesh::~Mesh() {
 
 void Mesh::LoadObj(const std::string& objFileName) {
 	if (!isLoad_) {
-		auto meshManager = MeshManager::GetInstance();
-		while (meshManager->IsNowThreadLoading()) {
-			// 非同期読み込みが終わるまでビジーループ
-		}
-
 		std::ifstream objFile(objFileName);
 		assert(objFile);
 		if (objFile.fail()) {

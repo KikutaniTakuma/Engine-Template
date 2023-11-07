@@ -247,7 +247,7 @@ void Texture2D::LoadTexture(const std::string& fileName) {
 	static TextureManager* textureManager = TextureManager::GetInstance();
 	assert(textureManager);
 	while (textureManager->IsNowThreadLoading()) {
-		// 非同期が終わるまでループ
+		// 非同期読み込みが終わるまでビジーループ
 	}
 	tex_ = textureManager->LoadTexture(fileName);
 

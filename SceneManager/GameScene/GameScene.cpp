@@ -19,7 +19,7 @@ void GameScene::Initialize() {
 
 	// objファイル読み込み
 	model_.ThreadLoadObj("./Resources/Watame/Watame.obj");
-	model2_.LoadObj("./Resources/Skydome/skydome.obj");
+	
 	model2_.scale_ *= 1000.0f;
 	//model_.rotate.y = std::numbers::pi_v<float>;
 
@@ -29,7 +29,7 @@ void GameScene::Initialize() {
 	tex2D_.isSameTexSize_ = true;
 	tex2D_.texScalar_ = 0.5f;
 
-	tex2D2_.LoadTexture("./Resources/watame.png");
+	
 	tex2D2_.pos_ = Vector2{ -380.0f,  -80.0f };
 	tex2D2_.scale_ *= 256.0f;
 
@@ -52,12 +52,10 @@ void GameScene::Update() {
 	model2_.Update();
 
 	if (input_->GetKey()->Pushed(DIK_1)) {
-		// ロード済みのテクスチャに変更することも可能
-		model_.ChangeTexture("face", texture_);
+		model2_.LoadObj("./Resources/Skydome/skydome.obj");
 	}
 	if (input_->GetKey()->Pushed(DIK_2)) {
-		// ロードしてなくてもここでパスを指定すれば読み込んで変更できる
-		model_.ChangeTexture("face", "./Resources/Rabbit/Rabbit_face_happy.png");
+		tex2D2_.LoadTexture("./Resources/watame.png");
 	}
 
 	tex2D_.Debug("tex");
