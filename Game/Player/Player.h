@@ -5,7 +5,7 @@
 #include <vector>
 #include "Game/CollisionManager/Collider/Collider.h"
 
-class Player : public Collider {
+class Player {
 public:
 	enum class Behavior {
 		Normal,
@@ -46,6 +46,7 @@ public:
 
 	Vector3 moveVec_;
 
+	Collider colliser_;
 private:
 	class GlobalVariables* globalVariables_ = nullptr;
 
@@ -68,4 +69,5 @@ private:
 
 	float cameraRotate_;
 	float cmaeraRotateSpd_;
+
 };

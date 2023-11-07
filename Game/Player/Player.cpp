@@ -55,10 +55,10 @@ Player::Player(GlobalVariables* globalVariables):
 	globalVariables_->AddItem(groupName, "attackSpd", attackSpd);
 	globalVariables_->AddItem(groupName, "cmaeraRotateSpd_", cmaeraRotateSpd_);
 
-	collisionPos_.y = 1.85f;
-	scale_.y = 5.0f;
-	scale_.x = 2.09f;
-	scale_.z = 2.09f;
+	colliser_.collisionPos_.y = 1.85f;
+	colliser_.scale_.y = 5.0f;
+	colliser_.scale_.x = 2.09f;
+	colliser_.scale_.z = 2.09f;
 
 	pos_.y = 8.0f;
 	pos_.x = 0.0f;
@@ -105,7 +105,7 @@ void Player::Animation() {
 
 void Player::Move() {
 	ApplyGlobalVariables();
-	UpdateCollision();
+	colliser_.UpdateCollision();
 	moveVec_ = {};
 	Animation();
 
@@ -156,7 +156,7 @@ void Player::Move() {
 	}
 
 	moveVec_.y = -15.0f;
-	collisionPos_ += moveVec_.Normalize() * spd * FrameInfo::GetInstance()->GetDelta();
+	colliser_.collisionPos_ += moveVec_.Normalize() * spd * FrameInfo::GetInstance()->GetDelta();
 }
 
 void Player::Update() {
@@ -165,8 +165,8 @@ void Player::Update() {
 		moveVec_.y = 0.0f;
 	}
 	pos_ += moveVec_.Normalize() * spd * FrameInfo::GetInstance()->GetDelta();
-	collisionPos_ = pos_;
-	collisionPos_.y += 1.85f;
+	colliser_.collisionPos_ = pos_;
+	colliser_.collisionPos_.y += 1.85f;
 
 	model[0]->pos_ = pos_;
 
@@ -185,7 +185,7 @@ void Player::Draw() {
 		i->Draw(camera->GetViewProjection(), camera->pos);
 	}
 
-	DebugDraw(camera->GetViewProjection());
+	colliser_.DebugDraw(camera->GetViewProjection());
 }
 
 void Player::Debug() {

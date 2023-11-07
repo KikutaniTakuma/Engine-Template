@@ -29,13 +29,13 @@ Enemy::Enemy() :
 	distanceLimit = 7.0f;
 	isPlayerCollsion = false;
 
-	scale_ = { 2.0f, 1.5f, 2.0f };
+	colliser_.scale_ = { 2.0f, 1.5f, 2.0f };
 
 	pos_.y = 8.0f;
 }
 
 void Enemy::Move() {
-	UpdateCollision();
+	colliser_.UpdateCollision();
 	moveVec = {};
 	float deltaTime = FrameInfo::GetInstance()->GetDelta();
 
@@ -63,7 +63,7 @@ void Enemy::Update() {
 	float deltaTime = FrameInfo::GetInstance()->GetDelta();
 
 	pos_ += moveVec * deltaTime;
-	collisionPos_ = pos_;
+	colliser_.collisionPos_ = pos_;
 	model[0]->pos_ = pos_;
 
 	model[1]->pos_ = ease.Get(easeDuration.first, easeDuration.second);
@@ -76,5 +76,5 @@ void Enemy::Draw() {
 		i->Draw(camera->GetViewProjection(), camera->pos);
 	}
 
-	DebugDraw(camera->GetViewProjection());
+	colliser_.DebugDraw(camera->GetViewProjection());
 }
