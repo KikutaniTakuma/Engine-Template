@@ -43,7 +43,7 @@ public:
 
 	void JoinThread();
 
-	bool IsNowThreadLoading();
+	bool IsNowThreadLoading() const;
 
 private:
 	std::unordered_map<std::string, std::unique_ptr<Mesh>> meshs_;
@@ -51,4 +51,5 @@ private:
 	std::queue<std::pair<std::string, Mesh**>> threadMeshBuff_;
 	std::thread load_;
 	bool isThreadFinish_;
+	bool isNowThreadLoading_;
 };

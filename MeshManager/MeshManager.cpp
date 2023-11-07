@@ -58,8 +58,10 @@ void MeshManager::Draw() {
 }
 
 void MeshManager::ThreadLoad() {
+	// 読み込み予定の物があるかつ今読み込み中ではない
 	if (!threadMeshBuff_.empty() && !load_.joinable()) {
 		auto loadProc = [this]() {
+			isNowThreadLoading_ = true;
 			while (!threadMeshBuff_.empty()) {
 				if (Engine::IsFinalize()) {
 					break;
@@ -89,6 +91,7 @@ void MeshManager::ThreadLoad() {
 				threadMeshBuff_.pop();
 			}
 
+			// テクスチャの読み込みが終わるまでループ
 			bool isTextureLoadFinish = false;
 			while (!isTextureLoadFinish) {
 				if (Engine::IsFinalize()) {
@@ -110,8 +113,10 @@ void MeshManager::ThreadLoad() {
 			}
 
 			isThreadFinish_ = true;
+			isNowThreadLoading_ = false;
 			};
 
+		// 非同期開始
 		load_ = std::thread(loadProc);
 	}
 }
@@ -133,6 +138,6 @@ void MeshManager::JoinThread() {
 	}
 }
 
-bool MeshManager::IsNowThreadLoading() {
-	return isThreadFinish_ && !threadMeshBuff_.empty();
+bool MeshManager::IsNowThreadLoading() const {
+	return isNowThreadLoading_;
 }

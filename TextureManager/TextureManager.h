@@ -28,7 +28,7 @@ public:
 	static void Finalize();
 
 private:
-	static TextureManager* instance;
+	static TextureManager* instance_;
 
 
 public:
@@ -51,12 +51,12 @@ public:
 
 	void ReleaseIntermediateResource();
 
-	bool ThreadLoadFinish() const {
-		return threadTextureBuff.empty();
+	bool IsNowThreadLoading() const {
+		return isNowThreadLoading_ && !isCloaseCommandList_;
 	}
 
 	inline ID3D12GraphicsCommandList* GetCommandList() const {
-		return commandList.Get();
+		return commandList_.Get();
 	}
 
 	void ResetCommandList();
@@ -65,23 +65,25 @@ public:
 
 
 private:
-	class DescriptorHeap* srvHeap;
+	class DescriptorHeap* srvHeap_;
 
-	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
-	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
+	bool isCloaseCommandList_;
 
-	Microsoft::WRL::ComPtr<ID3D12Fence> fence;
-	uint64_t fenceVal;
-	HANDLE fenceEvent;
+	Microsoft::WRL::ComPtr<ID3D12Fence> fence_;
+	uint64_t fenceVal_;
+	HANDLE fenceEvent_;
 
 	/// <summary>
 	/// Textureのコンテナ(キー値: ファイルネーム  コンテナデータ型: Texture*)
 	/// </summary>
-	std::unordered_map<std::string, std::unique_ptr<Texture>> textures;
-	bool thisFrameLoadFlg;
+	std::unordered_map<std::string, std::unique_ptr<Texture>> textures_;
+	bool thisFrameLoadFlg_;
 
-	std::queue<std::pair<std::string, Texture**>> threadTextureBuff;
-	std::thread load;
-	bool isThreadFinish;
+	std::queue<std::pair<std::string, Texture**>> threadTextureBuff_;
+	std::thread load_;
+	bool isThreadFinish_;
+	bool isNowThreadLoading_;
 };

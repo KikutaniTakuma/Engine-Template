@@ -31,7 +31,9 @@ public:
 
 public:
 	Model model_;
+	Model model2_;
 	Texture2D tex2D_;
+	Texture2D tex2D2_;
 
 	Texture* texture_;
 };

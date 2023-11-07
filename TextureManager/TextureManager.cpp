@@ -5,40 +5,40 @@
 #include <cassert>
 #include "Engine/DescriptorHeap/DescriptorHeap.h"
 
-TextureManager* TextureManager::instance = nullptr;
+TextureManager* TextureManager::instance_ = nullptr;
 
 TextureManager* TextureManager::GetInstance() {
-	return instance;
+	return instance_;
 }
 
 void TextureManager::Initialize() {
-	instance = new TextureManager();
-	assert(instance);
-	instance->LoadTexture("./Resources/white2x2.png");
+	instance_ = new TextureManager();
+	assert(instance_);
+	instance_->LoadTexture("./Resources/white2x2.png");
 }
 
 void TextureManager::Finalize() {
-	delete instance;
-	instance = nullptr;
+	delete instance_;
+	instance_ = nullptr;
 }
 
 TextureManager::TextureManager() :
-	textures(),
-	thisFrameLoadFlg(false),
-	threadTextureBuff(),
-	load(),
-	isThreadFinish(false),
-	fence(),
-	fenceVal(0),
-	fenceEvent(nullptr),
-	srvHeap(nullptr)
+	textures_(),
+	thisFrameLoadFlg_(false),
+	threadTextureBuff_(),
+	load_(),
+	isThreadFinish_(false),
+	fence_(),
+	fenceVal_(0),
+	fenceEvent_(nullptr),
+	srvHeap_(nullptr)
 {
 	ID3D12Device* device = DirectXDevice::GetInstance()->GetDevice();
 
 	// コマンドキューを作成
-	commandQueue = nullptr;
+	commandQueue_ = nullptr;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
-	HRESULT hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(commandQueue.GetAddressOf()));
+	HRESULT hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(commandQueue_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("TextureManager() : CreateCommandQueue() Failed", "TextureManager");
@@ -46,8 +46,8 @@ TextureManager::TextureManager() :
 	}
 
 	// コマンドアロケータを生成する
-	commandAllocator = nullptr;
-	hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(commandAllocator.GetAddressOf()));
+	commandAllocator_ = nullptr;
+	hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(commandAllocator_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("TextureManager() : CreateCommandAllocator() Failed", "TextureManager");
@@ -55,8 +55,8 @@ TextureManager::TextureManager() :
 	}
 
 	// コマンドリストを作成する
-	commandList = nullptr;
-	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), nullptr, IID_PPV_ARGS(commandList.GetAddressOf()));
+	commandList_ = nullptr;
+	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator_.Get(), nullptr, IID_PPV_ARGS(commandList_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("TextureManager() : CreateCommandList() Failed", "TextureManager");
@@ -64,9 +64,9 @@ TextureManager::TextureManager() :
 	}
 
 	// 初期値0でFenceを作る
-	fence = nullptr;
-	fenceVal = 0;
-	hr = device->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.GetAddressOf()));
+	fence_ = nullptr;
+	fenceVal_ = 0;
+	hr = device->CreateFence(fenceVal_, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("TextureManager() : CreateFence() Failed", "TextureManager");
@@ -74,56 +74,56 @@ TextureManager::TextureManager() :
 	}
 
 	// FenceのSignalを持つためのイベントを作成する
-	fenceEvent = nullptr;
-	fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-	assert(fenceEvent != nullptr);
-	if (!(fenceEvent != nullptr)) {
+	fenceEvent_ = nullptr;
+	fenceEvent_ = CreateEvent(NULL, FALSE, FALSE, NULL);
+	assert(fenceEvent_ != nullptr);
+	if (!(fenceEvent_ != nullptr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("TextureManager() : CreateEvent() Failed", "TextureManager");
 		return;
 	}
 
-	srvHeap = DescriptorHeap::GetInstance();
+	srvHeap_ = DescriptorHeap::GetInstance();
 }
 
 TextureManager::~TextureManager() {
-	if (load.joinable()) {
-		load.join();
+	if (load_.joinable()) {
+		load_.join();
 	}
-	CloseHandle(fenceEvent);
-	textures.clear();
+	CloseHandle(fenceEvent_);
+	textures_.clear();
 }
 
 
 Texture* TextureManager::LoadTexture(const std::string& fileName) {
-	if (textures.empty()) {
+	if (textures_.empty()) {
 		auto tex = std::make_unique<Texture>();
-		tex->Load(fileName, commandList.Get());
+		tex->Load(fileName, commandList_.Get());
 
 		/// コマンドリスト
-		commandList->Close();
-		ID3D12CommandList* commandLists[] = { commandList.Get() };
-		commandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
+		commandList_->Close();
+		ID3D12CommandList* commandLists[] = { commandList_.Get() };
+		commandQueue_->ExecuteCommandLists(_countof(commandLists), commandLists);
 		// Fenceの値を更新
-		fenceVal++;
+		fenceVal_++;
 		// GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
-		commandQueue->Signal(fence.Get(), fenceVal);
+		commandQueue_->Signal(fence_.Get(), fenceVal_);
 
 		// Fenceの値が指定したSigna値にたどり着いているか確認する
 		// GetCompletedValueの初期値はFence作成時に渡した初期値
-		if (fence->GetCompletedValue() < fenceVal) {
+		if (fence_->GetCompletedValue() < fenceVal_) {
 			// 指定したSignal値にたどり着いていないので、たどり着くまで待つようにイベントを設定する
-			fence->SetEventOnCompletion(fenceVal, fenceEvent);
+			fence_->SetEventOnCompletion(fenceVal_, fenceEvent_);
 			// イベントを待つ
-			WaitForSingleObject(fenceEvent, INFINITE);
+			WaitForSingleObject(fenceEvent_, INFINITE);
 		}
 
 		// 次フレーム用のコマンドリストを準備
-		auto hr = commandAllocator->Reset();
+		auto hr = commandAllocator_->Reset();
 		assert(SUCCEEDED(hr));
 		if (!SUCCEEDED(hr)) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CommandAllocator->Reset() Failed", "Engine");
 		}
-		hr = commandList->Reset(commandAllocator.Get(), nullptr);
+		hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
 		assert(SUCCEEDED(hr));
 		if (!SUCCEEDED(hr)) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CommandList->Reset() Failed", "Engine");
@@ -134,43 +134,43 @@ Texture* TextureManager::LoadTexture(const std::string& fileName) {
 			return nullptr;
 		}
 
-		tex->srvHeapHandleUint = srvHeap->CreateTxtureView(tex.get());
+		tex->srvHeapHandleUint = srvHeap_->CreateTxtureView(tex.get());
 		
-		textures.insert(std::make_pair(fileName, std::move(tex)));
+		textures_.insert(std::make_pair(fileName, std::move(tex)));
 
-		thisFrameLoadFlg = true;
+		thisFrameLoadFlg_ = true;
 	}
 	else {
-		auto itr = textures.find(fileName);
-		if (itr == textures.end()) {
+		auto itr = textures_.find(fileName);
+		if (itr == textures_.end()) {
 			auto tex = std::make_unique<Texture>();
-			tex->Load(fileName, commandList.Get());
+			tex->Load(fileName, commandList_.Get());
 
 			/// コマンドリスト
-			commandList->Close();
-			ID3D12CommandList* commandLists[] = { commandList.Get() };
-			commandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
+			commandList_->Close();
+			ID3D12CommandList* commandLists[] = { commandList_.Get() };
+			commandQueue_->ExecuteCommandLists(_countof(commandLists), commandLists);
 			// Fenceの値を更新
-			fenceVal++;
+			fenceVal_++;
 			// GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
-			commandQueue->Signal(fence.Get(), fenceVal);
+			commandQueue_->Signal(fence_.Get(), fenceVal_);
 
 			// Fenceの値が指定したSigna値にたどり着いているか確認する
 			// GetCompletedValueの初期値はFence作成時に渡した初期値
-			if (fence->GetCompletedValue() < fenceVal) {
+			if (fence_->GetCompletedValue() < fenceVal_) {
 				// 指定したSignal値にたどり着いていないので、たどり着くまで待つようにイベントを設定する
-				fence->SetEventOnCompletion(fenceVal, fenceEvent);
+				fence_->SetEventOnCompletion(fenceVal_, fenceEvent_);
 				// イベントを待つ
-				WaitForSingleObject(fenceEvent, INFINITE);
+				WaitForSingleObject(fenceEvent_, INFINITE);
 			}
 
 			// 次フレーム用のコマンドリストを準備
-			auto hr = commandAllocator->Reset();
+			auto hr = commandAllocator_->Reset();
 			assert(SUCCEEDED(hr));
 			if (!SUCCEEDED(hr)) {
 				ErrorCheck::GetInstance()->ErrorTextBox("CommandAllocator->Reset() Failed", "Engine");
 			}
-			hr = commandList->Reset(commandAllocator.Get(), nullptr);
+			hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
 			assert(SUCCEEDED(hr));
 			if (!SUCCEEDED(hr)) {
 				ErrorCheck::GetInstance()->ErrorTextBox("CommandList->Reset() Failed", "Engine");
@@ -181,130 +181,134 @@ Texture* TextureManager::LoadTexture(const std::string& fileName) {
 				return nullptr;
 			}
 
-			tex->srvHeapHandleUint = srvHeap->CreateTxtureView(tex.get());
+			tex->srvHeapHandleUint = srvHeap_->CreateTxtureView(tex.get());
 
-			textures.insert(std::make_pair(fileName, std::move(tex)));
+			textures_.insert(std::make_pair(fileName, std::move(tex)));
 
-			thisFrameLoadFlg = true;
+			thisFrameLoadFlg_ = true;
 		}
 	}
 	
-	return textures[fileName].get();
+	return textures_[fileName].get();
 }
 
-Texture* TextureManager::LoadTexture(const std::string& fileName, ID3D12GraphicsCommandList* commandList_) {
-	if (textures.empty()) {
+Texture* TextureManager::LoadTexture(const std::string& fileName, ID3D12GraphicsCommandList* commandList) {
+	if (textures_.empty()) {
 		auto tex = std::make_unique<Texture>();
-		tex->Load(fileName, commandList_);
+		tex->Load(fileName, commandList);
 		if (!tex->isLoad) {
 			return nullptr;
 		}
 
-		tex->srvHeapHandleUint = srvHeap->CreateTxtureView(tex.get());
+		tex->srvHeapHandleUint = srvHeap_->CreateTxtureView(tex.get());
 
-		textures.insert(std::make_pair(fileName, std::move(tex)));
+		textures_.insert(std::make_pair(fileName, std::move(tex)));
 
-		thisFrameLoadFlg = true;
+		thisFrameLoadFlg_ = true;
 	}
 	else {
-		auto itr = textures.find(fileName);
-		if (itr == textures.end()) {
+		auto itr = textures_.find(fileName);
+		if (itr == textures_.end()) {
 			auto tex = std::make_unique<Texture>();
-			tex->Load(fileName, commandList_);
+			tex->Load(fileName, commandList);
 			if (!tex->isLoad) {
 				return nullptr;
 			}
 
-			tex->srvHeapHandleUint = srvHeap->CreateTxtureView(tex.get());
+			tex->srvHeapHandleUint = srvHeap_->CreateTxtureView(tex.get());
 
-			textures.insert(std::make_pair(fileName, std::move(tex)));
+			textures_.insert(std::make_pair(fileName, std::move(tex)));
 
-			thisFrameLoadFlg = true;
+			thisFrameLoadFlg_ = true;
 		}
 	}
 
-	return textures[fileName].get();
+	return textures_[fileName].get();
 }
 
 void TextureManager::LoadTexture(const std::string& fileName, Texture** texPtr) {
 	// コンテナに追加
-	threadTextureBuff.push({ fileName, texPtr });
+	threadTextureBuff_.push({ fileName, texPtr });
 }
 
 void TextureManager::ThreadLoadTexture() {
-	if (!load.joinable() && !threadTextureBuff.empty()) {
+	if (!load_.joinable() && !threadTextureBuff_.empty()) {
 		auto loadProc = [this]() {
-			while (!threadTextureBuff.empty()) {
+			isNowThreadLoading_ = true;
+			while (!threadTextureBuff_.empty()) {
 				if (Engine::IsFinalize()) {
 					break;
 				}
-				auto& front = threadTextureBuff.front();
-				*front.second = LoadTexture(front.first, commandList.Get());
-				threadTextureBuff.pop();
+				auto& front = threadTextureBuff_.front();
+				*front.second = LoadTexture(front.first, commandList_.Get());
+				threadTextureBuff_.pop();
 			}
 
-			isThreadFinish = true;
+			isThreadFinish_ = true;
+			isNowThreadLoading_ = false;
 		};
 
-		load = std::thread(loadProc);
+		load_ = std::thread(loadProc);
 	}
 }
 
 Texture* TextureManager::GetWhiteTex() {
-	return instance->textures["./Resources/white2x2.png"].get();
+	return instance_->textures_["./Resources/white2x2.png"].get();
 }
 
 void TextureManager::ReleaseIntermediateResource() {
-	if (thisFrameLoadFlg && threadTextureBuff.empty()) {
-		for (auto& i : textures) {
+	if (thisFrameLoadFlg_ && threadTextureBuff_.empty()) {
+		for (auto& i : textures_) {
 			i.second->ReleaseIntermediateResource();
 		}
 
-		thisFrameLoadFlg = false;
+		thisFrameLoadFlg_ = false;
 	}
 }
 
 void TextureManager::ResetCommandList() {
-	if (isThreadFinish) {
-		commandList->Close();
-		ID3D12CommandList* commandLists[] = { commandList.Get() };
-		commandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
+	if (isThreadFinish_) {
+		isCloaseCommandList_ = true;
+		commandList_->Close();
+		ID3D12CommandList* commandLists[] = { commandList_.Get() };
+		commandQueue_->ExecuteCommandLists(_countof(commandLists), commandLists);
 		// Fenceの値を更新
-		fenceVal++;
+		fenceVal_++;
 		// GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
-		commandQueue->Signal(fence.Get(), fenceVal);
+		commandQueue_->Signal(fence_.Get(), fenceVal_);
 
 		// Fenceの値が指定したSigna値にたどり着いているか確認する
 		// GetCompletedValueの初期値はFence作成時に渡した初期値
-		if (fence->GetCompletedValue() < fenceVal) {
+		if (fence_->GetCompletedValue() < fenceVal_) {
 			// 指定したSignal値にたどり着いていないので、たどり着くまで待つようにイベントを設定する
-			fence->SetEventOnCompletion(fenceVal, fenceEvent);
+			fence_->SetEventOnCompletion(fenceVal_, fenceEvent_);
 			// イベントを待つ
-			WaitForSingleObject(fenceEvent, INFINITE);
+			WaitForSingleObject(fenceEvent_, INFINITE);
 		}
 
-		if (load.joinable()) {
-			load.join();
+		if (load_.joinable()) {
+			load_.join();
 		}
 
 		// 次フレーム用のコマンドリストを準備
-		auto hr = commandAllocator->Reset();
+		auto hr = commandAllocator_->Reset();
 		assert(SUCCEEDED(hr));
 		if (!SUCCEEDED(hr)) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CommandAllocator->Reset() Failed", "Engine");
 		}
-		hr = commandList->Reset(commandAllocator.Get(), nullptr);
+		hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
 		assert(SUCCEEDED(hr));
 		if (!SUCCEEDED(hr)) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CommandList->Reset() Failed", "Engine");
 		}
 
-		isThreadFinish = false;
+		isThreadFinish_ = false;
+		isCloaseCommandList_ = false;
 	}
 }
 
 void TextureManager::Use(uint32_t texIndex, UINT rootParam) {
 	auto* const mainComlist = DirectXCommon::GetInstance()->GetCommandList();
 	mainComlist->SetGraphicsRootDescriptorTable(
-		rootParam, srvHeap->GetSrvGpuHeapHandle(texIndex));
+		rootParam, srvHeap_->GetSrvGpuHeapHandle(texIndex));
 }

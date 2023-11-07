@@ -246,12 +246,10 @@ void Texture2D::CreateGraphicsPipeline() {
 void Texture2D::LoadTexture(const std::string& fileName) {
 	static TextureManager* textureManager = TextureManager::GetInstance();
 	assert(textureManager);
-	while (true) {
-		if (textureManager->ThreadLoadFinish()) {
-			tex_ = textureManager->LoadTexture(fileName);
-			break;
-		}
+	while (textureManager->IsNowThreadLoading()) {
+		// 非同期が終わるまでループ
 	}
+	tex_ = textureManager->LoadTexture(fileName);
 
 	if (tex_ && !isLoad_) {
 		isLoad_ = true;
