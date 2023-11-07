@@ -12,7 +12,7 @@ void CollisionManager::Update() {
 				continue;
 			}
 			else {
-				(*i)->IsCollision(*j);
+				(*i)->CollisionExtrusion(**j);
 			}
 		}
 	}

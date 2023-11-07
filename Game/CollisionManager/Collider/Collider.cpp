@@ -1,4 +1,5 @@
 #include "Collider.h"
+#include "externals/imgui/imgui.h"
 
 Collider::Collider() :
 	scale_(Vector3::identity),
@@ -32,38 +33,142 @@ bool Collider::IsCollision(const Vector3& pos) {
 	return false;
 }
 
-bool Collider::IsCollision(Collider* other) {
-	std::array<Vector3, 8> positions = {
-		Vector3(other->min_), // 左下手前
-		Vector3(other->min_.x, other->min_.y, other->max_.z), // 左下奥
-		Vector3(other->max_.x, other->min_.y, other->min_.z), // 右下手前
-		Vector3(other->max_.x, other->min_.y, other->max_.z), // 右下奥
+bool Collider::CollisionExtrusion(Collider& other) {
+	if (other.scale_.Length() > scale_.Length()) {
+		std::array<Vector3, 8> otherPositions = {
+			Vector3(min_), // 左下手前
+			Vector3(min_.x, min_.y, max_.z), // 左下奥
+			Vector3(max_.x, min_.y, min_.z), // 右下手前
+			Vector3(max_.x, min_.y, max_.z), // 右下奥
 
-		Vector3(other->min_.x, other->max_.y, other->min_.z), // 左上手前
-		Vector3(other->min_.x, other->max_.y, other->max_.z), // 左上奥
-		Vector3(other->max_.x, other->max_.y, other->min_.z), // 右上手前
-		Vector3(other->max_) // 右上奥
+			Vector3(min_.x, max_.y, min_.z), // 左上手前
+			Vector3(min_.x, max_.y, max_.z), // 左上奥
+			Vector3(max_.x, max_.y, min_.z), // 右上手前
+			Vector3(max_) // 右上奥
+		};
+
+		Vector3 closestPoint = {
+			std::clamp(collisionPos_.x, other.min_.x, other.max_.x),
+			std::clamp(collisionPos_.y, other.min_.y, other.max_.y),
+			std::clamp(collisionPos_.z, other.min_.z, other.max_.z)
+		};
+
+		for (auto& otherPos : otherPositions) {
+			if (other.IsCollision(otherPos)) {
+				Vector3 otherToVec = other.collisionPos_ - collisionPos_;
+				Vector3 direction = Vector3::identity;
+				if (direction.Dot(otherToVec) >= 0.0f
+					) {
+					Vector3 pushBack = closestPoint - otherPos;
+					std::list<float> pushBackValues;
+					for (size_t i = 0; i < 3llu; i++) {
+						pushBackValues.push_back(std::abs(pushBack[i]));
+					}
+					auto minElement = std::min_element(pushBackValues.begin(), pushBackValues.end());
+					size_t minIndex = std::distance(pushBackValues.begin(), minElement);
+					other.collisionPos_[minIndex] += *minElement;
+				}
+				else {
+					Vector3 pushBack = closestPoint - otherPos;
+					std::list<float> pushBackValues;
+					for (size_t i = 0; i < 3llu; i++) {
+						pushBackValues.push_back(std::abs(pushBack[i]));
+					}
+					auto minElement = std::min_element(pushBackValues.begin(), pushBackValues.end());
+					size_t minIndex = std::distance(pushBackValues.begin(), minElement);
+					other.collisionPos_[minIndex] -= *minElement;
+				}
+
+
+				//std::erase(pushBackValues, maxElement);
+
+
+				flg_ = true;
+				other.flg_ = true;
+				color_ = Vector4ToUint(Vector4::xIdy);
+				other.color_ = color_;
+				return static_cast<bool>(flg_);
+			}
+			else {
+				flg_ = false;
+				other.flg_ = false;
+				color_ = Vector4ToUint(Vector4::identity);
+				other.color_ = color_;
+			}
+		}
+
+
+		return static_cast<bool>(flg_);
+	}
+
+	std::array<Vector3, 8> otherPositions = {
+		Vector3(other.min_), // 左下手前
+		Vector3(other.min_.x, other.min_.y, other.max_.z), // 左下奥
+		Vector3(other.max_.x, other.min_.y, other.min_.z), // 右下手前
+		Vector3(other.max_.x, other.min_.y, other.max_.z), // 右下奥
+
+		Vector3(other.min_.x, other.max_.y, other.min_.z), // 左上手前
+		Vector3(other.min_.x, other.max_.y, other.max_.z), // 左上奥
+		Vector3(other.max_.x, other.max_.y, other.min_.z), // 右上手前
+		Vector3(other.max_) // 右上奥
 	};
 
-	for (auto& pos : positions) {
-		if (IsCollision(pos)) {
+	Vector3 closestPoint = {
+		std::clamp(other.collisionPos_.x, min_.x, max_.x),
+		std::clamp(other.collisionPos_.y, min_.y, max_.y),
+		std::clamp(other.collisionPos_.z, min_.z, max_.z)
+	};
+
+	for (auto& otherPos : otherPositions) {
+		if (IsCollision(otherPos)) {
+			Vector3 otherToVec = other.collisionPos_ - collisionPos_;
+			Vector3 direction = Vector3::identity;
+			if (direction.Dot(otherToVec) >= 0.0f
+				) {
+				Vector3 pushBack = closestPoint - otherPos;
+				std::list<float> pushBackValues;
+				for (size_t i = 0; i < 3llu; i++) {
+					pushBackValues.push_back(std::abs(pushBack[i]));
+				}
+				auto minElement = std::min_element(pushBackValues.begin(), pushBackValues.end());
+				size_t minIndex = std::distance(pushBackValues.begin(), minElement);
+				other.collisionPos_[minIndex] += *minElement;
+			}
+			else {
+				Vector3 pushBack = closestPoint - otherPos;
+				std::list<float> pushBackValues;
+				for (size_t i = 0; i < 3llu; i++) {
+					pushBackValues.push_back(std::abs(pushBack[i]));
+				}
+				auto minElement = std::min_element(pushBackValues.begin(), pushBackValues.end());
+				size_t minIndex = std::distance(pushBackValues.begin(), minElement);
+				other.collisionPos_[minIndex] -= *minElement;
+			}
+
+
+			//std::erase(pushBackValues, maxElement);
+
+
 			flg_ = true;
-			other->flg_ = true;
+			other.flg_ = true;
+			color_ = Vector4ToUint(Vector4::xIdy);
+			other.color_ = color_;
 			return static_cast<bool>(flg_);
 		}
 		else {
 			flg_ = false;
+			other.flg_ = false;
+			color_ = Vector4ToUint(Vector4::identity);
+			other.color_ = color_;
 		}
 	}
 
-	color_ = Vector4ToUint(Vector4::identity);
-
-	// もし当たってなかったら自分が相手に当たってるかを確認
-	if (!flg_) {
-		flg_ = other->IsCollision(this);
-	}
 
 	return static_cast<bool>(flg_);
+}
+
+bool Collider::CollisionPush(Collider& other) {
+	return other.CollisionExtrusion(*this);
 }
 
 void Collider::DebugDraw(const Mat4x4& viewProjection) {
@@ -121,6 +226,17 @@ void Collider::DebugDraw(const Mat4x4& viewProjection) {
 	for (auto& line : lines_) {
 		line.Draw(viewProjection, color_);
 	}
+}
+
+void Collider::Debug([[maybe_unused]] const std::string& guiName) {
+#ifdef _DEBUG
+	ImGui::Begin(guiName.c_str());
+
+	ImGui::DragFloat3("pos", &collisionPos_.x, 0.01f);
+	ImGui::DragFloat3("scale", &scale_.x, 0.01f, 0.001f, std::numeric_limits<float>::max());
+
+	ImGui::End();
+#endif // _DEBUG
 }
 
 void Collider::SetType(uint32_t type) {

@@ -21,10 +21,25 @@ public:
 public:
 	void UpdateCollision();
 
+	/// <summary>
+	/// ある一点が当たっているか
+	/// </summary>
+	/// <param name="pos">一点</param>
+	/// <returns>当たっていたらtrue</returns>
 	bool IsCollision(const Vector3& pos);
-	bool IsCollision(Collider* other);
+
+	/// <summary>
+	/// 引数に取ったコライダーが当たっていたら引数側のコライダーを押し出す
+	/// </summary>
+	/// <param name="other">他のコライダー</param>
+	/// <returns>当たっていたらtrue</returns>
+	bool CollisionExtrusion(Collider& other);
+
+	bool CollisionPush(Collider& other);
 
 	void DebugDraw(const Mat4x4& viewProjection);
+
+	void Debug(const std::string& guiName);
 
 	void SetType(uint32_t type);
 
