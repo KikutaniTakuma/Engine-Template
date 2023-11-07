@@ -30,10 +30,15 @@ public:
 	void Draw() override;
 
 public:
-	Model model_;
-	Model model2_;
-	Texture2D tex2D_;
-	Texture2D tex2D2_;
+	std::vector<Model> models_;
+	std::vector<Texture2D> texs_;
 
-	Texture* texture_;
+	std::unique_ptr<Player> player_;
+	std::unique_ptr<Goal> goal_;
+	std::unique_ptr<Enemy> enemy_;
+	std::unique_ptr<Model> skyDome_;
+
+	std::vector<MoveFloor> floor_;
+
+	GlobalVariables globalVariables_;
 };
