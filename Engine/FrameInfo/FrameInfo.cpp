@@ -106,9 +106,9 @@ void FrameInfo::End() {
 	auto elapsed =
 		std::chrono::duration_cast<std::chrono::microseconds>(end - reference_);
 
-	if (elapsed < minTime_) {
+	if (elapsed < minCheckTime_) {
 		while (std::chrono::steady_clock::now() - reference_ < minTime_) {
-			std::this_thread::sleep_for(std::chrono::microseconds(1));
+			std::this_thread::sleep_for(std::chrono::nanoseconds(250));
 		}
 	}
 
@@ -151,7 +151,7 @@ void FrameInfo::SetFpsLimit(double fpsLimit) {
 	fpsLimit_ = std::clamp(fpsLimit, 10.0, maxFpsLimit_);
 	           
 	minTime_ = std::chrono::microseconds(uint64_t(1000000.0 / fpsLimit_));
-	minCheckTime_ = std::chrono::microseconds(uint64_t(1000000.0 / fpsLimit_) - 1282LLU);
+	minCheckTime_ = std::chrono::microseconds(uint64_t(1000000.0 / (fpsLimit_ + (5.0f * (fpsLimit_ / 60.0f)))));
 }
 
 void FrameInfo::Debug() {
