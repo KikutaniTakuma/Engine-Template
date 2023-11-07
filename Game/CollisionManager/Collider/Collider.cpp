@@ -59,9 +59,9 @@ bool Collider::IsCollision(Collider* other) {
 	color_ = Vector4ToUint(Vector4::identity);
 
 	// もし当たってなかったら自分が相手に当たってるかを確認
-	if (!flg_) {
+	/*if (!flg_) {
 		flg_ = other->IsCollision(this);
-	}
+	}*/
 
 	return static_cast<bool>(flg_);
 }

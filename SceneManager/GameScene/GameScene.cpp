@@ -7,72 +7,121 @@
 
 GameScene::GameScene() :
 	BaseScene(BaseScene::ID::Game),
-	model_(),
-	tex2D_(),
-	texture_(nullptr)
-{}
+	models_(),
+	texs_(),
+	player_(),
+	globalVariables_()
+{
+}
 
 void GameScene::Initialize() {
 	camera_.farClip = 3000.0f;
-	camera_.pos.z = -5.0f;
-	camera_.pos.y = 1.1f;
 
-	// objファイル読み込み
-	model_.ThreadLoadObj("./Resources/Watame/Watame.obj");
-	
-	model2_.scale_ *= 1000.0f;
-	//model_.rotate.y = std::numbers::pi_v<float>;
+	globalVariables_.LoadFile();
 
-	// テクスチャ読み込み
-	tex2D_.ThreadLoadTexture("./Resources/uvChecker.png");
-	tex2D_.pos_ = Vector2{ 380.0f,  -80.0f };
-	tex2D_.isSameTexSize_ = true;
-	tex2D_.texScalar_ = 0.5f;
+	player_ = std::make_unique<Player>(&globalVariables_);
+	player_->SetCamera(&camera_);
 
-	
-	tex2D2_.pos_ = Vector2{ -380.0f,  -80.0f };
-	tex2D2_.scale_ *= 256.0f;
+	goal_ = std::make_unique<Goal>();
 
-	// テクスチャ単体でも読み込み出来る
-	texture_ =
-		textureManager_->LoadTexture("./Resources/Rabbit/Rabbit_face.png");
-}
+	skyDome_ = std::make_unique<Model>();
+	skyDome_->LoadObj("./Resources/skydome/skydome.obj");
+	skyDome_->scale_ *= 1000.0f;
 
-void GameScene::Finalize() {
+	enemy_ = std::make_unique<Enemy>();
+	enemy_->SetCamera(&camera_);
+	enemy_->SetPlayer(player_.get());
+	enemy_->pos_.z = 14.0f;
 
+
+	floor_.push_back(MoveFloor());
+	floor_[0].moveDuration_.first.x = -4.0f;
+	floor_[0].moveDuration_.first.z = 14.0f;
+	floor_[0].moveDuration_.second.x = 4.0f;
+	floor_[0].moveDuration_.second.z = 14.0f;
+	floor_[0].pos_.z = 14.0f;
+	floor_.push_back(MoveFloor());
+	floor_.push_back(MoveFloor());
+	floor_[2].moveDuration_.first.z = 28.0f;
+	floor_[2].moveDuration_.second.z = 28.0f;
+
+	goal_ = std::make_unique<Goal>();
+	goal_->collisionPos_.z = 28.0f;
 }
 
 void GameScene::Update() {
-	meshManager_->ResetDrawCount();
-
-	camera_.Debug("camera_");
-
-	model_.Debug("model");
-	model_.Update();
-	model2_.Update();
-
-	if (input_->GetKey()->Pushed(DIK_1)) {
-		model2_.LoadObj("./Resources/Skydome/skydome.obj");
-	}
-	if (input_->GetKey()->Pushed(DIK_2)) {
-		tex2D2_.LoadTexture("./Resources/watame.png");
+	for (auto& model : models_) {
+		model.Update();
 	}
 
-	tex2D_.Debug("tex");
-	tex2D_.Update();
-	tex2D2_.Update();
+	for (auto& tex : texs_) {
+		tex.Update();
+	}
+
+
+	for (auto& floor : floor_) {
+		floor.Update();
+	}
+
+	player_->Move();
+	enemy_->Move();
+
+	for (auto& floor : floor_) {
+		floor.IsCollision(player_.get());
+		if ((floor.OnStay() || floor.OnEnter()) && player_->pos_.y > floor.pos_.y) {
+			player_->moveVec_.y = 0.0f;
+			player_->collisionPos_.y = player_->pos_.y;
+			player_->pos_ += floor.moveVec_;
+		}
+
+		floor.IsCollision(enemy_.get());
+		if ((floor.OnStay() || floor.OnEnter()) && enemy_->pos_.y > floor.pos_.y) {
+			enemy_->moveVec.y = 0.0f;
+			enemy_->collisionPos_.y = enemy_->pos_.y;
+			enemy_->pos_ += floor.moveVec_;
+		}
+	}
+
+	enemy_->Update();
+	player_->Update();
+	goal_->Update();
+
+	goal_->IsCollision(player_.get());
+	enemy_->IsCollision(player_.get());
+	if (player_->pos_.y < -10.0f || goal_->OnEnter() || enemy_->OnEnter() || (player_->pos_ - enemy_->pos_).Length() < enemy_->scale_.x) {
+		player_.reset();
+		player_ = std::make_unique<Player>(&globalVariables_);
+		player_->SetCamera(&camera_);
+
+		enemy_.reset();
+		enemy_ = std::make_unique<Enemy>();
+		enemy_->SetCamera(&camera_);
+		enemy_->SetPlayer(player_.get());
+		enemy_->pos_.z = 14.0f;
+	}
 }
 
 void GameScene::Draw() {
-	camera_.Update(Vector3::zero);
+	for (auto& model : models_) {
+		model.Draw(camera_.GetViewProjection(), camera_.GetPos());
+	}
 
-	// 投資投影で描画
-	model_.Draw(camera_.GetViewProjection(), camera_.GetPos());
-	model2_.Draw(camera_.GetViewProjection(), camera_.GetPos());
+	for (auto& tex : texs_) {
+		tex.Draw(camera_.GetViewProjection());
+	}
 
-	// 平行投影で描画
-	tex2D_.Draw(camera_.GetOthographics(), Pipeline::Normal, true);
-	tex2D2_.Draw(camera_.GetOthographics(), Pipeline::Normal, true);
+	for (auto& floor : floor_) {
+		floor.Draw(camera_.GetViewProjection(), camera_.GetPos());
+	}
 
-	meshManager_->Draw();
+	skyDome_->Draw(camera_.GetViewProjection(), camera_.GetPos());
+
+	enemy_->Draw();
+
+	player_->Draw();
+
+	goal_->Draw(camera_.GetViewProjection(), camera_.GetPos());
+}
+void GameScene::Finalize() {
+
 }
