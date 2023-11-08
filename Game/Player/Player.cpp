@@ -192,14 +192,6 @@ void Player::Move() {
 
 	moveVec_ *= MakeMatrixRotateY(cameraRotate_);
 
-	if (isMove) {
-		Vector2 rotate;
-		rotate.x = -moveVec_.x;
-		rotate.y = moveVec_.z;
-
-		model_[0]->worldMat_ *= MakeMatrixRotateY(cameraRotate_ - (std::numbers::pi_v<float> *0.5f));
-	}
-
 	auto nowTime = std::chrono::steady_clock::now();
 	if (!isDash_) {
 		if (input->GetKey()->LongPush(DIK_RETURN) ||
@@ -213,7 +205,12 @@ void Player::Move() {
 	if (isDash_.OnEnter()) {
 		spd *= dashScale_;
 		moveVec_ = Vector3::zIdy;
-		moveVec_ *= MakeMatrixRotateY(model_[0]->rotate_.y/* + (std::numbers::pi_v<float> *0.5f)*/);
+		if (preMoveVec_.Normalize() == -Vector3::zIdy) {
+			moveVec_ *= DirectionToDirection(-Vector3::zIdy, preMoveVec_.Normalize());
+		}
+		else {
+			moveVec_ *= DirectionToDirection(Vector3::zIdy, preMoveVec_.Normalize());
+		}
 	}
 
 
@@ -278,8 +275,20 @@ void Player::Update() {
 
 	cameraEaseing_.Update();
 
+	if (moveVec_ != Vector3::zero && !isDash_) {
+		preMoveVec_ = moveVec_;
+	}
+
 	for (auto& i : model_) {
 		i->Update();
+	}
+	if (preMoveVec_ != Vector3::zero) {
+		if (preMoveVec_.Normalize() == -Vector3::zIdy) {
+			model_[0]->worldMat_ = DirectionToDirection(-Vector3::zIdy, preMoveVec_.Normalize()) * MakeMatrixRotateY(std::numbers::pi_v<float>) * model_[0]->worldMat_;
+		}
+		else {
+			model_[0]->worldMat_ = DirectionToDirection(Vector3::zIdy, preMoveVec_.Normalize()) * model_[0]->worldMat_;
+		}
 	}
 	weapon_->Debug("weapon_");
 	weapon_->Update();

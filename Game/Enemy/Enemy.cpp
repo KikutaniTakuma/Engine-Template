@@ -48,6 +48,7 @@ void Enemy::Move() {
 		if ((player_->pos_ - pos_).Length() < distanceLimit) {
 			moveVec = (player_->pos_ - pos_).Normalize() * spd;
 			moveVec.y = -15.0f;
+			model[0]->rotate_.y = (std::numbers::pi_v<float> *1.5f);
 			//Vector2 rotate = { moveVec.z, moveVec.x };
 
 			//model[0]->rotate_.y = rotate.GetRad() + (std::numbers::pi_v<float> *1.5f);
@@ -72,6 +73,14 @@ void Enemy::Update() {
 
 	for (auto& i : model) {
 		i->Update();
+	}
+	if (moveVec != Vector3::zero) {
+		if (-Vector3::zIdy == moveVec.Normalize()) {
+			model.front()->worldMat_ = DirectionToDirection(-Vector3::zIdy, moveVec) * model.front()->worldMat_;
+		}
+		else {
+			model.front()->worldMat_ = DirectionToDirection(Vector3::zIdy, moveVec) * model.front()->worldMat_;
+		}
 	}
 }
 

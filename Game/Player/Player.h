@@ -94,4 +94,6 @@ private:
 	Vector3 preCameraPos_;
 
 	float delayCaemraSpeed_;
+
+	Vector3 preMoveVec_;
 };
