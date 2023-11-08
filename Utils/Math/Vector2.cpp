@@ -132,14 +132,6 @@ Vector2 Vector2::Normalize() const noexcept {
 	return *this / Length();
 }
 
-float Vector2::GetRad() const noexcept {
-	if (*this == Vector2::zero) {
-		return 0.0f;
-	}
-
-	return std::atan2(y, x);
-}
-
 Vector2 Vector2::Lerp(const Vector2& start, const Vector2& end, float easeSpd) {
 	Vector2 result;
 

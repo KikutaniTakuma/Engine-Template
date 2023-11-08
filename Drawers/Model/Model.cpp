@@ -265,6 +265,15 @@ void Model::Update() {
 	if (!isLoadObj_ && mesh_ && mesh_->GetIsLoad()) {
 		isLoadObj_ = true;
 	}
+
+	worldMat_.Affin(scale_, rotate_, pos_);
+}
+
+Vector3 Model::GetPos() const {
+	if (parent_) {
+		return Vector3{ worldMat_[3][0],worldMat_[3][1],worldMat_[3][2] } * parent_->worldMat_;
+	}
+	return Vector3{ worldMat_[3][0],worldMat_[3][1],worldMat_[3][2] };
 }
 
 void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
@@ -274,9 +283,9 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 			data_ = mesh_->CopyBuffer();
 		}
 
-		wvpData_->worldMat.Affin(scale_, rotate_, pos_);
+		wvpData_->worldMat = worldMat_;
 		if (parent_) {
-			wvpData_->worldMat *= parent_->wvpData_->worldMat;
+			wvpData_->worldMat *= parent_->worldMat_;
 		}
 		wvpData_->viewProjectoionMat = viewProjectionMat;
 

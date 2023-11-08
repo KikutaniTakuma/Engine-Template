@@ -30,6 +30,8 @@ void MoveFloor::Update() {
 	model_->scale_ = scale_*0.5f;
 
 	ease_.Update();
+
+	model_->Update();
 }
 
 void MoveFloor::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {

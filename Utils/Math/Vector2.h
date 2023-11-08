@@ -52,8 +52,6 @@ public:
 
 	Vector2 Normalize() const noexcept;
 
-	float GetRad() const noexcept;
-
 /// <summary>
 /// メンバ変数
 /// </summary>

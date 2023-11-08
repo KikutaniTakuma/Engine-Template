@@ -17,7 +17,9 @@ GameScene::GameScene() :
 void GameScene::Initialize() {
 	camera_.farClip = 3000.0f;
 
+	Player::Initialize(&globalVariables_);
 	globalVariables_.LoadFile();
+
 
 	player_ = std::make_unique<Player>(&globalVariables_);
 	player_->SetCamera(&camera_);
@@ -50,6 +52,8 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
+	globalVariables_.Update();
+
 	for (auto& model : models_) {
 		model.Update();
 	}
@@ -58,13 +62,16 @@ void GameScene::Update() {
 		tex.Update();
 	}
 
+	skyDome_->Update();
 
 	for (auto& floor : floor_) {
 		floor.Update();
 	}
 
 	player_->Move();
-	enemy_->Move();
+	if (enemy_) {
+		enemy_->Move();
+	}
 
 	for (auto& floor : floor_) {
 		floor.IsCollision(player_.get());
@@ -74,21 +81,36 @@ void GameScene::Update() {
 			player_->pos_ += floor.moveVec_;
 		}
 
-		floor.IsCollision(enemy_.get());
-		if ((floor.OnStay() || floor.OnEnter()) && enemy_->pos_.y > floor.pos_.y) {
-			enemy_->moveVec.y = 0.0f;
-			enemy_->collisionPos_.y = enemy_->pos_.y;
-			enemy_->pos_ += floor.moveVec_;
+		if (enemy_) {
+			floor.IsCollision(enemy_.get());
+			if ((floor.OnStay() || floor.OnEnter()) && enemy_->pos_.y > floor.pos_.y) {
+				enemy_->moveVec.y = 0.0f;
+				enemy_->collisionPos_.y = enemy_->pos_.y;
+				enemy_->pos_ += floor.moveVec_;
+			}
 		}
 	}
 
-	enemy_->Update();
+	if (enemy_) { enemy_->Update(); }
 	player_->Update();
 	goal_->Update();
 
 	goal_->IsCollision(player_.get());
-	enemy_->IsCollision(player_.get());
-	if (player_->pos_.y < -10.0f || goal_->OnEnter() || enemy_->OnEnter() || (player_->pos_ - enemy_->pos_).Length() < enemy_->scale_.x) {
+	if (enemy_) { 
+		enemy_->IsCollision(player_.get()); 
+		if (enemy_->OnEnter() || (player_->pos_ - enemy_->pos_).Length() < enemy_->scale_.x) {
+			player_.reset();
+			player_ = std::make_unique<Player>(&globalVariables_);
+			player_->SetCamera(&camera_);
+
+			enemy_.reset();
+			enemy_ = std::make_unique<Enemy>();
+			enemy_->SetCamera(&camera_);
+			enemy_->SetPlayer(player_.get());
+			enemy_->pos_.z = 14.0f;
+		}
+	}
+	if (player_->pos_.y < -10.0f || goal_->OnEnter()) {
 		player_.reset();
 		player_ = std::make_unique<Player>(&globalVariables_);
 		player_->SetCamera(&camera_);
@@ -98,6 +120,11 @@ void GameScene::Update() {
 		enemy_->SetCamera(&camera_);
 		enemy_->SetPlayer(player_.get());
 		enemy_->pos_.z = 14.0f;
+	}
+	if (enemy_ && player_->GetBehavior() == Player::Behavior::Attack) {
+		if (player_->GetWeaponCollider().IsCollision(enemy_.get())) {
+			enemy_.reset();
+		}
 	}
 }
 
@@ -116,7 +143,9 @@ void GameScene::Draw() {
 
 	skyDome_->Draw(camera_.GetViewProjection(), camera_.GetPos());
 
-	enemy_->Draw();
+	if (enemy_) {
+		enemy_->Draw();
+	}
 
 	player_->Draw();
 

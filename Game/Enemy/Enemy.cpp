@@ -48,9 +48,9 @@ void Enemy::Move() {
 		if ((player_->pos_ - pos_).Length() < distanceLimit) {
 			moveVec = (player_->pos_ - pos_).Normalize() * spd;
 			moveVec.y = -15.0f;
-			Vector2 rotate = { moveVec.z, moveVec.x };
+			//Vector2 rotate = { moveVec.z, moveVec.x };
 
-			model[0]->rotate_.y = rotate.GetRad() + (std::numbers::pi_v<float> *1.5f);
+			//model[0]->rotate_.y = rotate.GetRad() + (std::numbers::pi_v<float> *1.5f);
 		}
 		else {
 			model[0]->rotate_.y = freq + (std::numbers::pi_v<float> *0.5f);
@@ -69,6 +69,10 @@ void Enemy::Update() {
 	model[1]->pos_ = ease.Get(easeDuration.first, easeDuration.second);
 
 	ease.Update();
+
+	for (auto& i : model) {
+		i->Update();
+	}
 }
 
 void Enemy::Draw() {

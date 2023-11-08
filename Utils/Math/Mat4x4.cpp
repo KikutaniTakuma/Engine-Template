@@ -417,3 +417,11 @@ Mat4x4 MakeMatrixViewPort(float left, float top, float width, float height, floa
 
 	return tmp;
 }
+
+Mat4x4 DirectionToDirection(const Vector3& from, const Vector3& to) {
+	Vector3 normal = from.Cross(to).Normalize();
+	float theataCos = from.Normalize().Dot(to.Normalize());
+	float theataSin = from.Normalize().Cross(to.Normalize()).Length();
+
+	Mat4x4 result;
+}

@@ -77,6 +77,8 @@ public:
 	void MeshChangeTexture(const std::string& useMtlName, const std::string& texName);
 	void MeshChangeTexture(const std::string& useMtlName, Texture* tex);
 
+	Vector3 GetPos() const;
+
 public:
 	Vector3 pos_;
 	Vector3 rotate_;
@@ -86,6 +88,8 @@ public:
 	Model* parent_;
 
 	Mesh::DirectionLight light_;
+
+	Mat4x4 worldMat_;
 
 private:
 	Mesh* mesh_;

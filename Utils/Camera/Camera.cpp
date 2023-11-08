@@ -33,7 +33,7 @@ Camera::Camera(Camera&& right) noexcept
 
 void Camera::Update() {
 	view.Affin(scale, rotate, pos);
-	worldPos = { view[0][3],view[1][3], view[2][3] };
+	worldPos = { view[3][0],view[3][1], view[3][2] };
 	view.Inverse();
 
 	static auto engine = Engine::GetInstance();
@@ -66,7 +66,7 @@ void Camera::Update(const Vector3& gazePoint) {
 	offset *= MakeMatrixRotate(rotate);
 
 	view.Affin(scale, rotate, offset);
-	worldPos = { view[0][3],view[1][3], view[2][3] };
+	worldPos = { view[3][0],view[3][1], view[3][2] };
 	view.Inverse();
 
 	static auto engine = Engine::GetInstance();
@@ -96,7 +96,7 @@ void Camera::Update(const Vector3& gazePoint) {
 void Camera::Update(const Mat4x4& worldMat) {
 	view.Affin(scale, rotate, pos);
 	view = worldMat * view;
-	worldPos = { view[0][3],view[1][3], view[2][3] };
+	worldPos = { view[3][0],view[3][1], view[3][2] };
 	view.Inverse();
 
 	static auto engine = Engine::GetInstance();
