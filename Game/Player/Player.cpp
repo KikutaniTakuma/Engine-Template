@@ -247,11 +247,6 @@ void Player::Update() {
 		model_[3]->rotate_.y = 0.0f;
 	}
 
-
-	ImGui::Begin("weaponColliser_");
-	ImGui::DragFloat3("weaponColliser_", &weaponColliser_.scale_[0], 0.01f);
-	ImGui::End();
-
 	if (camera) {
 		Vector3 offset = { 0.0f, 7.0f, -30.0f };
 		camera->rotate.y = cameraRotate_;
