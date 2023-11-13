@@ -285,7 +285,7 @@ void Player::Update() {
 			model_[0]->worldMat_ = DirectionToDirection(Vector3::zIdy, preMoveVec_.Normalize()) * model_[0]->worldMat_;
 		}
 	}
-	weapon_->Debug("weapon_");
+	
 	weapon_->Update();
 	if (behavior == Behavior::Attack) {
 		weapon_->worldMat_.Affin(weapon_->scale_, Vector3::zero, weapon_->pos_);
