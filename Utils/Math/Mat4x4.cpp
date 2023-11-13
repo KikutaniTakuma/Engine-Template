@@ -417,3 +417,36 @@ Mat4x4 MakeMatrixViewPort(float left, float top, float width, float height, floa
 
 	return tmp;
 }
+
+Mat4x4 DirectionToDirection(const Vector3& from, const Vector3& to) {
+	Vector3 normal = from.Cross(to).Normalize();
+	float theataCos = from.Normalize().Dot(to.Normalize());
+	float theataSin = from.Normalize().Cross(to.Normalize()).Length();
+
+	Mat4x4 result = Mat4x4{
+		std::array<Vector4, 4>{
+			Vector4{ 
+				normal.x * normal.x * (1.0f - theataCos) + theataCos,
+				normal.x * normal.y * (1.0f - theataCos) + normal.z * theataSin,
+				normal.x * normal.z * (1.0f - theataCos) - normal.y * theataSin,
+				0.0f
+			},
+			Vector4{
+				normal.y* normal.x* (1.0f - theataCos) - normal.z * theataSin,
+				normal.y* normal.y* (1.0f - theataCos) + theataCos,
+				normal.y* normal.z* (1.0f - theataCos) + normal.x * theataSin,
+				0.0f
+			},
+			Vector4{
+				normal.z * normal.x * (1.0f - theataCos) + normal.y * theataSin,
+				normal.z * normal.y * (1.0f - theataCos) - normal.x * theataSin,
+				normal.z * normal.z * (1.0f - theataCos) + theataCos,
+				0.0f
+			},
+			Vector4::wIdy
+		}
+	};
+
+
+	return result;
+}

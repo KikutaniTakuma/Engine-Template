@@ -169,3 +169,6 @@ Mat4x4 MakeMatrixPerspectiveFov(float fovY, float aspectRatio, float nearClip, f
 Mat4x4 MakeMatrixOrthographic(float left, float top, float right, float bottom, float nearClip, float farClip);
 
 Mat4x4 MakeMatrixViewPort(float left, float top, float width, float height, float minDepth, float maxDepth);
+
+
+Mat4x4 DirectionToDirection(const Vector3& from, const Vector3& to);
